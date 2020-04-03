@@ -29,7 +29,7 @@ public abstract class Util {
             // getInstance() method is called with algorithm SHA-512
             MessageDigest md = MessageDigest.getInstance("SHA-512");
 
-            // digest() method is called
+            // digest() method is called from here
             // to calculate message digest of the input string
             // returned as array of byte
             byte[] messageDigest = md.digest(string.getBytes());
