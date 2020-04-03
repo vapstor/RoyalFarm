@@ -1,0 +1,19 @@
+<resources>
+    <string name="app_name">RoyalFarma</string>
+    <string name="title_pesquisar">Pesquisar</string>
+    <string name="title_home">Home</string>
+    <string name="title_carrinho">Carrinho</string>
+    <string name="entrar">Entrar</string>
+    <string name="logo">logo</string>
+    <string name="E_mail">E-mail</string>
+    <string name="Senha">Senha</string>
+    <string name="add">Adicionar</string>
+    <string name="r_10_80">R$ 10,80</string>
+    <string name="cimegripe">Cimegripe</string>
+    <string name="remover_item">Remover Item</string>
+    <string name="adicionar_item">Adicionar Item</string>
+    <string name="zero">0</string>
+    <string name="aguarde_a_configura_o_do_app">Aguarde a configuração do app...</string>
+    <string name="n_o_tem_login">Não tem login?</string>
+    <string name="cadastre_se">Cadastre-se</string>
+</resources>
