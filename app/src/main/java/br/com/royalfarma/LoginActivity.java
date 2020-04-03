@@ -245,18 +245,19 @@ public class LoginActivity extends AppCompatActivity {
     private void resultLogin(boolean success) {
         if (success) {
             try {
-                final AssetFileDescriptor afd = this.getResources().getAssets().openFd("hero_decorative-celebration-02.wav");
+                final AssetFileDescriptor afd = getResources().openRawResourceFd(R.raw.beep_login);
                 final FileDescriptor fileDescriptor = afd.getFileDescriptor();
                 MediaPlayer player = new MediaPlayer();
                 player.setDataSource(fileDescriptor, afd.getStartOffset(), afd.getLength());
                 player.setLooping(false);
                 player.prepare();
-                player.setOnCompletionListener(mp -> {
-                    Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
-                    Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-                    startActivity(intent, bundle);
-                });
+//                player.setOnCompletionListener(mp -> {
+//
+//                });
                 player.start();
+                Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
+                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+                startActivity(intent, bundle);
                 Toast.makeText(this, "Conectado com sucesso", Toast.LENGTH_SHORT).show();
                 toggleCircularBarBtn(false);
             } catch (IOException ex) {
