@@ -7,7 +7,7 @@
   <p align="center">
     <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." />
      <!--<img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." /> -->
-    <img src="https://img.shields.io/badge/version-1.0.0-blue.svg" alt="Current APP version." />  
+    <img src="https://img.shields.io/badge/version-2.13.0-blue.svg" alt="Current APP version." />  
   </p>
 </p>
 
@@ -62,10 +62,11 @@
 
   -  [x] Implementar Bottom Navigation
   -  [x] Implementar Layout do Card de produto
-  -  [ ] Implementar HorizontalScrollView para card de produtos (3)
-  -  [ ] Implementar (+) Ver Mais no fim do HorizontalScrollView
+  -  [x] Implementar HorizontalScrollView para card de produtos (3)
+  -  [x] Implementar (+) Ver Mais no fim do HorizontalScrollView
   -  [ ] Implementar VerticalScrollView na categoria de produto selecionada (ver mais)
   -  [ ] Implementar CircularReveal para detalhamento ao clicar no Produto
+  -  [x] Implementar Diálogo de detalhamento do produto
   -  [ ] Configurar Card de produtos Horizontal dinamicos por categorias
   -  [ ] Configurar Card de produtos Vertical dinamicos
   -  [ ] Configurar Dialogo de detalhamento do produto
@@ -75,6 +76,7 @@
   - [ ] Implementar botão para limpar seção de pesquisa
 
 * Desenvolver CarrinhoPage
+  - [x] Implementar Badge no menu de carrinho com quantidade de itens selecionados 
   - [ ] Implementar RecyclerView Simples com lista produtos selecionados
   - [ ] Implementar Textview com resultado da compra
   - [ ] Implementar Botão para FinalizarCompra
