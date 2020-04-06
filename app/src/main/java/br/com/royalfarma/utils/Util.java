@@ -5,15 +5,34 @@ import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
+import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
+import java.text.DecimalFormat;
 
 public abstract class Util {
     public final static String CONNECTION = "CONNECTION";
     public final static String CONFIG_FILE = "CONFIG_FILE";
     public final static String MY_LOG_TAG = "VAPSTOR";
     public static long elapsedTime = 0;
+
+
+    private static DecimalFormat DINHEIRO_REAL;
+
+    public static String RSmask(double valor) {
+        DINHEIRO_REAL = new DecimalFormat("R$ ###,###,##0.00");
+        return DINHEIRO_REAL.format(valor);
+    }
+
+    public static String RSmask(BigDecimal bd) {
+//        String valor = bd.toString();
+        return "R$ " + bd.setScale(2, RoundingMode.UP).toString().replace(".", ",");
+//        DINHEIRO_REAL = new DecimalFormat("¤ ###,###,##0.00");
+//        return DINHEIRO_REAL.format(bd);
+    }
+
 
     public static void confirmQuitApp(AppCompatActivity activity) {
         if (SystemClock.elapsedRealtime() - elapsedTime < 1500) {
@@ -23,6 +42,7 @@ public abstract class Util {
         }
         elapsedTime = SystemClock.elapsedRealtime();
     }
+
 
     public static String getSha512FromString(String string) {
         try {

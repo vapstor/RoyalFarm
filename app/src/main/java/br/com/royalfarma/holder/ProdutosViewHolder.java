@@ -1,20 +1,20 @@
 package br.com.royalfarma.holder;
 
 import android.view.View;
-import android.widget.Button;
-import android.widget.ImageView;
-import android.widget.TextView;
 
+import androidx.appcompat.widget.AppCompatButton;
+import androidx.appcompat.widget.AppCompatImageButton;
+import androidx.appcompat.widget.AppCompatImageView;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
 import br.com.royalfarma.R;
 
 public class ProdutosViewHolder extends RecyclerView.ViewHolder {
-    public Button qntdPlus;
-    public Button qntdMinus;
-    public Button addToCart;
-    public TextView tituloItemProduto, qntdItem, precoItemProduto;
-    public ImageView imgProduto;
+    public AppCompatImageButton qntdPlus, qntdMinus;
+    public AppCompatButton addToCart;
+    public AppCompatTextView tituloItemProduto, qntdItem, precoItemProduto;
+    public AppCompatImageView imgProduto;
 
     public ProdutosViewHolder(View itemView) {
         super(itemView);
@@ -24,5 +24,6 @@ public class ProdutosViewHolder extends RecyclerView.ViewHolder {
         precoItemProduto = itemView.findViewById(R.id.preco_item_produto);
         qntdItem = itemView.findViewById(R.id.qntd_item_produto);
         imgProduto = itemView.findViewById(R.id.image_item_produto);
+        addToCart = itemView.findViewById(R.id.btn_add_produto_carrinho);
     }
 }

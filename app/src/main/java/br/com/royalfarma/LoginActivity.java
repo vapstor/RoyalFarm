@@ -129,38 +129,38 @@ public class LoginActivity extends AppCompatActivity {
     }
 
     public void entrar(View v) {
-        if (passInput.getText() != null) {
-            pass = passInput.getText().toString();
-            if (pass.equals("")) {
-                passLayout.setErrorEnabled(true);
-                passLayout.setError("insira sua senha");
-            } else {
-                passLayout.setErrorEnabled(false);
-            }
-        } else {
-            passLayout.setErrorEnabled(true);
-            passLayout.setError("nulo");
-        }
-
-        if (loginInput.getText() != null) {
-            login = loginInput.getText().toString();
-            if (login.equals("")) {
-                loginLayout.setErrorEnabled(true);
-                loginLayout.setError("insira seu e-mail");
-            } else {
-                loginLayout.setErrorEnabled(false);
-            }
-        } else {
-            loginLayout.setErrorEnabled(true);
-            loginLayout.setError("nulo");
-        }
-
-        if (!loginLayout.isErrorEnabled() || !passLayout.isErrorEnabled()) {
-            authenticateLogin();
-        } else {
-            Toast.makeText(this, "Confira as informações!", Toast.LENGTH_SHORT).show();
-        }
-
+//        if (passInput.getText() != null) {
+//            pass = passInput.getText().toString();
+//            if (pass.equals("")) {
+//                passLayout.setErrorEnabled(true);
+//                passLayout.setError("insira sua senha");
+//            } else {
+//                passLayout.setErrorEnabled(false);
+//            }
+//        } else {
+//            passLayout.setErrorEnabled(true);
+//            passLayout.setError("nulo");
+//        }
+//
+//        if (loginInput.getText() != null) {
+//            login = loginInput.getText().toString();
+//            if (login.equals("")) {
+//                loginLayout.setErrorEnabled(true);
+//                loginLayout.setError("insira seu e-mail");
+//            } else {
+//                loginLayout.setErrorEnabled(false);
+//            }
+//        } else {
+//            loginLayout.setErrorEnabled(true);
+//            loginLayout.setError("nulo");
+//        }
+//
+//        if (!loginLayout.isErrorEnabled() && !passLayout.isErrorEnabled()) {
+//            authenticateLogin();
+//        } else {
+//            Toast.makeText(this, "Confira as informações!", Toast.LENGTH_SHORT).show();
+//        }
+        debugApp();
     }
 
     public void cadastrarUsuario(View v) {
@@ -267,5 +267,12 @@ public class LoginActivity extends AppCompatActivity {
         } else {
             Toast.makeText(this, "Informações incorretas", Toast.LENGTH_SHORT).show();
         }
+    }
+
+    private void debugApp() {
+        Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+        startActivity(intent, bundle);
+        Toast.makeText(this, "Conectado com sucesso", Toast.LENGTH_SHORT).show();
     }
 }

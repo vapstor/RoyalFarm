@@ -1,9 +1,8 @@
 <?xml version="1.0" encoding="utf-8"?>
 <androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/layout_item_produto"
-    android:layout_width="200dp"
+    android:layout_width="175dp"
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
@@ -11,13 +10,14 @@
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_item_produto"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="16dp"
+        android:layout_width="100dp"
+        android:layout_height="100dp"
+        android:layout_marginTop="8dp"
+        android:elevation="4dp"
         app:layout_constraintEnd_toStartOf="@+id/btn_add_item_produto"
         app:layout_constraintStart_toEndOf="@+id/btn_remove_item_produto"
         app:layout_constraintTop_toBottomOf="@+id/preco_item_produto"
-        app:srcCompat="@drawable/android_01" />
+        app:srcCompat="@drawable/empty_product_image" />
 
     <androidx.constraintlayout.widget.ConstraintLayout
         android:id="@+id/header_item_produto"
@@ -53,20 +53,24 @@
         android:layout_width="0dp"
         android:layout_height="wrap_content"
         android:layout_marginStart="16dp"
-        android:layout_marginTop="4dp"
+        android:layout_marginTop="2dp"
         android:layout_marginEnd="16dp"
         android:layout_marginBottom="8dp"
         android:drawableStart="@drawable/ic_shopping_basket_white_18dp"
+        android:enabled="false"
         android:text="@string/add"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="@+id/btn_add_item_produto"
         app:layout_constraintStart_toStartOf="@+id/btn_remove_item_produto"
         app:layout_constraintTop_toBottomOf="@+id/qntd_item_produto" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
+
         android:id="@+id/preco_item_produto"
         android:layout_width="0dp"
         android:layout_height="wrap_content"
+        android:layout_marginStart="1dp"
+        android:layout_marginEnd="1dp"
         android:background="#EEEEEE"
         android:gravity="center"
         android:padding="3dp"
@@ -77,13 +81,12 @@
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/header_item_produto" />
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_add_item_produto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginEnd="8dp"
-        android:background="@null"
-        android:backgroundTint="@drawable/ib_selector"
+        android:background="@drawable/ib_plus_selector"
         android:clickable="true"
         android:contentDescription="@string/adicionar_item"
         android:focusable="true"
@@ -93,13 +96,12 @@
         app:layout_constraintTop_toTopOf="@+id/image_item_produto"
         app:srcCompat="@drawable/ic_add_circle_white_24dp" />
 
-    <ImageButton
+    <androidx.appcompat.widget.AppCompatImageButton
         android:id="@+id/btn_remove_item_produto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:layout_marginStart="8dp"
-        android:background="@null"
-        android:backgroundTint="@drawable/ib_selector"
+        android:background="@drawable/ib_minus_selector"
         android:clickable="true"
         android:contentDescription="@string/remover_item"
         android:focusable="true"
@@ -109,11 +111,11 @@
         app:layout_constraintTop_toTopOf="@+id/image_item_produto"
         app:srcCompat="@drawable/ic_remove_circle_white_24dp" />
 
-    <TextView
+    <androidx.appcompat.widget.AppCompatTextView
         android:id="@+id/qntd_item_produto"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:layout_marginTop="8dp"
+        android:layout_marginTop="4dp"
         android:fontFamily="@font/roboto_bold"
         android:gravity="center"
         android:text="@string/zero"
