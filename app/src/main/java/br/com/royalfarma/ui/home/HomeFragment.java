@@ -2,6 +2,7 @@ package br.com.royalfarma.ui.home;
 
 import android.content.Context;
 import android.os.Bundle;
+import android.os.Parcelable;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,14 +25,16 @@ import br.com.royalfarma.model.Produto;
 public class HomeFragment extends Fragment {
 
     private ArrayList<Produto> produtosNovidades, produtosPopulares, produtosMaisVendidos;
+    private RecyclerView recyclerMaisVendidos, recyclerNovidades, recyclerPopulares;
+    private Parcelable mListState;
+    private ArrayList<Parcelable> mDataset;
+    private ProdutosAdapter adapterNovidades, adapterPopulares, adapterMaisVendidos;
 
-    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
-        View root = inflater.inflate(R.layout.fragment_home, container, false);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), s -> {
-        });
+    @Override
+    public void onCreate(@Nullable Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
 
-//        (int id, String titulo, int quantidade, double valor, long codBarra)
+        //        (int id, String titulo, int quantidade, double valor, long codBarra)
         produtosNovidades = new ArrayList<>();
         Produto produto = new Produto(0, "Vacina Corona 1", 0, 10.25, 123456);
         produtosNovidades.add(produto);
@@ -77,7 +80,16 @@ public class HomeFragment extends Fragment {
         produtoMaisVendido = new Produto(4, "Vacina Corona 1", 0, 10.25, 123456);
         produtosMaisVendidos.add(produtoMaisVendido);
 
+        adapterNovidades = new ProdutosAdapter(produtosNovidades, getContext());
+        adapterPopulares = new ProdutosAdapter(produtosPopulares, getContext());
+        adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidos, getContext());
+    }
 
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        View root = inflater.inflate(R.layout.fragment_home, container, false);
+        homeViewModel.getText().observe(getViewLifecycleOwner(), s -> {
+        });
         return root;
     }
 
@@ -86,13 +98,9 @@ public class HomeFragment extends Fragment {
         super.onViewCreated(view, savedInstanceState);
         Context context = getContext();
         if (context != null) {
-            RecyclerView recyclerNovidades = view.findViewById(R.id.recyclerNovidades);
-            RecyclerView recyclerPopulares = view.findViewById(R.id.recyclerPopulares);
-            RecyclerView recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
-
-            ProdutosAdapter adapterNovidades = new ProdutosAdapter(produtosNovidades, context);
-            ProdutosAdapter adapterPopulares = new ProdutosAdapter(produtosPopulares, context);
-            ProdutosAdapter adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidos, context);
+            recyclerNovidades = view.findViewById(R.id.recyclerNovidades);
+            recyclerPopulares = view.findViewById(R.id.recyclerPopulares);
+            recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
 
             LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
             linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
@@ -128,7 +136,6 @@ public class HomeFragment extends Fragment {
             });
         }
 
-
         //Click nos adaptadores não usado, apenas nos botoes e imagem
 //        ItemClickSupport.addTo(recyclerNovidades).setOnItemClickListener((recyclerView, position, v) -> {
 //        });
@@ -138,3 +145,26 @@ public class HomeFragment extends Fragment {
 //        });
     }
 }
+
+//    @Override
+//    public void onSaveInstanceState(@NonNull Bundle outState) {
+//        if (recyclerNovidades.getLayoutManager() != null) {
+//            Parcelable novidadesListState = recyclerNovidades.getLayoutManager().onSaveInstanceState();
+//            // putting recyclerview position
+//            outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, novidadesListState);
+//            // putting recyclerview items
+//            outState.putParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID, mDataset);
+//        }
+//        super.onSaveInstanceState(outState);
+//    }
+//
+//
+//    public void restorePreviousState(Bundle savedInstanceState) {
+//        // getting recyclerview position
+//        mListState = savedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
+//        // getting recyclerview items
+//        mDataset = savedInstanceState.getParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID);
+//        // Restoring adapter items
+//        mAdapter.setItems(mDataset);
+//        // Restoring recycler view position
+//        mRvMedia.getLayoutManager().

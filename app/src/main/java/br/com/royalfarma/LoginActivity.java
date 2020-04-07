@@ -10,6 +10,7 @@ import android.os.Handler;
 import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
+import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
@@ -170,10 +171,31 @@ public class LoginActivity extends AppCompatActivity {
         elapsedTime = SystemClock.elapsedRealtime();
 
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
-        WebView myWebView = new WebView(this);
+        WebView myWebView = new WebView(getApplicationContext()) {
+            @Override
+            public boolean onCheckIsTextEditor() {
+                return true;
+            }
+        };
         myWebView.loadUrl("https://www.royalfarma.com.br/conta/cadastro#acc");
         WebSettings webSettings = myWebView.getSettings();
         webSettings.setJavaScriptEnabled(true);
+        myWebView.requestFocusFromTouch();
+        myWebView.getSettings().setUseWideViewPort(true);
+        myWebView.requestFocus(View.FOCUS_DOWN);
+        myWebView.setOnTouchListener((v1, event) -> {
+            v1.performClick();
+            switch (event.getAction()) {
+                case MotionEvent.ACTION_DOWN:
+                case MotionEvent.ACTION_UP:
+                    if (!v1.hasFocus()) {
+                        v1.requestFocus();
+                    }
+                    break;
+            }
+            return false;
+        });
+
         webSettings.setUseWideViewPort(true);
         //Interface para mostrar que está carregando...
         ProgressDialog progressBar = new ProgressDialog(this);
