@@ -46,7 +46,7 @@ public class MainActivity extends AppCompatActivity {
     public void onBackPressed() {
         if (navView.getSelectedItemId() == R.id.navigation_home) {
             Bundle bundle = makeSceneTransitionAnimation(this).toBundle();
-            Intent intent = new Intent(this, LoginActivity.class);
+            Intent intent = new Intent(this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
             startActivity(intent, bundle);
         } else {
             super.onBackPressed();

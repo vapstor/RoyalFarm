@@ -1,6 +1,6 @@
 package br.com.royalfarma.ui.home;
 
-import android.content.Intent;
+import android.content.Context;
 import android.os.Bundle;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -9,23 +9,17 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProviders;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
-
 import java.util.ArrayList;
-import java.util.Objects;
 
-import br.com.royalfarma.ProductDetailActivity;
 import br.com.royalfarma.R;
 import br.com.royalfarma.adapter.ProdutosAdapter;
 import br.com.royalfarma.model.Produto;
-import br.com.royalfarma.utils.ItemClickSupport;
-
-import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
 
 public class HomeFragment extends Fragment {
 
@@ -90,33 +84,49 @@ public class HomeFragment extends Fragment {
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        RecyclerView recyclerNovidades = view.findViewById(R.id.recyclerNovidades);
-        RecyclerView recyclerPopulares = view.findViewById(R.id.recyclerPopulares);
-        RecyclerView recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
+        Context context = getContext();
+        if (context != null) {
+            RecyclerView recyclerNovidades = view.findViewById(R.id.recyclerNovidades);
+            RecyclerView recyclerPopulares = view.findViewById(R.id.recyclerPopulares);
+            RecyclerView recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
 
-        ProdutosAdapter adapterNovidades = new ProdutosAdapter(produtosNovidades, getContext());
-        ProdutosAdapter adapterPopulares = new ProdutosAdapter(produtosPopulares, getContext());
-        ProdutosAdapter adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidos, getContext());
+            ProdutosAdapter adapterNovidades = new ProdutosAdapter(produtosNovidades, context);
+            ProdutosAdapter adapterPopulares = new ProdutosAdapter(produtosPopulares, context);
+            ProdutosAdapter adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidos, context);
 
-        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerNovidades.setLayoutManager(linearLayoutManager);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerNovidades.setLayoutManager(linearLayoutManager);
 
-        linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerPopulares.setLayoutManager(linearLayoutManager);
+            linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerPopulares.setLayoutManager(linearLayoutManager);
 
-        linearLayoutManager = new LinearLayoutManager(getContext());
-        linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-        recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
+            linearLayoutManager = new LinearLayoutManager(context);
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
 
-        adapterNovidades.setHasStableIds(true);
-        adapterPopulares.setHasStableIds(true);
-        adapterMaisVendidos.setHasStableIds(true);
+            adapterNovidades.setHasStableIds(true);
+            adapterPopulares.setHasStableIds(true);
+            adapterMaisVendidos.setHasStableIds(true);
 
-        recyclerNovidades.setAdapter(adapterNovidades);
-        recyclerPopulares.setAdapter(adapterPopulares);
-        recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
+            recyclerNovidades.setAdapter(adapterNovidades);
+            recyclerPopulares.setAdapter(adapterPopulares);
+            recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
+
+
+            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisNovidades).setOnClickListener(v -> {
+                Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
+            });
+
+            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisPopulares).setOnClickListener(v -> {
+                Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
+            });
+
+            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
+                Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
+            });
+        }
 
 
         //Click nos adaptadores não usado, apenas nos botoes e imagem
@@ -127,7 +137,4 @@ public class HomeFragment extends Fragment {
 //        ItemClickSupport.addTo(recyclerMaisVendidos).setOnItemClickListener((recyclerView, position, v) -> {
 //        });
     }
-
-
-
 }

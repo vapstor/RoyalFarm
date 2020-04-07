@@ -1,9 +1,6 @@
 package br.com.royalfarma.utils;
 
 import android.os.SystemClock;
-import android.widget.Toast;
-
-import androidx.appcompat.app.AppCompatActivity;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
@@ -34,13 +31,14 @@ public abstract class Util {
     }
 
 
-    public static void confirmQuitApp(AppCompatActivity activity) {
+    public static boolean confirmQuitApp() {
         if (SystemClock.elapsedRealtime() - elapsedTime < 1500) {
-            activity.finishAffinity();
+            elapsedTime = SystemClock.elapsedRealtime();
+            return true;
         } else {
-            Toast.makeText(activity, "Toque novamente para sair", Toast.LENGTH_SHORT).show();
+            elapsedTime = SystemClock.elapsedRealtime();
+            return false;
         }
-        elapsedTime = SystemClock.elapsedRealtime();
     }
 
 
