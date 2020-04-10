@@ -1,20 +1,40 @@
 package br.com.royalfarma.model;
 
-import java.io.Serializable;
+import android.os.Parcel;
+import android.os.Parcelable;
 
-public class Produto implements Serializable {
+public class Produto implements Parcelable {
 
-    public int imagemURL;
+    public String imagemURL;
     public String tituloProduto;
     public double preco;
     public int id, quantidade;
     public long codBarra;
     public double totalPrecoItem;
-    private int estoqueAtual;
+    public int estoqueAtual;
 
-    public Produto() {
-
+    protected Produto(Parcel in) {
+        imagemURL = in.readString();
+        tituloProduto = in.readString();
+        preco = in.readDouble();
+        id = in.readInt();
+        quantidade = in.readInt();
+        codBarra = in.readLong();
+        totalPrecoItem = in.readDouble();
+        estoqueAtual = in.readInt();
     }
+
+    public static final Creator<Produto> CREATOR = new Creator<Produto>() {
+        @Override
+        public Produto createFromParcel(Parcel in) {
+            return new Produto(in);
+        }
+
+        @Override
+        public Produto[] newArray(int size) {
+            return new Produto[size];
+        }
+    };
 
     public double getTotalPrecoItem() {
         return totalPrecoItem;
@@ -24,12 +44,23 @@ public class Produto implements Serializable {
         this.totalPrecoItem = totalPrecoItem;
     }
 
-    public Produto(int id, String titulo, int quantidade, double valor, long codBarra) {
+    public Produto(String pathToImage, int id, String titulo, int quantidade, double valor, long codBarra, int estoqueAtual) {
+        this.imagemURL = pathToImage;
         this.id = id;
         this.tituloProduto = titulo;
         this.preco = valor;
         this.quantidade = quantidade;
         this.codBarra = codBarra;
+        this.estoqueAtual = estoqueAtual;
+    }
+
+    public Produto(String pathToImage, int id, String titulo, double valor, long codBarra, int estoqueAtual) {
+        this.imagemURL = pathToImage;
+        this.id = id;
+        this.tituloProduto = titulo;
+        this.preco = valor;
+        this.codBarra = codBarra;
+        this.estoqueAtual = estoqueAtual;
     }
 
     public int getId() {
@@ -64,17 +95,16 @@ public class Produto implements Serializable {
         quantidade = qntd;
     }
 
-    public int getImagemURL() {
+    public String getImagemURL() {
         return imagemURL;
     }
 
-    public void setImagemURL(int imagemURL) {
+    public void setImagemURL(String imagemURL) {
         this.imagemURL = imagemURL;
     }
 
     public String getJsonObject() {
         return "{id:" + id + ",nome:" + tituloProduto + ",preco:" + preco + ",quantidade:" + quantidade + "}";
-
     }
 
     public long getCodBarra() {
@@ -91,5 +121,26 @@ public class Produto implements Serializable {
 
     public int getEstoqueAtual() {
         return estoqueAtual;
+    }
+
+    /**
+     * PARCELABLE
+     **/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(imagemURL);
+        dest.writeString(tituloProduto);
+        dest.writeDouble(preco);
+        dest.writeInt(id);
+        dest.writeInt(quantidade);
+        dest.writeLong(codBarra);
+        dest.writeDouble(totalPrecoItem);
+        dest.writeInt(estoqueAtual);
     }
 }

@@ -1,214 +1,243 @@
 <?xml version="1.0" encoding="utf-8"?>
-<ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
-    xmlns:tools="http://schemas.android.com/tools"
-    android:id="@+id/home_scroll_vertical"
+
+
+<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:id="@+id/swipe_container"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    android:orientation="vertical"
-    tools:context=".ui.home.HomeFragment">
+    android:layout_height="match_parent">
 
-    <androidx.constraintlayout.widget.ConstraintLayout
+    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
+        xmlns:app="http://schemas.android.com/apk/res-auto"
+        xmlns:tools="http://schemas.android.com/tools"
+        android:id="@+id/home_scroll_vertical"
         android:layout_width="match_parent"
-        android:layout_height="wrap_content">
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/titleNovidades"
-            style="@style/SectionTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:elevation="1dp"
-            android:text="Novidades"
-            android:textAlignment="viewStart"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
-            app:layout_constraintStart_toStartOf="@+id/layoutNovidades"
-            app:layout_constraintTop_toTopOf="parent" />
-
-        <TextView
-            android:id="@+id/subtitleNovidades"
-            style="@style/SectionSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Confira os mais novos produtos"
-            android:textSize="13sp"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
-            app:layout_constraintStart_toStartOf="@+id/titleNovidades"
-            app:layout_constraintTop_toBottomOf="@+id/titleNovidades" />
-
-        <Button
-            android:id="@+id/btnVerMaisNovidades"
-            style="@style/ButtonVerMais"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:text="Ver Mais"
-            app:layout_constraintBottom_toBottomOf="@+id/subtitleNovidades"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/titleNovidades" />
+        android:layout_height="wrap_content"
+        android:orientation="vertical"
+        tools:context=".ui.home.HomeFragment">
 
         <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutNovidades"
             android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/subtitleNovidades">
+            android:layout_height="wrap_content">
 
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerNovidades"
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/titleNovidades"
+                style="@style/SectionTitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:layout_margin="4dp"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:elevation="1dp"
+                android:text="Novidades"
+                android:textAlignment="viewStart"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
+                app:layout_constraintStart_toStartOf="@+id/layoutNovidades"
+                app:layout_constraintTop_toTopOf="parent" />
+
+            <TextView
+                android:id="@+id/subtitleNovidades"
+                style="@style/SectionSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Confira os mais novos produtos"
+                android:textSize="13sp"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
+                app:layout_constraintStart_toStartOf="@+id/titleNovidades"
+                app:layout_constraintTop_toBottomOf="@+id/titleNovidades" />
+
+            <Button
+                android:id="@+id/btnVerMaisNovidades"
+                style="@style/ButtonVerMais"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="Ver Mais"
+                app:layout_constraintBottom_toBottomOf="@+id/subtitleNovidades"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/titleNovidades" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutNovidades"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
                 android:layout_marginTop="4dp"
-                android:layout_marginBottom="4dp"
-                android:columnWidth="100dp"
-                android:gravity="center"
-                android:horizontalSpacing="1dp"
-                android:numColumns="6"
-                android:orientation="horizontal"
-                android:padding="4dp"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbars="horizontal"
-                android:stretchMode="none"
-                android:verticalSpacing="1dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/subtitleNovidades">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerNovidades"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="4dp"
+                    android:columnWidth="100dp"
+                    android:gravity="center"
+                    android:horizontalSpacing="1dp"
+                    android:numColumns="6"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
+                    android:scrollbars="horizontal"
+                    android:stretchMode="none"
+                    android:verticalSpacing="1dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent">
+
+                </androidx.recyclerview.widget.RecyclerView>
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/titlePopulares"
+                style="@style/SectionTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:elevation="1dp"
+                android:text="Populares"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutNovidades" />
+
+            <TextView
+                android:id="@+id/subtitlePopulares"
+                style="@style/SectionSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Nossos produtos mais populares"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
+                app:layout_constraintStart_toStartOf="@+id/titlePopulares"
+                app:layout_constraintTop_toBottomOf="@+id/titlePopulares" />
+
+            <Button
+                android:id="@+id/btnVerMaisPopulares"
+                style="@style/ButtonVerMais"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="Ver Mais"
+                app:layout_constraintBottom_toBottomOf="@+id/subtitlePopulares"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/titlePopulares" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutPopulares"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/titlePopulares"
+                app:layout_constraintTop_toBottomOf="@+id/subtitlePopulares">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerPopulares"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_marginTop="4dp"
+                    android:columnWidth="100dp"
+                    android:gravity="center"
+                    android:horizontalSpacing="1dp"
+                    android:numColumns="6"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    android:scrollbars="horizontal"
+                    android:stretchMode="none"
+                    android:verticalSpacing="1dp"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/titleMaisVendidos"
+                style="@style/SectionTitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="4dp"
+                android:layout_marginTop="8dp"
+                android:elevation="1dp"
+                android:text="Mais Vendidos"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/layoutPopulares" />
+
+            <TextView
+                android:id="@+id/subtitleMaisVendidos"
+                style="@style/SectionSubtitle"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:text="Os campeões de vendas"
+                app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
+                app:layout_constraintStart_toStartOf="@+id/titlePopulares"
+                app:layout_constraintTop_toBottomOf="@+id/titleMaisVendidos" />
+
+            <Button
+                android:id="@+id/btnVerMaisMaisVendidos"
+                style="@style/ButtonVerMais"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="4dp"
+                android:text="Ver Mais"
+                app:layout_constraintBottom_toBottomOf="@+id/subtitleMaisVendidos"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/titleMaisVendidos" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/layoutMaisVendidos"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                app:layout_constraintTop_toBottomOf="@+id/subtitleMaisVendidos">
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerMaisVendidos"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_margin="4dp"
+                    android:layout_marginTop="4dp"
+                    android:layout_marginBottom="8dp"
+                    android:gravity="center"
+                    android:horizontalSpacing="1dp"
+                    android:numColumns="6"
+                    android:orientation="horizontal"
+                    android:padding="4dp"
+                    android:scrollbarAlwaysDrawHorizontalTrack="true"
+                    android:scrollbarAlwaysDrawVerticalTrack="true"
+                    android:scrollbars="horizontal"
+                    android:stretchMode="none"
+                    android:verticalSpacing="1dp"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <FrameLayout
+                android:id="@+id/frameLoadingLayout"
+                android:layout_width="0dp"
+                android:layout_height="0dp"
+                android:alpha="0.75"
+                android:background="@color/white"
+                android:elevation="2dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
-            </androidx.recyclerview.widget.RecyclerView>
+                <ProgressBar
+                    android:id="@+id/progressBarHome"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_gravity="center" />
+            </FrameLayout>
+
         </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/titlePopulares"
-            style="@style/SectionTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:elevation="1dp"
-            android:text="Populares"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutNovidades" />
-
-        <TextView
-            android:id="@+id/subtitlePopulares"
-            style="@style/SectionSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Nossos produtos mais populares"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
-            app:layout_constraintStart_toStartOf="@+id/titlePopulares"
-            app:layout_constraintTop_toBottomOf="@+id/titlePopulares" />
-
-        <Button
-            android:id="@+id/btnVerMaisPopulares"
-            style="@style/ButtonVerMais"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:text="Ver Mais"
-            app:layout_constraintBottom_toBottomOf="@+id/subtitlePopulares"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/titlePopulares" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutPopulares"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:layout_marginTop="4dp"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintStart_toStartOf="@+id/titlePopulares"
-            app:layout_constraintTop_toBottomOf="@+id/subtitlePopulares">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerPopulares"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_marginTop="4dp"
-                android:columnWidth="100dp"
-                android:gravity="center"
-                android:horizontalSpacing="1dp"
-                android:numColumns="6"
-                android:orientation="horizontal"
-                android:padding="4dp"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarAlwaysDrawVerticalTrack="true"
-                android:scrollbars="horizontal"
-                android:stretchMode="none"
-                android:verticalSpacing="1dp"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-        <androidx.appcompat.widget.AppCompatTextView
-            android:id="@+id/titleMaisVendidos"
-            style="@style/SectionTitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_marginStart="4dp"
-            android:layout_marginTop="8dp"
-            android:elevation="1dp"
-            android:text="Mais Vendidos"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
-            app:layout_constraintStart_toStartOf="parent"
-            app:layout_constraintTop_toBottomOf="@+id/layoutPopulares" />
-
-        <TextView
-            android:id="@+id/subtitleMaisVendidos"
-            style="@style/SectionSubtitle"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:text="Os campeões de vendas"
-            app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
-            app:layout_constraintStart_toStartOf="@+id/titlePopulares"
-            app:layout_constraintTop_toBottomOf="@+id/titleMaisVendidos" />
-
-        <Button
-            android:id="@+id/btnVerMaisMaisVendidos"
-            style="@style/ButtonVerMais"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:layout_marginEnd="4dp"
-            android:text="Ver Mais"
-            app:layout_constraintBottom_toBottomOf="@+id/subtitleMaisVendidos"
-            app:layout_constraintEnd_toEndOf="parent"
-            app:layout_constraintTop_toTopOf="@+id/titleMaisVendidos" />
-
-        <androidx.constraintlayout.widget.ConstraintLayout
-            android:id="@+id/layoutMaisVendidos"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            app:layout_constraintTop_toBottomOf="@+id/subtitleMaisVendidos">
-
-            <androidx.recyclerview.widget.RecyclerView
-                android:id="@+id/recyclerMaisVendidos"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-                android:layout_margin="4dp"
-                android:layout_marginTop="4dp"
-                android:layout_marginBottom="8dp"
-                android:gravity="center"
-                android:horizontalSpacing="1dp"
-                android:numColumns="6"
-                android:orientation="horizontal"
-                android:padding="4dp"
-                android:scrollbarAlwaysDrawHorizontalTrack="true"
-                android:scrollbarAlwaysDrawVerticalTrack="true"
-                android:scrollbars="horizontal"
-                android:stretchMode="none"
-                android:verticalSpacing="1dp"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintStart_toStartOf="parent"
-                app:layout_constraintTop_toTopOf="parent" />
-        </androidx.constraintlayout.widget.ConstraintLayout>
-
-    </androidx.constraintlayout.widget.ConstraintLayout>
-</ScrollView>
+    </ScrollView>
+</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>

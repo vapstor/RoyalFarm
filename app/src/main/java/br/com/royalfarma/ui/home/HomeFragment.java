@@ -2,96 +2,142 @@ package br.com.royalfarma.ui.home;
 
 import android.content.Context;
 import android.os.Bundle;
-import android.os.Parcelable;
+import android.os.Handler;
+import android.os.Message;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
+import android.widget.FrameLayout;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
-import androidx.lifecycle.ViewModelProviders;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
+import androidx.transition.Fade;
+import androidx.transition.TransitionManager;
 
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.adapter.ProdutosAdapter;
+import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.interfaces.IFetchHomeProducts;
 import br.com.royalfarma.model.Produto;
 
-public class HomeFragment extends Fragment {
-
-    private ArrayList<Produto> produtosNovidades, produtosPopulares, produtosMaisVendidos;
+public class HomeFragment extends Fragment implements IFetchHomeProducts {
     private RecyclerView recyclerMaisVendidos, recyclerNovidades, recyclerPopulares;
-    private Parcelable mListState;
-    private ArrayList<Parcelable> mDataset;
     private ProdutosAdapter adapterNovidades, adapterPopulares, adapterMaisVendidos;
+    private HomeViewModel homeViewModel;
+    private Handler handler;
+    private DataBaseConnection dataBaseConnetion;
+    private SwipeRefreshLayout swipeContainer;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        //        (int id, String titulo, int quantidade, double valor, long codBarra)
-        produtosNovidades = new ArrayList<>();
-        Produto produto = new Produto(0, "Vacina Corona 1", 0, 10.25, 123456);
-        produtosNovidades.add(produto);
-        produto = new Produto(1, "Vacina Corona 2", 0, 10.25, 123456);
-        produtosNovidades.add(produto);
-        produto = new Produto(2, "Vacina Corona 3", 0, 10.25, 123456);
-        produtosNovidades.add(produto);
-        produto = new Produto(3, "Vacina Corona 4", 0, 10.25, 123456);
-        produtosNovidades.add(produto);
-        produto = new Produto(4, "Vacina Corona 5", 0, 10.25, 123456);
-        produtosNovidades.add(produto);
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                updateUI(msg);
+            }
+        };
 
-        produtosPopulares = new ArrayList<>();
-        Produto produtoPopular = new Produto(0, "Vacina Corona 5", 0, 10.25, 123456);
-        produtosPopulares.add(produtoPopular);
+//        fetchProducts();
+    }
 
-        produtoPopular = new Produto(1, "Vacina Corona 4", 0, 10.25, 123456);
-        produtosPopulares.add(produtoPopular);
+    private void fetchProducts() {
+        //resgata produtos assíncronamente
+        DataBaseConnection.FetchHomeProducts fetchHomeProducts = new DataBaseConnection.FetchHomeProducts(handler, this);
+        fetchHomeProducts.execute();
 
-        produtoPopular = new Produto(2, "Vacina Corona 3", 0, 10.25, 123456);
-        produtosPopulares.add(produtoPopular);
+    }
 
-        produtoPopular = new Produto(3, "Vacina Corona 2", 0, 10.25, 123456);
-        produtosPopulares.add(produtoPopular);
+    private void updateUI(Message msg) {
+        if (msg.what == 0) {
+            if ("tentando_conectar".equals(msg.obj)) {
+                toggleFrameLoadingVisibility(true);
+            }
+        } else if (msg.what == 1) {
+            switch ((String) msg.obj) {
+                case "onPreExecute":
+                    toggleFrameLoadingVisibility(true);
+                    break;
+                case "erro_sql":
+                    Toast.makeText(getContext(), "Erro de SQL", Toast.LENGTH_SHORT).show();
+                    toggleFrameLoadingVisibility(false);
+                    if (getActivity() != null) {
+                        getActivity().finish();
+                    }
+                case "onPostExecute":
+                    toggleFrameLoadingVisibility(false);
+                    Toast.makeText(getActivity(), "Produtos recuperados com sucesso!", Toast.LENGTH_SHORT).show();
+                    break;
+            }
+        } else {
+            Toast.makeText(getContext(), "Ocorreu um erro!", Toast.LENGTH_SHORT).show();
+        }
+    }
 
-        produtoPopular = new Produto(4, "Vacina Corona 1", 0, 10.25, 123456);
-        produtosPopulares.add(produtoPopular);
-
-
-        produtosMaisVendidos = new ArrayList<>();
-        Produto produtoMaisVendido = new Produto(0, "Vacina Corona 5", 0, 10.25, 123456);
-        produtosMaisVendidos.add(produtoMaisVendido);
-
-        produtoMaisVendido = new Produto(1, "Vacina Corona 4", 0, 10.25, 123456);
-        produtosMaisVendidos.add(produtoMaisVendido);
-
-        produtoMaisVendido = new Produto(2, "Vacina Corona 3", 0, 10.25, 123456);
-        produtosMaisVendidos.add(produtoMaisVendido);
-
-        produtoMaisVendido = new Produto(3, "Vacina Corona 2", 0, 10.25, 123456);
-        produtosMaisVendidos.add(produtoMaisVendido);
-
-        produtoMaisVendido = new Produto(4, "Vacina Corona 1", 0, 10.25, 123456);
-        produtosMaisVendidos.add(produtoMaisVendido);
-
-        adapterNovidades = new ProdutosAdapter(produtosNovidades, getContext());
-        adapterPopulares = new ProdutosAdapter(produtosPopulares, getContext());
-        adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidos, getContext());
+    private void toggleFrameLoadingVisibility(boolean frameVisibility) {
+        if (getActivity() != null) {
+            final ViewGroup root = getActivity().findViewById(R.id.home_scroll_vertical);
+            FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
+            TransitionManager.beginDelayedTransition(root, new Fade());
+            if (frameVisibility) {
+                frameLayout.setVisibility(View.VISIBLE);
+            } else {
+                frameLayout.setVisibility(View.INVISIBLE);
+            }
+        }
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        HomeViewModel homeViewModel = ViewModelProviders.of(this).get(HomeViewModel.class);
+        homeViewModel = new ViewModelProvider(requireParentFragment()).get(HomeViewModel.class);
         View root = inflater.inflate(R.layout.fragment_home, container, false);
-        homeViewModel.getText().observe(getViewLifecycleOwner(), s -> {
+
+        homeViewModel.getProdutosPopularesLiveData().observe(getViewLifecycleOwner(), produtosPopularesList -> {
+            if (produtosPopularesList.size() == 0) {
+                fetchProducts();
+            } else {
+                //Confirm that frame not block ui
+                toggleFrameLoadingVisibility(false);
+
+                adapterPopulares = new ProdutosAdapter(produtosPopularesList, getContext());
+                adapterPopulares.setHasStableIds(true);
+                LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                recyclerPopulares.setLayoutManager(linearLayoutManager);
+                recyclerPopulares.setAdapter(adapterPopulares);
+            }
+        });
+        homeViewModel.getProdutosNovidadesLiveData().observe(getViewLifecycleOwner(), produtosNovidadesList -> {
+            adapterNovidades = new ProdutosAdapter(produtosNovidadesList, getContext());
+            adapterNovidades.setHasStableIds(true);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerNovidades.setLayoutManager(linearLayoutManager);
+            recyclerNovidades.setAdapter(adapterNovidades);
+
+        });
+
+        homeViewModel.getProdutosMaisVendidosLiveData().observe(getViewLifecycleOwner(), produtosMaisVendidosList -> {
+            adapterMaisVendidos = new ProdutosAdapter(produtosMaisVendidosList, getContext());
+            adapterMaisVendidos.setHasStableIds(true);
+            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
+            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+            recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
+            recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
+
         });
         return root;
     }
+
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
@@ -102,26 +148,13 @@ public class HomeFragment extends Fragment {
             recyclerPopulares = view.findViewById(R.id.recyclerPopulares);
             recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
 
-            LinearLayoutManager linearLayoutManager = new LinearLayoutManager(context);
-            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            recyclerNovidades.setLayoutManager(linearLayoutManager);
-
-            linearLayoutManager = new LinearLayoutManager(context);
-            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            recyclerPopulares.setLayoutManager(linearLayoutManager);
-
-            linearLayoutManager = new LinearLayoutManager(context);
-            linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-            recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
-
-            adapterNovidades.setHasStableIds(true);
-            adapterPopulares.setHasStableIds(true);
-            adapterMaisVendidos.setHasStableIds(true);
-
-            recyclerNovidades.setAdapter(adapterNovidades);
-            recyclerPopulares.setAdapter(adapterPopulares);
-            recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
-
+            swipeContainer = view.findViewById(R.id.swipe_container);
+            // Setup refresh listener which triggers new data loading
+            // Your code to refresh the list here.
+            // Make sure you call swipeContainer.setRefreshing(false)
+            // once the network request has completed successfully.
+            swipeContainer.setOnRefreshListener(this::fetchProducts);
+            swipeContainer.setColorSchemeResources(R.color.colorAccent);
 
             ((AppCompatActivity) context).findViewById(R.id.btnVerMaisNovidades).setOnClickListener(v -> {
                 Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
@@ -136,7 +169,7 @@ public class HomeFragment extends Fragment {
             });
         }
 
-        //Click nos adaptadores não usado, apenas nos botoes e imagem
+        //Click nas views não utilizado, apenas nos botoes e imagem
 //        ItemClickSupport.addTo(recyclerNovidades).setOnItemClickListener((recyclerView, position, v) -> {
 //        });
 //        ItemClickSupport.addTo(recyclerPopulares).setOnItemClickListener((recyclerView, position, v) -> {
@@ -144,27 +177,32 @@ public class HomeFragment extends Fragment {
 //        ItemClickSupport.addTo(recyclerMaisVendidos).setOnItemClickListener((recyclerView, position, v) -> {
 //        });
     }
+
+    @Override
+    public void updateHomeWithData(ArrayList<ArrayList<Produto>> listaDeProdutos) {
+        /**Para uso no SwipeRefresh*/
+        if (adapterPopulares != null) {
+            // Remember to CLEAR OUT old items before appending in the new ones
+            adapterPopulares.clear();
+            // ...the data has come back, add new items to your adapter...
+            adapterPopulares.addAll(listaDeProdutos.get(0));
+        }
+        if (adapterNovidades != null) {
+            adapterNovidades.clear();
+            adapterNovidades.addAll(listaDeProdutos.get(1));
+        }
+        if (adapterMaisVendidos != null) {
+            adapterMaisVendidos.clear();
+            adapterMaisVendidos.addAll(listaDeProdutos.get(2));
+        }
+        /**Fim Para uso no SwipeRefresh*/
+
+        homeViewModel.setProdutosPopulares(listaDeProdutos.get(0));
+        homeViewModel.setProdutosNovidades(listaDeProdutos.get(1));
+        homeViewModel.setProdutosMaisVendidos(listaDeProdutos.get(2));
+
+        // Now we call setRefreshing(false) to signal refresh has finished
+        swipeContainer.setRefreshing(false);
+    }
 }
 
-//    @Override
-//    public void onSaveInstanceState(@NonNull Bundle outState) {
-//        if (recyclerNovidades.getLayoutManager() != null) {
-//            Parcelable novidadesListState = recyclerNovidades.getLayoutManager().onSaveInstanceState();
-//            // putting recyclerview position
-//            outState.putParcelable(SAVED_RECYCLER_VIEW_STATUS_ID, novidadesListState);
-//            // putting recyclerview items
-//            outState.putParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID, mDataset);
-//        }
-//        super.onSaveInstanceState(outState);
-//    }
-//
-//
-//    public void restorePreviousState(Bundle savedInstanceState) {
-//        // getting recyclerview position
-//        mListState = savedInstanceState.getParcelable(SAVED_RECYCLER_VIEW_STATUS_ID);
-//        // getting recyclerview items
-//        mDataset = savedInstanceState.getParcelableArrayList(SAVED_RECYCLER_VIEW_DATASET_ID);
-//        // Restoring adapter items
-//        mAdapter.setItems(mDataset);
-//        // Restoring recycler view position
-//        mRvMedia.getLayoutManager().

@@ -12,6 +12,10 @@ import java.sql.DriverManager;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+
+import br.com.royalfarma.interfaces.IFetchHomeProducts;
+import br.com.royalfarma.model.Produto;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.getSha512FromString;
@@ -20,7 +24,7 @@ public class DataBaseConnection {
     //    private static final String driverFireBird = "net.sourceforge.jtds.jdbc.Driver";
     public static Connection connection;
     private static Handler handler;
-    private static final Object lock = new Object();
+    public static final Object lock = new Object();
 
     public DataBaseConnection(Handler handler) {
         DataBaseConnection.handler = handler;
@@ -170,5 +174,94 @@ public class DataBaseConnection {
         }
     }
 
+    public static class FetchHomeProducts extends AsyncTask<Void, Void, ArrayList<ArrayList<Produto>>> {
+        private final Handler handler;
+        private final IFetchHomeProducts iFetchHomeProducts;
+        private Message message;
+        private ArrayList<ArrayList<Produto>> listaDeCategorias;
 
+        public FetchHomeProducts(Handler handler, IFetchHomeProducts iFetchHomeProducts) {
+            this.iFetchHomeProducts = iFetchHomeProducts;
+            this.handler = handler;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.v(MY_LOG_TAG, "### ON PRE EXECUTE ###");
+            this.message = new Message();
+            this.message.what = 1;
+            message.obj = "onPreExecute";
+            handler.sendMessage(message);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ArrayList<ArrayList<Produto>> doInBackground(Void... voids) {
+            try {
+                synchronized (lock) {
+                    new Thread(DataBaseConnection::createConnection).start();
+                    lock.wait();
+                    Log.v(MY_LOG_TAG, "doInBackground");
+                    this.message = new Message();
+                    this.message.what = 1;
+
+                    String sqlGetHomePdtsNovidades = "SELECT pdt_id, pdt_code, pdt_title, pdt_cover, pdt_price, pdt_inventory FROM ws_products WHERE pdt_category IS NULL AND pdt_cover IS NOT NULL LIMIT 5";
+//                    String sqlGetHomePdtsNovidades = "SELECT pdt_id, pdt_code, pdt_title, pdt_cover, pdt_price, pdt_inventory FROM ws_products WHERE pdt_category IS NULL LIMIT 5";
+//                    String getHomeProductsPopulares = "SELECT TOP 5 user_password FROM ws_users WHERE user_email = ?";
+//                    String getHomeProductsMaisVendidos = "SELECT TOP 5 user_password FROM ws_users WHERE user_email = ?";
+
+                    PreparedStatement pstmt = connection.prepareStatement(sqlGetHomePdtsNovidades);
+//                    pstmt.setString(1, "CATEGORIA");
+//                    pstmt.setString(1, String.valueOf(NULL));
+                    ResultSet resultSet = pstmt.executeQuery();
+                    listaDeCategorias = new ArrayList<>();
+                    ArrayList<Produto> produtosNovidades = new ArrayList<>();
+                    ArrayList<Produto> produtosPopulares = new ArrayList<>();
+                    ArrayList<Produto> produtosMaisVendidos = new ArrayList<>();
+                    while (resultSet.next()) {
+                        String id = resultSet.getString("pdt_id");
+                        String codBarra = resultSet.getString("pdt_code");
+                        String titulo = resultSet.getString("pdt_title");
+                        String pathToImage = resultSet.getString("pdt_cover");
+                        String preco = resultSet.getString("pdt_price");
+                        String qtdDisponivel = resultSet.getString("pdt_inventory");
+//                        public Produto(int id, String titulo, double valor, long codBarra, int Estoque) {
+                        Produto produto = new Produto(pathToImage, Integer.parseInt(id), titulo, Double.parseDouble(preco.replace(", ", ".")), Long.parseLong(codBarra), Integer.parseInt(qtdDisponivel));
+                        produtosPopulares.add(produto);
+                        produtosNovidades.add(produto);
+                        produtosMaisVendidos.add(produto);
+                    }
+                    listaDeCategorias.add(produtosPopulares);
+                    listaDeCategorias.add(produtosNovidades);
+                    listaDeCategorias.add(produtosMaisVendidos);
+                    return listaDeCategorias;
+                }
+            } catch (SQLException e) {
+                Log.e(MY_LOG_TAG, "Erro de SQL");
+                message.obj = "erro_sql";
+                handler.sendMessage(message);
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        //        @Override
+//        protected void onProgressUpdate(Integer... progress) {
+//            Log.d(MY_LOG_TAG, "### ON PROGRESS UPDATE ###");
+//            super.onProgressUpdate(progress);
+//        }
+
+        @Override
+        protected void onPostExecute(ArrayList<ArrayList<Produto>> listaDeProdutos) {
+            this.message = new Message();
+            this.message.what = 1;
+            Log.v(MY_LOG_TAG, "### ON POST EXECUTE ###");
+            message.obj = "onPostExecute";
+            handler.sendMessage(message);
+            //let HomeFragment know that we are done
+            iFetchHomeProducts.updateHomeWithData(listaDeProdutos);
+        }
+    }
 }

@@ -15,6 +15,7 @@
         android:id="@+id/navigation_home"
         android:name="br.com.royalfarma.ui.home.HomeFragment"
         android:label="@string/title_home"
+        app:defaultNavHost="true"
         tools:layout="@layout/fragment_home" />
 
     <fragment
