@@ -46,11 +46,11 @@
 - [x] Criar SplashScreen
 - [x] Utilizar Fundamentos do Material Design
 - [x] Utilizar JDBC MySQL
--  [x] Configurar botões de BottomNavigation:
-
+- [x] Configurar botões de BottomNavigation:
       - [x] Pesquisa
       - [x] Home
       - [x] Carrinho
+- [X] Utilizar MVVM Architeture 
 
 * Desenvolver LoginPage ["LOGIN"]
 
@@ -65,11 +65,12 @@
   -  [x] Implementar HorizontalScrollView para card de produtos (3)
   -  [x] Implementar (+) Ver Mais no fim do HorizontalScrollView
   -  [ ] Implementar VerticalScrollView na categoria de produto selecionada (ver mais)
-  -  [ ] Implementar CircularReveal para detalhamento ao clicar no Produto
+  -  [x] Implementar detalhamento ao clicar no Produto
   -  [x] Implementar Diálogo de detalhamento do produto
-  -  [ ] Configurar Card de produtos Horizontal dinamicos por categorias
+  -  [x] Configurar Card de produtos Horizontal dinamicos por categorias
   -  [ ] Configurar Card de produtos Vertical dinamicos
-  -  [ ] Configurar Dialogo de detalhamento do produto
+  -  [x] Configurar Dialogo de detalhamento do produto
+  -  [x] Implementar SwipeRefresh
       
 * Desenvolver Pesquisar
   - [ ] Implementar tela com VerticalScrollView de produtos com palavra chave 
