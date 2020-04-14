@@ -2,13 +2,13 @@
 
 
 <androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_container"
     android:layout_width="match_parent"
     android:layout_height="match_parent">
 
-    <ScrollView xmlns:android="http://schemas.android.com/apk/res/android"
-        xmlns:app="http://schemas.android.com/apk/res-auto"
-        xmlns:tools="http://schemas.android.com/tools"
+    <ScrollView
         android:id="@+id/home_scroll_vertical"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
@@ -27,7 +27,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:elevation="1dp"
-                android:text="Novidades"
+                android:text="@string/novidades"
                 android:textAlignment="viewStart"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
                 app:layout_constraintStart_toStartOf="@+id/layoutNovidades"
@@ -38,7 +38,7 @@
                 style="@style/SectionSubtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Confira os mais novos produtos"
+                android:text="@string/confira_os_mais_novos_produtos"
                 android:textSize="13sp"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisNovidades"
                 app:layout_constraintStart_toStartOf="@+id/titleNovidades"
@@ -46,11 +46,11 @@
 
             <Button
                 android:id="@+id/btnVerMaisNovidades"
-                style="@style/ButtonVerMais"
+                style="@style/ButtonTextWhiteBGAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="4dp"
-                android:text="Ver Mais"
+                android:text="@string/ver_mais"
                 app:layout_constraintBottom_toBottomOf="@+id/subtitleNovidades"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/titleNovidades" />
@@ -97,7 +97,7 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:elevation="1dp"
-                android:text="Populares"
+                android:text="@string/populares"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutNovidades" />
@@ -107,18 +107,18 @@
                 style="@style/SectionSubtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Nossos produtos mais populares"
+                android:text="@string/nossos_produtos_mais_populares"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisPopulares"
                 app:layout_constraintStart_toStartOf="@+id/titlePopulares"
                 app:layout_constraintTop_toBottomOf="@+id/titlePopulares" />
 
             <Button
                 android:id="@+id/btnVerMaisPopulares"
-                style="@style/ButtonVerMais"
+                style="@style/ButtonTextWhiteBGAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="4dp"
-                android:text="Ver Mais"
+                android:text="@string/ver_mais"
                 app:layout_constraintBottom_toBottomOf="@+id/subtitlePopulares"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/titlePopulares" />
@@ -163,28 +163,28 @@
                 android:layout_marginStart="4dp"
                 android:layout_marginTop="8dp"
                 android:elevation="1dp"
-                android:text="Mais Vendidos"
+                android:text="@string/mais_vendidos"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/layoutPopulares" />
 
-            <TextView
+            <androidx.appcompat.widget.AppCompatTextView
                 android:id="@+id/subtitleMaisVendidos"
                 style="@style/SectionSubtitle"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
-                android:text="Os campeões de vendas"
+                android:text="@string/os_campe_es_de_vendas"
                 app:layout_constraintEnd_toStartOf="@+id/btnVerMaisMaisVendidos"
                 app:layout_constraintStart_toStartOf="@+id/titlePopulares"
                 app:layout_constraintTop_toBottomOf="@+id/titleMaisVendidos" />
 
-            <Button
+            <androidx.appcompat.widget.AppCompatButton
                 android:id="@+id/btnVerMaisMaisVendidos"
-                style="@style/ButtonVerMais"
+                style="@style/ButtonTextWhiteBGAccent"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:layout_marginEnd="4dp"
-                android:text="Ver Mais"
+                android:text="@string/ver_mais"
                 app:layout_constraintBottom_toBottomOf="@+id/subtitleMaisVendidos"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintTop_toTopOf="@+id/titleMaisVendidos" />
@@ -233,9 +233,11 @@
                 <ProgressBar
                     android:id="@+id/progressBarHome"
                     style="?android:attr/progressBarStyle"
-                    android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_gravity="center" />
+                    android:layout_width="50dp"
+                    android:layout_height="50dp"
+                    android:layout_gravity="center"
+                    android:alpha="1"
+                    android:elevation="2dp" />
             </FrameLayout>
 
         </androidx.constraintlayout.widget.ConstraintLayout>

@@ -18,10 +18,8 @@ public class PesquisarFragment extends Fragment {
 
     private PesquisarViewModel pesquisarViewModel;
 
-    public View onCreateView(@NonNull LayoutInflater inflater,
-                             ViewGroup container, Bundle savedInstanceState) {
-        pesquisarViewModel =
-                ViewModelProviders.of(this).get(PesquisarViewModel.class);
+    public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
+        pesquisarViewModel = ViewModelProviders.of(this).get(PesquisarViewModel.class);
         View root = inflater.inflate(R.layout.fragment_pesquisar, container, false);
         final TextView textView = root.findViewById(R.id.text_home);
         pesquisarViewModel.getText().observe(getViewLifecycleOwner(), new Observer<String>() {

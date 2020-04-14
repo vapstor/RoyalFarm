@@ -16,17 +16,17 @@
         android:theme="@style/AppTheme"
         tools:ignore="GoogleAppIndexingWarning">
         <activity
-            android:name=".ProductDetailImage"
+            android:name=".activitys.ProductDetailImageActivity"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />
         <activity
-            android:name=".ProductDetailActivity"
+            android:name=".activitys.ProductDetailActivity"
             android:label="@string/title_activity_product_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".LoginActivity"
+            android:name=".activitys.LoginActivity"
             android:windowSoftInputMode="adjustResize" />
         <activity
-            android:name=".SplashScreen"
+            android:name=".activitys.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
@@ -35,7 +35,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name=".MainActivity"
+            android:name=".activitys.MainActivity"
             android:label="@string/app_name"
             android:theme="@style/AppTheme.Bridge" />
 

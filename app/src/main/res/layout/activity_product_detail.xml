@@ -5,7 +5,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:fitsSystemWindows="true"
-    tools:context=".ProductDetailActivity">
+    tools:context=".activitys.ProductDetailActivity">
 
     <com.google.android.material.appbar.AppBarLayout
         android:id="@+id/app_bar"
@@ -19,6 +19,7 @@
             android:layout_width="match_parent"
             android:layout_height="match_parent"
             android:fitsSystemWindows="true"
+            android:theme="@style/CollapseBarCustom"
             app:contentScrim="?attr/colorPrimary"
             app:layout_scrollFlags="scroll|exitUntilCollapsed"
             app:toolbarId="@+id/toolbar">
@@ -30,12 +31,14 @@
                 android:adjustViewBounds="true"
                 android:src="@drawable/empty_product_image"
                 app:layout_collapseMode="parallax"
-                app:layout_collapseParallaxMultiplier="0.7" />
+                app:layout_collapseParallaxMultiplier="0.5" />
 
             <androidx.appcompat.widget.Toolbar
                 android:id="@+id/toolbar"
                 android:layout_width="match_parent"
                 android:layout_height="?attr/actionBarSize"
+                android:theme="@style/AppTheme.AppBarOverlay"
+                android:windowActionBarOverlay="true"
                 app:layout_collapseMode="pin"
                 app:popupTheme="@style/AppTheme.PopupOverlay" />
 

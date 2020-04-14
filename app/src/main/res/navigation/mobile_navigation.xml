@@ -3,7 +3,7 @@
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/mobile_navigation"
-    app:startDestination="@+id/navigation_pesquisar">
+    app:startDestination="@id/navigation_home">
 
     <fragment
         android:id="@+id/navigation_pesquisar"
@@ -14,13 +14,54 @@
     <fragment
         android:id="@+id/navigation_home"
         android:name="br.com.royalfarma.ui.home.HomeFragment"
-        android:label="@string/title_home"
-        app:defaultNavHost="true"
-        tools:layout="@layout/fragment_home" />
+        tools:layout="@layout/fragment_home">
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_lista_produtos"
+            app:destination="@id/navigation_lista_produtos"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_home_to_navigation_pesquisar"
+            app:destination="@id/navigation_pesquisar"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_home_self"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/fragment_fade_enter"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:launchSingleTop="false"
+            app:popEnterAnim="@android:anim/fade_in"
+            app:popExitAnim="@android:anim/fade_out" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_carrinho"
         android:name="br.com.royalfarma.ui.carrinho.CarrinhoFragment"
         android:label="@string/title_carrinho"
-        tools:layout="@layout/fragment_carrinho" />
+        tools:layout="@layout/fragment_carrinho">
+        <action
+            android:id="@+id/action_navigation_carrinho_to_navigation_home"
+            app:destination="@id/navigation_home" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_lista_produtos"
+        android:name="br.com.royalfarma.ui.listaDeProdutos.ListaDeProdutosFragment"
+        tools:layout="@layout/fragment_lista_de_produtos">
+        <action
+            android:id="@+id/action_navigation_lista_produtos_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@anim/fragment_open_enter"
+            app:exitAnim="@anim/fragment_open_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@anim/fragment_close_exit"
+            app:popUpTo="@id/navigation_home" />
+    </fragment>
 </navigation>

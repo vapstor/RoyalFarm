@@ -5,15 +5,20 @@ import android.os.Parcelable;
 
 public class Produto implements Parcelable {
 
-    public String imagemURL;
-    public String tituloProduto;
-    public double preco;
-    public int id, quantidade;
-    public long codBarra;
-    public double totalPrecoItem;
-    public int estoqueAtual;
+    private String imagemURL;
+    private String tituloProduto;
+    private double preco;
+    private int id, quantidade;
+    private long codBarra;
+    private double totalPrecoItem;
+    private int estoqueAtual;
+    private boolean desconto;
+    private double precoOferta;
+    private String inicioOferta, fimOferta;
+    private String valorTotal;
 
-    protected Produto(Parcel in) {
+
+    private Produto(Parcel in) {
         imagemURL = in.readString();
         tituloProduto = in.readString();
         preco = in.readDouble();
@@ -22,6 +27,7 @@ public class Produto implements Parcelable {
         codBarra = in.readLong();
         totalPrecoItem = in.readDouble();
         estoqueAtual = in.readInt();
+        valorTotal = in.readString();
     }
 
     public static final Creator<Produto> CREATOR = new Creator<Produto>() {
@@ -35,6 +41,10 @@ public class Produto implements Parcelable {
             return new Produto[size];
         }
     };
+
+    public Produto() {
+
+    }
 
     public double getTotalPrecoItem() {
         return totalPrecoItem;
@@ -142,5 +152,46 @@ public class Produto implements Parcelable {
         dest.writeLong(codBarra);
         dest.writeDouble(totalPrecoItem);
         dest.writeInt(estoqueAtual);
+        dest.writeString(valorTotal);
+    }
+
+    public boolean isDesconto() {
+        return desconto;
+    }
+
+    public void setDesconto(boolean desconto) {
+        this.desconto = desconto;
+    }
+
+    public String getFimOferta() {
+        return fimOferta;
+    }
+
+    public void setFimOferta(String fimOferta) {
+        this.fimOferta = fimOferta;
+    }
+
+    public double getPrecoOferta() {
+        return precoOferta;
+    }
+
+    public void setPrecoOferta(double precoOferta) {
+        this.precoOferta = precoOferta;
+    }
+
+    public String getInicioOferta() {
+        return inicioOferta;
+    }
+
+    public void setInicioOferta(String inicioOferta) {
+        this.inicioOferta = inicioOferta;
+    }
+
+    public String getValorTotal() {
+        return valorTotal;
+    }
+
+    public void setValorTotal(String valorTotal) {
+        this.valorTotal = valorTotal;
     }
 }

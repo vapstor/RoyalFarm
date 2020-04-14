@@ -13,8 +13,10 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
 
-import br.com.royalfarma.interfaces.IFetchHomeProducts;
+import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
@@ -174,15 +176,18 @@ public class DataBaseConnection {
         }
     }
 
-    public static class FetchHomeProducts extends AsyncTask<Void, Void, ArrayList<ArrayList<Produto>>> {
+    public static class FetchProducts extends AsyncTask<Void, Void, ArrayList<Produto>> {
         private final Handler handler;
-        private final IFetchHomeProducts iFetchHomeProducts;
+        private final IFetchProducts iFetchProducts;
+        private final boolean limited;
+        private final int limit;
         private Message message;
-        private ArrayList<ArrayList<Produto>> listaDeCategorias;
 
-        public FetchHomeProducts(Handler handler, IFetchHomeProducts iFetchHomeProducts) {
-            this.iFetchHomeProducts = iFetchHomeProducts;
+        public FetchProducts(Handler handler, boolean limited, int limit, IFetchProducts iFetchProducts) {
+            this.iFetchProducts = iFetchProducts;
             this.handler = handler;
+            this.limited = limited;
+            this.limit = limit;
         }
 
         @Override
@@ -196,7 +201,7 @@ public class DataBaseConnection {
         }
 
         @Override
-        protected ArrayList<ArrayList<Produto>> doInBackground(Void... voids) {
+        protected ArrayList<Produto> doInBackground(Void... voids) {
             try {
                 synchronized (lock) {
                     new Thread(DataBaseConnection::createConnection).start();
@@ -204,37 +209,78 @@ public class DataBaseConnection {
                     Log.v(MY_LOG_TAG, "doInBackground");
                     this.message = new Message();
                     this.message.what = 1;
+                    Date currentTime = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO ANTES DO SELECT" + currentTime.toString());
+                    String sqlGetHomePdtsNovidades = "SELECT " +
+                            "pdt_id, " +
+                            "pdt_code, " +
+                            "pdt_name, " +
+                            "pdt_title, " +
+                            "pdt_inventory, " +
+                            "pdt_cover, " +
+                            "pdt_offer_price, " +
+                            "pdt_offer_start, " +
+                            "pdt_offer_end, " +
+                            "pdt_price " +
+                            "FROM  ws_products " +
+                            "WHERE pdt_status = 1 " +
+                            "AND (pdt_inventory >= 1 OR pdt_inventory IS NULL) " +
+                            "AND (pdt_offer_end IS NULL OR pdt_offer_end < NOW() OR TIMEDIFF(pdt_offer_end, CURRENT_TIMESTAMP()) > '24:00:00') " +
+                            "ORDER BY " +
+                            "RAND() ";
+                    StringBuilder sb = new StringBuilder(sqlGetHomePdtsNovidades);
+                    if (limited)
+                        sb.append("LIMIT ").append(limit);
 
-                    String sqlGetHomePdtsNovidades = "SELECT pdt_id, pdt_code, pdt_title, pdt_cover, pdt_price, pdt_inventory FROM ws_products WHERE pdt_category IS NULL AND pdt_cover IS NOT NULL LIMIT 5";
-//                    String sqlGetHomePdtsNovidades = "SELECT pdt_id, pdt_code, pdt_title, pdt_cover, pdt_price, pdt_inventory FROM ws_products WHERE pdt_category IS NULL LIMIT 5";
-//                    String getHomeProductsPopulares = "SELECT TOP 5 user_password FROM ws_users WHERE user_email = ?";
-//                    String getHomeProductsMaisVendidos = "SELECT TOP 5 user_password FROM ws_users WHERE user_email = ?";
+                    currentTime = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DO SELECT " + currentTime.toString());
 
-                    PreparedStatement pstmt = connection.prepareStatement(sqlGetHomePdtsNovidades);
-//                    pstmt.setString(1, "CATEGORIA");
-//                    pstmt.setString(1, String.valueOf(NULL));
+                    PreparedStatement pstmt = connection.prepareStatement(sb.toString());
+
+                    Date currentTime1 = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO ANTES DE EXECUTAR A QUERY: " + currentTime.getTime());
                     ResultSet resultSet = pstmt.executeQuery();
-                    listaDeCategorias = new ArrayList<>();
-                    ArrayList<Produto> produtosNovidades = new ArrayList<>();
-                    ArrayList<Produto> produtosPopulares = new ArrayList<>();
-                    ArrayList<Produto> produtosMaisVendidos = new ArrayList<>();
+
+                    Date currentTime2 = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DE EXECUTAR A QUERY: " + currentTime.getTime());
+                    Log.v(MY_LOG_TAG, "OU SEJA: " + (currentTime1.getTime() - currentTime2.getTime()));
+                    ArrayList<Produto> todosOsProdutos = new ArrayList<>();
+                    Produto produto;
+                    currentTime = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO ANTES DO WHILE: " + currentTime.getTime());
                     while (resultSet.next()) {
                         String id = resultSet.getString("pdt_id");
                         String codBarra = resultSet.getString("pdt_code");
                         String titulo = resultSet.getString("pdt_title");
                         String pathToImage = resultSet.getString("pdt_cover");
                         String preco = resultSet.getString("pdt_price");
-                        String qtdDisponivel = resultSet.getString("pdt_inventory");
-//                        public Produto(int id, String titulo, double valor, long codBarra, int Estoque) {
-                        Produto produto = new Produto(pathToImage, Integer.parseInt(id), titulo, Double.parseDouble(preco.replace(", ", ".")), Long.parseLong(codBarra), Integer.parseInt(qtdDisponivel));
-                        produtosPopulares.add(produto);
-                        produtosNovidades.add(produto);
-                        produtosMaisVendidos.add(produto);
+                        String estoque = resultSet.getString("pdt_inventory");
+                        String precoOferta = resultSet.getString("pdt_offer_price");
+                        String inicioOferta = resultSet.getString("pdt_offer_start");
+                        String fimOferta = resultSet.getString("pdt_offer_end");
+
+                        produto = new Produto();
+                        produto.setImagemURL(pathToImage);
+                        produto.setId(Integer.parseInt(id));
+                        produto.setNome(titulo);
+                        produto.setPreco(Double.parseDouble(preco.replace(", ", ".")));
+                        produto.setCodBarra(Long.parseLong(codBarra));
+                        produto.setEstoqueAtual(Integer.parseInt(estoque));
+                        if (precoOferta != null && !precoOferta.equals("NULL") && !precoOferta.equals("")) {
+                            produto.setDesconto(true);
+                            produto.setPrecoOferta(Double.parseDouble(precoOferta.replace(", ", ".")));
+                            produto.setInicioOferta(inicioOferta);
+                            produto.setFimOferta(fimOferta);
+                        }
+                        todosOsProdutos.add(produto);
                     }
-                    listaDeCategorias.add(produtosPopulares);
-                    listaDeCategorias.add(produtosNovidades);
-                    listaDeCategorias.add(produtosMaisVendidos);
-                    return listaDeCategorias;
+
+//                    listaDeCategorias.add(produtosNovidades);
+//                    listaDeCategorias.add(produtosMaisVendidos);
+                    currentTime2 = Calendar.getInstance().getTime();
+                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DO WHILE: " + currentTime.getTime());
+                    Log.v(MY_LOG_TAG, "OU SEJA: " + (currentTime.getTime() - currentTime2.getTime()));
+                    return todosOsProdutos;
                 }
             } catch (SQLException e) {
                 Log.e(MY_LOG_TAG, "Erro de SQL");
@@ -254,14 +300,14 @@ public class DataBaseConnection {
 //        }
 
         @Override
-        protected void onPostExecute(ArrayList<ArrayList<Produto>> listaDeProdutos) {
+        protected void onPostExecute(ArrayList<Produto> todosOsProdutos) {
             this.message = new Message();
             this.message.what = 1;
             Log.v(MY_LOG_TAG, "### ON POST EXECUTE ###");
             message.obj = "onPostExecute";
             handler.sendMessage(message);
             //let HomeFragment know that we are done
-            iFetchHomeProducts.updateHomeWithData(listaDeProdutos);
+            iFetchProducts.onGetDataDone(todosOsProdutos);
         }
     }
 }

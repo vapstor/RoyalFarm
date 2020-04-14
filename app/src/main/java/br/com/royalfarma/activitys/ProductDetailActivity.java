@@ -1,4 +1,4 @@
-package br.com.royalfarma;
+package br.com.royalfarma.activitys;
 
 import android.content.Intent;
 import android.os.Bundle;
@@ -16,6 +16,7 @@ import com.squareup.picasso.Picasso;
 
 import java.util.Objects;
 
+import br.com.royalfarma.R;
 import br.com.royalfarma.model.Produto;
 
 import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
@@ -55,7 +56,7 @@ public class ProductDetailActivity extends AppCompatActivity {
 
             String finalUrl = url;
             imagem.setOnClickListener(v -> {
-                Intent intent = new Intent(this, ProductDetailImage.class);
+                Intent intent = new Intent(this, ProductDetailImageActivity.class);
                 Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull(this)).toBundle();
                 intent.putExtra("imageURL", finalUrl);
                 startActivity(intent, bundle);

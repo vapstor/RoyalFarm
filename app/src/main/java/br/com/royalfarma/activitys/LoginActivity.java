@@ -1,4 +1,4 @@
-package br.com.royalfarma;
+package br.com.royalfarma.activitys;
 
 import android.app.ProgressDialog;
 import android.content.Intent;
@@ -33,6 +33,7 @@ import com.google.android.material.textfield.TextInputLayout;
 import java.io.FileDescriptor;
 import java.io.IOException;
 
+import br.com.royalfarma.R;
 import br.com.royalfarma.database.DataBaseConnection;
 
 import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
@@ -291,10 +292,11 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-//    private void debugApp() {
-//        Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
-//        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//        startActivity(intent, bundle);
-//        Toast.makeText(this, "Conectado com sucesso", Toast.LENGTH_SHORT).show();
-//    }
+    private void debugApp() {
+        Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
+        Intent intent = new Intent(LoginActivity.this, MainActivity.class);
+//        intent.setFlags(intent.getFlags() | Intent.FLAG_ACTIVITY_CLEAR_TOP | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+        startActivity(intent, bundle);
+        Toast.makeText(this, "Conectado com sucesso", Toast.LENGTH_SHORT).show();
+    }
 }

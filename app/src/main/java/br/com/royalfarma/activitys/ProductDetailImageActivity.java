@@ -1,4 +1,4 @@
-package br.com.royalfarma;
+package br.com.royalfarma.activitys;
 
 import android.os.Bundle;
 import android.widget.ImageView;
@@ -8,7 +8,9 @@ import androidx.appcompat.app.AppCompatActivity;
 
 import com.squareup.picasso.Picasso;
 
-public class ProductDetailImage extends AppCompatActivity {
+import br.com.royalfarma.R;
+
+public class ProductDetailImageActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {

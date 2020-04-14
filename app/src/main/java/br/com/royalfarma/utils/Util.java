@@ -13,12 +13,7 @@ public abstract class Util {
     public final static String CONNECTION = "CONNECTION";
     public final static String CONFIG_FILE = "CONFIG_FILE";
     public final static String MY_LOG_TAG = "VAPSTOR";
-    public final static String SAVED_RECYCLER_VIEW_NOVIDADES_STATUS_ID = "SAVED_RECYCLER_VIEW_NOVIDADES_STATUS_ID";
-    public final static String SAVED_RECYCLER_VIEW_POPULARES_STATUS_ID = "SAVED_RECYCLER_VIEW_POPULARES_STATUS_ID";
-    public final static String SAVED_RECYCLER_VIEW_MAIS_VENDIDOS_STATUS_ID = "SAVED_RECYCLER_VIEW_MAIS_VENDIDOS_STATUS_ID";
-    public final static String SAVED_RECYCLER_VIEW_NOVIDADES_DATASET_ID = "SAVED_RECYCLER_VIEW_NOVIDADES_DATASET_ID";
-    public final static String SAVED_RECYCLER_VIEW_POPULARES_DATASET_ID = "SAVED_RECYCLER_VIEW_POPULARES_DATASET_ID";
-    public final static String SAVED_RECYCLER_VIEW_MAIS_VENDIDOS_DATASET_ID = "SAVED_RECYCLER_VIEW_MAIS_VENDIDOS_DATASET_ID";
+    public final static String DB_PDT = "ws_products";
 
     public static long elapsedTime = 0;
 
@@ -26,8 +21,9 @@ public abstract class Util {
     private static DecimalFormat DINHEIRO_REAL;
 
     public static String RSmask(double valor) {
-        DINHEIRO_REAL = new DecimalFormat("R$ ###,###,##0.00");
-        return DINHEIRO_REAL.format(valor);
+        BigDecimal bigDecimal = new BigDecimal(valor).setScale(2, BigDecimal.ROUND_HALF_UP);
+//        DINHEIRO_REAL = new BigDecimal("R$ ###,###,##0,00");
+        return "R$ " + bigDecimal.toString().replace(".", ",");
     }
 
     public static String RSmask(BigDecimal bd) {
