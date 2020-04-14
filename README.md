@@ -40,6 +40,7 @@
   <img src="app/screenshots/screen2.png?raw=true" width="250"/>
   <img src="app/screenshots/screen3.png?raw=true" width="250"/> 
   <img src="app/screenshots/screen4.png?raw=true" width="250"/> 
+  <img src="app/screenshots/screen5.png?raw=true" width="250"/> 
 </div>
 
 ## 👏 Todo (Desenvolvimento)
