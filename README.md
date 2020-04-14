@@ -5,9 +5,9 @@
 <p align="center">
   <strong>Repositório para centralizar o Ambiente de Desenvolvimento</strong>
   <p align="center">
-    <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." />
-     <!--<img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." /> -->
-    <img src="https://img.shields.io/badge/version-5.0.0-blue.svg" alt="Current APP version." />  
+<!--     <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." /> -->
+     <img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." />
+    <img src="https://img.shields.io/badge/version-8.2.4-blue.svg" alt="Current APP version." />  
   </p>
 </p>
 
