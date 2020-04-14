@@ -66,11 +66,11 @@
   -  [x] Implementar Layout do Card de produto
   -  [x] Implementar HorizontalScrollView para card de produtos (3)
   -  [x] Implementar (+) Ver Mais no fim do HorizontalScrollView
-  -  [ ] Implementar VerticalScrollView na categoria de produto selecionada (ver mais)
+  -  [x] Implementar VerticalScrollView na categoria de produto selecionada (ver mais)
   -  [x] Implementar detalhamento ao clicar no Produto
   -  [x] Implementar Diálogo de detalhamento do produto
   -  [x] Configurar Card de produtos Horizontal dinamicos por categorias
-  -  [ ] Configurar Card de produtos Vertical dinamicos
+  -  [x] Configurar Card de produtos Vertical dinamicos
   -  [x] Configurar Dialogo de detalhamento do produto
   -  [x] Implementar SwipeRefresh
       
@@ -80,12 +80,13 @@
 
 * Desenvolver CarrinhoPage
   - [x] Implementar Badge no menu de carrinho com quantidade de itens selecionados 
-  - [ ] Implementar RecyclerView Simples com lista produtos selecionados
-  - [ ] Implementar Textview com resultado da compra
-  - [ ] Implementar Botão para FinalizarCompra
+  - [x] Implementar RecyclerView Simples com lista produtos selecionados
+  - [x] Implementar Textview com resultado da compra
+  - [x] Implementar Botão para FinalizarCompra
   
 * Desenvolver FinalizaCompraPage
   - [ ] Implementar RadioButton para Dinheiro ou Cartão
+  - [ ] ~Implementar Linha do Tempo de Pedido~
   - [ ] Implementar ImageView para bandeiras aceitas caso Cartão
   - [ ] Implementar CheckBox para necessidade de troco caso opção "Dinheiro": 
     - [ ] Implementar Input "Troco para quanto"
