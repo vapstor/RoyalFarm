@@ -105,7 +105,7 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter<ProdutosCarrin
             }
         });
 
-        //Btn -
+        //Btn
         qntdMinus.setOnClickListener(v -> {
             if (item.getQtdNoCarrinho() - 1 > 0) {
                 if (qntdPlus.getVisibility() != View.VISIBLE) {
