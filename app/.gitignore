@@ -1,1 +1,2 @@
 /build
+!*/build/intermediates/full/debug/AndroidManifest.xml
