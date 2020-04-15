@@ -8,9 +8,8 @@
 /.idea/navEditor.xml
 /.idea/assetWizardSettings.xml
 .DS_Store
-!*/build/intermediates/full/debug/AndroidManifest.xml
-!*/app/build/intermediates/full/debug/AndroidManifest.xml
-/build
+!*app/build/intermediates/full/debug/AndroidManifest.xml
+app/build
 /captures
 .externalNativeBuild
 .cxx
