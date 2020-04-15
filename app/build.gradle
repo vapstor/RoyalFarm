@@ -2,7 +2,7 @@ apply plugin: 'com.android.application'
 
 def versionChanges = 8
 def versionImproves = 2
-def versionBugs = 5
+def versionBugs = 6
 
 android {
     compileSdkVersion 29
