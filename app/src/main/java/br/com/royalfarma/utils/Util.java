@@ -22,15 +22,24 @@ public abstract class Util {
 
     public static String RSmask(double valor) {
         BigDecimal bigDecimal = new BigDecimal(valor).setScale(2, BigDecimal.ROUND_HALF_UP);
-//        DINHEIRO_REAL = new BigDecimal("R$ ###,###,##0,00");
         return "R$ " + bigDecimal.toString().replace(".", ",");
     }
 
+    public static String cutEspaceAndChangeComma4Dot(String str) {
+        return str.trim().replace(",", ".");
+    }
+
+    public static String cutEspaceAndChangeDot4Comma(String str) {
+        return str.trim().replace(".", ",");
+    }
+
+    public static double fromRStoDouble(String RSFormat) {
+        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        return Double.parseDouble(bigDecimal.toString());
+    }
+
     public static String RSmask(BigDecimal bd) {
-//        String valor = bd.toString();
         return "R$ " + bd.setScale(2, RoundingMode.UP).toString().replace(".", ",");
-//        DINHEIRO_REAL = new DecimalFormat("¤ ###,###,##0.00");
-//        return DINHEIRO_REAL.format(bd);
     }
 
 
@@ -73,4 +82,15 @@ public abstract class Util {
             return null;
         }
     }
+
+    public static String unmask(String s) {
+        return s.replaceAll("[.]", "")
+                .replaceAll("[-]", "")
+                .replaceAll("[/]", "")
+                .replaceAll("[(]", "")
+                .replaceAll("[)]", "")
+                .replaceAll("R", "")
+                .replaceAll("[$]", "");
+    }
+
 }

@@ -10,67 +10,14 @@ public class Produto implements Parcelable {
     private double preco;
     private int id, quantidade;
     private long codBarra;
-    private double totalPrecoItem;
     private int estoqueAtual;
     private boolean desconto;
     private double precoOferta;
     private String inicioOferta, fimOferta;
     private String valorTotal;
-
-
-    private Produto(Parcel in) {
-        imagemURL = in.readString();
-        tituloProduto = in.readString();
-        preco = in.readDouble();
-        id = in.readInt();
-        quantidade = in.readInt();
-        codBarra = in.readLong();
-        totalPrecoItem = in.readDouble();
-        estoqueAtual = in.readInt();
-        valorTotal = in.readString();
-    }
-
-    public static final Creator<Produto> CREATOR = new Creator<Produto>() {
-        @Override
-        public Produto createFromParcel(Parcel in) {
-            return new Produto(in);
-        }
-
-        @Override
-        public Produto[] newArray(int size) {
-            return new Produto[size];
-        }
-    };
+    private int qtdNoCarrinho;
 
     public Produto() {
-
-    }
-
-    public double getTotalPrecoItem() {
-        return totalPrecoItem;
-    }
-
-    public void setTotalPrecoItem(double totalPrecoItem) {
-        this.totalPrecoItem = totalPrecoItem;
-    }
-
-    public Produto(String pathToImage, int id, String titulo, int quantidade, double valor, long codBarra, int estoqueAtual) {
-        this.imagemURL = pathToImage;
-        this.id = id;
-        this.tituloProduto = titulo;
-        this.preco = valor;
-        this.quantidade = quantidade;
-        this.codBarra = codBarra;
-        this.estoqueAtual = estoqueAtual;
-    }
-
-    public Produto(String pathToImage, int id, String titulo, double valor, long codBarra, int estoqueAtual) {
-        this.imagemURL = pathToImage;
-        this.id = id;
-        this.tituloProduto = titulo;
-        this.preco = valor;
-        this.codBarra = codBarra;
-        this.estoqueAtual = estoqueAtual;
     }
 
     public int getId() {
@@ -113,9 +60,9 @@ public class Produto implements Parcelable {
         this.imagemURL = imagemURL;
     }
 
-    public String getJsonObject() {
-        return "{id:" + id + ",nome:" + tituloProduto + ",preco:" + preco + ",quantidade:" + quantidade + "}";
-    }
+//    public String getJsonObject() {
+//        return "{id:" + id + ",nome:" + tituloProduto + ",preco:" + preco + ",quantidade:" + quantidade + "}";
+//    }
 
     public long getCodBarra() {
         return codBarra;
@@ -131,28 +78,6 @@ public class Produto implements Parcelable {
 
     public int getEstoqueAtual() {
         return estoqueAtual;
-    }
-
-    /**
-     * PARCELABLE
-     **/
-
-    @Override
-    public int describeContents() {
-        return 0;
-    }
-
-    @Override
-    public void writeToParcel(Parcel dest, int flags) {
-        dest.writeString(imagemURL);
-        dest.writeString(tituloProduto);
-        dest.writeDouble(preco);
-        dest.writeInt(id);
-        dest.writeInt(quantidade);
-        dest.writeLong(codBarra);
-        dest.writeDouble(totalPrecoItem);
-        dest.writeInt(estoqueAtual);
-        dest.writeString(valorTotal);
     }
 
     public boolean isDesconto() {
@@ -193,5 +118,60 @@ public class Produto implements Parcelable {
 
     public void setValorTotal(String valorTotal) {
         this.valorTotal = valorTotal;
+    }
+
+    public int getQtdNoCarrinho() {
+        return qtdNoCarrinho;
+    }
+
+    public void setQtdNoCarrinho(int qtdNoCarrinho) {
+        this.qtdNoCarrinho = qtdNoCarrinho;
+    }
+
+
+    /**
+     * PARCELABLE
+     **/
+
+    @Override
+    public int describeContents() {
+        return 0;
+    }
+
+    @Override
+    public void writeToParcel(Parcel dest, int flags) {
+        dest.writeString(imagemURL);
+        dest.writeString(tituloProduto);
+        dest.writeDouble(preco);
+        dest.writeInt(id);
+        dest.writeInt(quantidade);
+        dest.writeLong(codBarra);
+        dest.writeInt(estoqueAtual);
+        dest.writeString(valorTotal);
+        dest.writeInt(qtdNoCarrinho);
+    }
+
+    public static final Creator<Produto> CREATOR = new Creator<Produto>() {
+        @Override
+        public Produto createFromParcel(Parcel in) {
+            return new Produto(in);
+        }
+
+        @Override
+        public Produto[] newArray(int size) {
+            return new Produto[size];
+        }
+    };
+
+    private Produto(Parcel in) {
+        imagemURL = in.readString();
+        tituloProduto = in.readString();
+        preco = in.readDouble();
+        id = in.readInt();
+        quantidade = in.readInt();
+        codBarra = in.readLong();
+        estoqueAtual = in.readInt();
+        valorTotal = in.readString();
+        qtdNoCarrinho = in.readInt();
     }
 }

@@ -20,7 +20,6 @@ import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
-import androidx.swiperefreshlayout.widget.SwipeRefreshLayout;
 import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
@@ -32,13 +31,14 @@ import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
+import br.com.royalfarma.utils.CustomSwipeRefreshLayout;
 
 public class HomeFragment extends Fragment implements IFetchProducts {
     private RecyclerView recyclerMaisVendidos, recyclerNovidades, recyclerPopulares;
     private ProdutosHomeAdapter adapterNovidades, adapterPopulares, adapterMaisVendidos;
     private ProductsViewModel productsViewModel;
     private Handler handler;
-    private SwipeRefreshLayout swipeContainer;
+    private CustomSwipeRefreshLayout swipeContainer;
     private NavController navController;
     private CountDownTimer countdown;
     private LinearLayoutManager linearLayoutManager;
@@ -61,9 +61,15 @@ public class HomeFragment extends Fragment implements IFetchProducts {
 
             @Override
             public void onFinish() {
-                Toast.makeText(getContext(), "Por favor, aguarde...", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    if (navController != null && navController.getCurrentDestination() != null && navController.getCurrentDestination().getId() == R.id.navigation_home) {
+                        Toast.makeText(getContext(), "Por favor, aguarde...", Toast.LENGTH_SHORT).show();
+                    }
+                }
             }
         };
+
+        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
     }
 
     private void fetchProducts() {
@@ -105,35 +111,65 @@ public class HomeFragment extends Fragment implements IFetchProducts {
     private void toggleFrameLoadingVisibility(boolean frameVisibility) {
         if (getActivity() != null) {
             final ViewGroup root = getActivity().findViewById(R.id.home_scroll_vertical);
-            FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
-            TransitionManager.beginDelayedTransition(root, new Fade().setDuration(750));
-            if (frameVisibility) {
-                frameLayout.setVisibility(View.VISIBLE);
-                frameLayout.setClickable(true);
-                frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
-            } else {
-                frameLayout.setVisibility(View.INVISIBLE);
+            if (root != null) {
+                FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
+                TransitionManager.beginDelayedTransition(root, new Fade().setDuration(750));
+                if (frameVisibility) {
+                    frameLayout.setVisibility(View.VISIBLE);
+                    frameLayout.setClickable(true);
+                    frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
+                } else {
+                    frameLayout.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }
 
+    @Override
+    public void onDestroyView() {
+        //confirm frame do not block UI
+        toggleFrameLoadingVisibility(false);
+        super.onDestroyView();
+    }
+
+    @Override
+    public void onResume() {
+        if (productsViewModel != null && productsViewModel.getTodosOsProdutosLiveData().getValue() != null && productsViewModel.getTodosOsProdutosLiveData().getValue().size() > 0)
+            toggleFrameLoadingVisibility(false);
+        super.onResume();
+    }
+
+    @Override
+    public void onPause() {
+        super.onPause();
+        //confirm frame do not block UI
+        toggleFrameLoadingVisibility(false);
+    }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         productsViewModel = new ViewModelProvider(requireParentFragment()).get(ProductsViewModel.class);
         carrinhoViewModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
-        productsViewModel.getProductLiveData().observe(getViewLifecycleOwner(), position -> {
-            if (position < 5) {
-                if (adapterNovidades != null) {
-                    adapterNovidades.notifyItemChanged(position);
-                }
-            } else if (position > 5 && position <= 10) {
-                if (adapterPopulares != null) {
-                    adapterPopulares.notifyItemChanged(position);
-                }
-            } else {
-                if (adapterMaisVendidos != null) {
-                    adapterMaisVendidos.notifyItemChanged(position);
+        productsViewModel.getProductLiveData().observe(getViewLifecycleOwner(), produto -> {
+            ArrayList<Produto> produtosIniciais = productsViewModel.getTodosOsProdutosLiveData().getValue();
+            if (produtosIniciais != null) {
+                for (int i = 0; i < produtosIniciais.size(); i++) {
+                    if (produto.getId() == produtosIniciais.get(i).getId()) {
+                        if (i < 5) {
+                            if (adapterNovidades != null) {
+                                adapterNovidades.notifyItemChanged(i);
+                            }
+                        } else if (i < 10) {
+                            if (adapterPopulares != null) {
+                                adapterPopulares.notifyItemChanged(i - 5);
+                            }
+                        } else {
+                            if (adapterMaisVendidos != null) {
+                                adapterMaisVendidos.notifyItemChanged(i - 10);
+                            }
+                        }
+                        break;
+                    }
                 }
             }
         });
@@ -147,7 +183,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                 linearLayoutManager = new LinearLayoutManager(getContext());
                 linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                 ArrayList<Produto> novidades = new ArrayList<>(listaDeTodosOsProdutos.subList(0, 5));
-                adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel);
+                adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel, "novidades");
                 adapterNovidades.setHasStableIds(true);
                 recyclerNovidades.setLayoutManager(linearLayoutManager);
                 recyclerNovidades.setAdapter(adapterNovidades);
@@ -155,7 +191,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                 linearLayoutManager = new LinearLayoutManager(getContext());
                 linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                 ArrayList<Produto> populares = new ArrayList<>(listaDeTodosOsProdutos.subList(5, 10));
-                adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel);
+                adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel, "populares");
                 adapterPopulares.setHasStableIds(true);
                 recyclerPopulares.setLayoutManager(linearLayoutManager);
                 recyclerPopulares.setAdapter(adapterPopulares);
@@ -163,7 +199,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                 linearLayoutManager = new LinearLayoutManager(getContext());
                 linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                 ArrayList<Produto> mais_vendidos = new ArrayList<>(listaDeTodosOsProdutos.subList(10, 15));
-                adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel);
+                adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel, "mais_vendidos");
                 adapterMaisVendidos.setHasStableIds(true);
                 recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
                 recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
@@ -191,7 +227,6 @@ public class HomeFragment extends Fragment implements IFetchProducts {
 
             ((AppCompatActivity) context).findViewById(R.id.btnVerMaisNovidades).setOnClickListener(v -> {
                 if (getActivity() != null) {
-                    navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
                     Bundle extras = new Bundle();
                     extras.putString("title", "Novidades");
                     navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
@@ -199,11 +234,19 @@ public class HomeFragment extends Fragment implements IFetchProducts {
             });
 
             ((AppCompatActivity) context).findViewById(R.id.btnVerMaisPopulares).setOnClickListener(v -> {
-                Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    Bundle extras = new Bundle();
+                    extras.putString("title", "Populares");
+                    navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
+                }
             });
 
             ((AppCompatActivity) context).findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
-                Toast.makeText(context, "Em implementação agora", Toast.LENGTH_SHORT).show();
+                if (getActivity() != null) {
+                    Bundle extras = new Bundle();
+                    extras.putString("title", "Mais Vendidos");
+                    navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
+                }
             });
         }
 

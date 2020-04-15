@@ -6,6 +6,7 @@ import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;
 import androidx.lifecycle.ViewModel;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 
 import br.com.royalfarma.model.Produto;
@@ -15,9 +16,10 @@ import static br.com.royalfarma.utils.Util.RSmask;
 
 public class CarrinhoViewModel extends ViewModel {
 
-    private MutableLiveData<Integer> valorTotalProdutoLiveData;
+    private int badgeNumber;
     private String subtotal;
     private MutableLiveData<String> subTotalLiveData;
+    private MutableLiveData<Integer> badgeDisplayLiveData;
     private MutableLiveData<Integer> produtoLiveData;
     private MutableLiveData<ArrayList<Produto>> cartProductsLiveData;
     private ArrayList<Produto> cartProducts;
@@ -25,11 +27,13 @@ public class CarrinhoViewModel extends ViewModel {
     public CarrinhoViewModel() {
         cartProductsLiveData = new MutableLiveData<>();
         produtoLiveData = new MutableLiveData<>();
+        badgeDisplayLiveData = new MutableLiveData<>();
         subTotalLiveData = new MutableLiveData<>();
         cartProducts = new ArrayList<>();
         cartProductsLiveData.setValue(cartProducts);
         subtotal = "R$ 0,00";
         subTotalLiveData.setValue(subtotal);
+        badgeNumber = 0;
     }
 
 
@@ -45,86 +49,90 @@ public class CarrinhoViewModel extends ViewModel {
         return produtoLiveData;
     }
 
-    public void addProductToCart(Produto produto) {
-        boolean jaExisteNaLista = false;
+    public void addProductToCart(Produto produtoAdd) {
+        boolean atualizado = false;
         ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
         if (cartProducts != null) {
-            for (Produto p : cartProducts) {
-                if (p.getId() == produto.getId()) {
-                    jaExisteNaLista = true;
+            if (cartProducts.size() > 0) {
+                Produto produtoNoCart;
+                for (int i = 0; i < cartProducts.size(); i++) {
+                    produtoNoCart = cartProducts.get(i);
+                    //checa se já existe
+                    if (produtoNoCart.getId() == produtoAdd.getId()) {
+                        if (produtoNoCart.getQtdNoCarrinho() + produtoAdd.getQtdNoCarrinho() > produtoNoCart.getEstoqueAtual()) {
+                            produtoNoCart.setQtdNoCarrinho(produtoNoCart.getEstoqueAtual());
+                        } else {
+                            Log.d(MY_LOG_TAG, "produtoNoCart.getQtdNoCarrinho() : " + produtoNoCart.getQtdNoCarrinho());
+                            Log.d(MY_LOG_TAG, "produtoAdd.getQtdNoCarrinho() : " + produtoNoCart.getQtdNoCarrinho());
+                            produtoNoCart.setQtdNoCarrinho(produtoNoCart.getQtdNoCarrinho() + produtoAdd.getQtdNoCarrinho());
+                        }
+                        cartProducts.set(i, produtoNoCart);
+                        cartProductsLiveData.setValue(cartProducts);
+                        updateSubtotal();
+                        atualizado = true;
+                        break;
+                    }
                 }
-            }
-            if (jaExisteNaLista) {
-                updateItemCartQuantity(produto);
+                if (!atualizado) {
+                    cartProducts.add(produtoAdd);
+                    cartProductsLiveData.setValue(cartProducts);
+                    updateSubtotal();
+                }
             } else {
-                cartProducts.add(produto);
+                cartProducts.add(produtoAdd);
                 cartProductsLiveData.setValue(cartProducts);
-                if (produto.isDesconto()) {
-                    double novoValorCompra = formatSubtotalString4Double(this.subtotal) + produto.getPrecoOferta();
-                    updateSubtotal(novoValorCompra);
-                } else {
-                    updateSubtotal(formatSubtotalString4Double(this.subtotal) + produto.getPreco());
-                }
+                //badgeDisplayLiveData.setValue();
+                updateSubtotal();
             }
         } else {
             Log.d(MY_LOG_TAG, "addProductToCart Error cartProducts == NULL");
         }
     }
 
-    public void updateSubtotal(double newSubtotal) {
+    public void updateSubtotal() {
+        subTotalLiveData.setValue("Calculando");
+        BigDecimal newSubtotal = new BigDecimal(0);
+        ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
+        if (cartProducts != null) {
+            for (Produto cartProduct : cartProducts) {
+                if (cartProduct.isDesconto()) {
+                    newSubtotal = newSubtotal.add(new BigDecimal(cartProduct.getQtdNoCarrinho() * cartProduct.getPrecoOferta()));
+                } else {
+                    newSubtotal = newSubtotal.add(new BigDecimal(cartProduct.getQtdNoCarrinho() * cartProduct.getPreco()));
+                }
+            }
+        }
         this.subtotal = RSmask(newSubtotal);
         subTotalLiveData.setValue(this.subtotal);
     }
 
-    public void updateProduct(int positionUpdated) {
-        produtoLiveData.setValue(positionUpdated);
-    }
-
-    public void updateItemCartQuantity(Produto item) {
+    //    public void updateProductOnCartList(int i) {
+    public void updateProductOnCartList(Produto produto) {
         ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
         if (cartProducts != null) {
             for (int i = 0; i < cartProducts.size(); i++) {
-                Produto produto = cartProducts.get(i);
-                if (produto.getId() == item.getId()) {
-                    if (item.getQuantidade() == 0) {
-                        if (item.isDesconto()) {
-                            updateSubtotal(formatSubtotalString4Double(this.subtotal) - cartProducts.get(i).getPrecoOferta());
-                        } else {
-                            updateSubtotal(formatSubtotalString4Double(this.subtotal) - cartProducts.get(i).getPreco());
-                        }
-                        removeProductFromCartList(i);
-                    } else {
-                        cartProducts.get(i).setQuantidade(item.getQuantidade());
-                        if (item.isDesconto()) {
-                            cartProducts.get(i).setValorTotal(RSmask(item.getQuantidade() * item.getPrecoOferta()));
-                            updateSubtotal(formatSubtotalString4Double(this.subtotal) + cartProducts.get(i).getPrecoOferta());
-                        } else {
-                            cartProducts.get(i).setValorTotal(RSmask(item.getQuantidade() * item.getPreco()));
-                            updateSubtotal(formatSubtotalString4Double(this.subtotal) + cartProducts.get(i).getPreco());
-                        }
-                        updateProduct(i);
-                    }
-                    return;
+                if (cartProducts.get(i).getId() == produto.getId()) {
+                    cartProducts.set(i, produto);
+                    produtoLiveData.setValue(i);
+                    cartProductsLiveData.setValue(cartProducts);
+                    updateSubtotal();
+//                    break;
+                } else {
+                    Log.e(MY_LOG_TAG, "ERRO: Produto não está na lista!");
                 }
             }
         } else {
-            Log.d(MY_LOG_TAG, "updateItemCartQuantity Error cartProducts == NULL");
+            Log.d(MY_LOG_TAG, "removeProductFromCartList Error cartProducts == NULL");
         }
     }
 
-    private void removeProductFromCartList(int i) {
-        ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
-        if (cartProducts != null) {
-            cartProducts.remove(i);
-            cartProductsLiveData.setValue(cartProducts);
-        } else {
-            Log.d(MY_LOG_TAG, "removeProductFromCartList Error cartProducts == NULL");
-        }
-
+    public void updateProductsList(ArrayList<Produto> newProducts) {
+        cartProductsLiveData.setValue(newProducts);
     }
 
 
     private double formatSubtotalString4Double(String subtotal) {
         return Double.parseDouble((subtotal).replace("-", "").replace("R$", "").replace(".", "").replace(",", "").trim()) / 100;
     }
+
 }

@@ -3,7 +3,6 @@ package br.com.royalfarma.holder;
 import android.view.View;
 import android.widget.ProgressBar;
 
-import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
@@ -16,6 +15,7 @@ public class ProdutosCarrinhoViewHolder extends RecyclerView.ViewHolder {
     public ProgressBar progressBar;
     public AppCompatTextView tituloItemProduto, qntdItem, precoItemProduto;
     public AppCompatImageView imgProduto;
+    public View viewForeground, viewBackground;
 
     public ProdutosCarrinhoViewHolder(View itemView) {
         super(itemView);
@@ -26,5 +26,7 @@ public class ProdutosCarrinhoViewHolder extends RecyclerView.ViewHolder {
         qntdItem = itemView.findViewById(R.id.qntd_item_produto);
         imgProduto = itemView.findViewById(R.id.image_item_produto);
         progressBar = itemView.findViewById(R.id.progressBar);
+        viewBackground = itemView.findViewById(R.id.viewBackground);
+        viewForeground = itemView.findViewById(R.id.viewForeground);
     }
 }

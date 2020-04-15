@@ -23,7 +23,6 @@ import androidx.recyclerview.widget.RecyclerView;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
-import com.google.android.material.snackbar.Snackbar;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -42,7 +41,7 @@ import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimati
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.RSmask;
 
-public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter {
+public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter<ProdutosCarrinhoViewHolder> {
 
     private final Toast toast;
     private final CarrinhoViewModel carrinhoViewModel;
@@ -65,50 +64,86 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter {
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.layout_cartlist_item, parent, false);
+    public ProdutosCarrinhoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_item_cart, parent, false);
         return new ProdutosCarrinhoViewHolder(view);
     }
 
-    // Clean all elements of the recycler
-    public void clear() {
-        itens.clear();
-        notifyDataSetChanged();
-    }
-
-    // Add a list of items -- change to type used
-    public void addAll(ArrayList<Produto> list) {
-        itens.addAll(list);
-        notifyDataSetChanged();
-    }
-
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
+    public void onBindViewHolder(@NonNull ProdutosCarrinhoViewHolder holder, int position) {
         AppCompatTextView descricaoItem, valorTotalLabel;
 
-        ProdutosCarrinhoViewHolder produtoCarrinhoHolder = (ProdutosCarrinhoViewHolder) holder;
         Produto item = itens.get(position);
 
-        qntdItem = produtoCarrinhoHolder.qntdItem;
-        qntdItem.setText(String.valueOf(item.getQuantidade()));
+        qntdItem = holder.qntdItem;
+        qntdItem.setText(String.valueOf(item.getQtdNoCarrinho()));
 
-        qntdMinus = produtoCarrinhoHolder.qntdMinus;
-        qntdPlus = produtoCarrinhoHolder.qntdPlus;
+        qntdMinus = holder.qntdMinus;
+        qntdPlus = holder.qntdPlus;
 
-        descricaoItem = produtoCarrinhoHolder.tituloItemProduto;
+        descricaoItem = holder.tituloItemProduto;
         descricaoItem.setText(item.getNome());
         descricaoItem.setOnLongClickListener(v -> {
             makeText(context, item.getNome(), Toast.LENGTH_SHORT).show();
             return true;
         });
 
-        valorTotalLabel = produtoCarrinhoHolder.precoItemProduto;
+        valorTotalLabel = holder.precoItemProduto;
 
+
+        badgeDrawable = navBottomView.getBadge(R.id.navigation_carrinho);
+        //Btn +
+        qntdPlus.setOnClickListener(v -> {
+            if (item.getQtdNoCarrinho() + 1 < item.getEstoqueAtual()) {
+                if (qntdMinus.getVisibility() != View.VISIBLE) {
+                    qntdMinus.setVisibility(View.VISIBLE);
+                }
+                item.setQtdNoCarrinho(item.getQtdNoCarrinho() + 1);
+                badgePreviousValue = badgeDrawable.getNumber();
+                badgeDrawable.setNumber(badgePreviousValue + 1);
+                carrinhoViewModel.updateProductOnCartList(item);
+            }
+        });
+
+        //Btn -
+        qntdMinus.setOnClickListener(v -> {
+            if (item.getQtdNoCarrinho() - 1 > 0) {
+                if (qntdPlus.getVisibility() != View.VISIBLE) {
+                    qntdPlus.setVisibility(View.VISIBLE);
+                }
+                item.setQtdNoCarrinho(item.getQtdNoCarrinho() - 1);
+                badgePreviousValue = badgeDrawable.getNumber();
+                badgeDrawable.setNumber(badgePreviousValue - 1);
+                if (badgeDrawable.getNumber() == 0) {
+                    badgeDrawable.clearNumber();
+                }
+                carrinhoViewModel.updateProductOnCartList(item);
+            }
+        });
+
+
+        //Botões + e -
+        if (item.getQtdNoCarrinho() > 1) {
+            qntdMinus.setEnabled(true);
+            qntdMinus.setClickable(true);
+            qntdMinus.setVisibility(View.VISIBLE);
+        } else {
+            qntdMinus.setVisibility(View.GONE);
+        }
+        if (item.getQtdNoCarrinho() + 1 < item.getEstoqueAtual()) {
+            qntdPlus.setEnabled(true);
+            qntdPlus.setClickable(true);
+            qntdPlus.setVisibility(View.VISIBLE);
+        } else {
+            qntdPlus.setVisibility(View.GONE);
+        }
+
+        //Preco
         if (item.isDesconto()) {
             String precoNormal, precoEmOferta;
-            if (item.getQuantidade() > 0) {
-                precoNormal = RSmask(item.getPreco() * item.getQuantidade());
-                precoEmOferta = RSmask(item.getPrecoOferta() * item.getQuantidade());
+            if (item.getQtdNoCarrinho() > 1) {
+                precoNormal = RSmask(item.getPreco() * item.getQtdNoCarrinho());
+                precoEmOferta = RSmask(item.getPrecoOferta() * item.getQtdNoCarrinho());
             } else {
                 precoNormal = RSmask(item.getPreco());
                 precoEmOferta = RSmask(item.getPrecoOferta());
@@ -117,20 +152,22 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter {
             valorTotalLabel.setText(ssb, TextView.BufferType.EDITABLE);
             item.setValorTotal(precoEmOferta);
         } else {
-            if (item.getQuantidade() > 0) {
-                item.setValorTotal(RSmask(item.getPreco() * item.getQuantidade()));
-                valorTotalLabel.setText(RSmask(item.getPreco() * item.getQuantidade()));
+            if (item.getQtdNoCarrinho() > 1) {
+                item.setValorTotal(RSmask(item.getPreco() * item.getQtdNoCarrinho()));
+                valorTotalLabel.setText(RSmask(item.getPreco() * item.getQtdNoCarrinho()));
             } else {
                 item.setValorTotal(RSmask(item.getPreco()));
                 valorTotalLabel.setText(RSmask(item.getPreco()));
             }
         }
+        //fim preco
 
-        AppCompatImageView imagemItem = produtoCarrinhoHolder.imgProduto;
+        //Imagem
+        AppCompatImageView imagemItem = holder.imgProduto;
         String url = "https://www.royalfarma.com.br/uploads/" + item.getImagemURL();
 
         //LOADER
-        final ProgressBar progressView = produtoCarrinhoHolder.progressBar;
+        final ProgressBar progressView = holder.progressBar;
         progressView.setVisibility(View.VISIBLE);
         imagemItem.setVisibility(View.VISIBLE);
 
@@ -167,60 +204,31 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter {
                     .into(imagemItem, loadedCallback);
         }
         //FIM LOADER
+        //fim imagem
 
         //Open detail page
         String finalUrl = url;
         imagemItem.setOnClickListener(v -> openDetailImageActivity(finalUrl));
-
-        qntdPlus.setClickable(true);
-        if (item.getQuantidade() > 0) {
-            qntdMinus.setEnabled(true);
-            qntdMinus.setClickable(true);
-        } else {
-            qntdMinus.setClickable(false);
-            qntdMinus.setEnabled(false);
-        }
-
-        badgeDrawable = navBottomView.getBadge(R.id.navigation_carrinho);
-
-        qntdPlus.setOnClickListener(v -> {
-            if (item.getQuantidade() + 1 < item.getEstoqueAtual()) {
-                qntdMinus.setEnabled(true);
-                item.setQuantidade(item.getQuantidade() + 1);
-                badgePreviousValue = badgeDrawable.getNumber();
-                badgeDrawable.setNumber(badgePreviousValue + 1);
-                carrinhoViewModel.updateItemCartQuantity(item);
-            } else {
-                qntdPlus.setClickable(true);
-                qntdPlus.setEnabled(true);
-                Snackbar.make(v, "Não há mais produtos suficientes no estoque", Snackbar.LENGTH_LONG).setActionTextColor(context.getResources().getColor(R.color.colorSecondaryLight)).setAction("Fechar", v1 -> {
-                }).show();
-            }
-        });
-
-        qntdMinus.setOnClickListener(v -> {
-            qntdPlus.setEnabled(true);
-            if (item.getQuantidade() > 0) {
-                item.setQuantidade(item.getQuantidade() - 1);
-                badgePreviousValue = badgeDrawable.getNumber();
-                badgeDrawable.setNumber(badgePreviousValue - 1);
-                carrinhoViewModel.updateItemCartQuantity(item);
-            } else {
-                qntdMinus.setEnabled(false);
-                Snackbar.make(v, "Não é possível diminuir", Snackbar.LENGTH_LONG).setActionTextColor(context.getResources().getColor(R.color.colorSecondaryLight)).setAction("Fechar", v1 -> {
-                }).show();
-            }
-        });
-
     }
+
+    // Clean all elements of the recycler
+    public void clear() {
+        itens.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(ArrayList<Produto> list) {
+        itens.addAll(list);
+        notifyDataSetChanged();
+    }
+
 
     private SpannableStringBuilder configValueWithDiscount(String precoNormal, String precoEmOferta) {
         // Use a SpannableStringBuilder so that both the text and the spans are mutable
         SpannableStringBuilder ssb = new SpannableStringBuilder(precoNormal);
-
         // Create a span that will strikethrough the text
         StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
-
         // Add the secondWord and apply the strikethrough span to only the second word
         ssb.setSpan(
                 strikethroughSpan,

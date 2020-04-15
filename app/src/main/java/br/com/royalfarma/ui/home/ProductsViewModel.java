@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import br.com.royalfarma.model.Produto;
 
 public class ProductsViewModel extends ViewModel {
-    private final MutableLiveData<Integer> produtoLiveData;
+    private final MutableLiveData<Produto> produtoLiveData;
     private MutableLiveData<ArrayList<Produto>> todosOsProdutosLiveData;
     private ArrayList<Produto> todosOsProdutos;
 
@@ -30,11 +30,11 @@ public class ProductsViewModel extends ViewModel {
         todosOsProdutosLiveData.setValue(todosOsProdutos);
     }
 
-    public LiveData<Integer> getProductLiveData() {
+    public LiveData<Produto> getProductLiveData() {
         return produtoLiveData;
     }
 
     public void updateProduct(Integer updatePosition) {
-        produtoLiveData.setValue(updatePosition);
+        produtoLiveData.setValue(todosOsProdutosLiveData.getValue().get(updatePosition));
     }
 }

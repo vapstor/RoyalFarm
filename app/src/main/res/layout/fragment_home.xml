@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 
 
-<androidx.swiperefreshlayout.widget.SwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
+<br.com.royalfarma.utils.CustomSwipeRefreshLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:app="http://schemas.android.com/apk/res-auto"
     xmlns:tools="http://schemas.android.com/tools"
     android:id="@+id/swipe_container"
@@ -74,7 +74,7 @@
                     android:columnWidth="100dp"
                     android:gravity="center"
                     android:horizontalSpacing="1dp"
-                    android:numColumns="6"
+                    android:numColumns="5"
                     android:orientation="horizontal"
                     android:padding="4dp"
                     android:scrollbarAlwaysDrawHorizontalTrack="true"
@@ -242,4 +242,4 @@
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>
-</androidx.swiperefreshlayout.widget.SwipeRefreshLayout>
+</br.com.royalfarma.utils.CustomSwipeRefreshLayout>
