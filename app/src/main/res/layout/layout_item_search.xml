@@ -24,7 +24,7 @@
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
                 android:fontFamily="@font/roboto"
-                android:text="@string/deletar"
+                android:text="@string/adicionar"
                 android:textAlignment="center"
                 android:textAllCaps="true"
                 android:textColor="@color/white"
@@ -86,7 +86,6 @@
                 android:fontFamily="@font/roboto"
                 android:text="Ritalina"
                 android:textSize="16sp"
-                app:layout_constraintEnd_toStartOf="@+id/btn_remove_item_produto"
                 app:layout_constraintStart_toEndOf="@+id/image_item_produto"
                 app:layout_constraintTop_toTopOf="@+id/image_item_produto" />
 
@@ -100,44 +99,6 @@
                 android:textSize="12sp"
                 app:layout_constraintStart_toStartOf="@+id/title_item_produto"
                 app:layout_constraintTop_toBottomOf="@+id/title_item_produto" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_add_item_produto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="8dp"
-                android:layout_marginBottom="8dp"
-                android:background="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toEndOf="parent"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_add_circle_outline_accent_24dp" />
-
-            <androidx.appcompat.widget.AppCompatTextView
-                android:id="@id/qntd_item_produto"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginEnd="16dp"
-                android:fontFamily="@font/roboto_light"
-                android:text="@string/zero"
-                app:layout_constraintBottom_toBottomOf="@+id/btn_add_item_produto"
-                app:layout_constraintEnd_toStartOf="@+id/btn_add_item_produto"
-                app:layout_constraintTop_toTopOf="@+id/btn_add_item_produto" />
-
-            <androidx.appcompat.widget.AppCompatImageButton
-                android:id="@+id/btn_remove_item_produto"
-                android:layout_width="0dp"
-                android:layout_height="wrap_content"
-
-                android:layout_marginTop="8dp"
-                android:layout_marginEnd="16dp"
-                android:layout_marginBottom="8dp"
-                android:background="@null"
-                app:layout_constraintBottom_toBottomOf="parent"
-                app:layout_constraintEnd_toStartOf="@+id/qntd_item_produto"
-                app:layout_constraintTop_toTopOf="parent"
-                app:srcCompat="@drawable/ic_remove_circle_outline_accent_24dp" />
 
             <ProgressBar
                 android:id="@+id/progressBar"

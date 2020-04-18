@@ -310,4 +310,139 @@ public class DataBaseConnection {
             iFetchProducts.onGetDataDone(todosOsProdutos);
         }
     }
+
+    public static class FetchProductsByQuery extends AsyncTask<String, Integer, ArrayList<Produto>> {
+        private final Handler handler;
+        private final IFetchProducts iFetchProducts;
+        private final boolean limited;
+        private final int limit;
+        private Message message;
+
+        public FetchProductsByQuery(Handler handler, boolean limited, int limit, IFetchProducts iFetchProducts) {
+            this.iFetchProducts = iFetchProducts;
+            this.handler = handler;
+            this.limited = limited;
+            this.limit = limit;
+        }
+
+        @Override
+        protected void onPreExecute() {
+            Log.v(MY_LOG_TAG, "### ON PRE EXECUTE ###");
+            this.message = new Message();
+            this.message.what = 1;
+            this.message.obj = "onPreExecute";
+            this.handler.sendMessage(message);
+            super.onPreExecute();
+        }
+
+        @Override
+        protected ArrayList<Produto> doInBackground(String... strings) {
+            try {
+                synchronized (lock) {
+                    new Thread(DataBaseConnection::createConnection).start();
+                    lock.wait();
+                    Log.v(MY_LOG_TAG, "doInBackground");
+                    this.message = new Message();
+                    this.message.what = 1;
+
+                    String sqlGetHomePdtsNovidades = "SELECT " +
+                            "pdt_id, " +
+                            "pdt_code, " +
+                            "pdt_name, " +
+                            "pdt_title, " +
+                            "pdt_inventory, " +
+                            "pdt_cover, " +
+                            "pdt_offer_price, " +
+                            "pdt_offer_start, " +
+                            "pdt_offer_end, " +
+                            "pdt_price " +
+                            "FROM  ws_products " +
+                            "WHERE pdt_status = 1 " +
+                            "AND (pdt_inventory >= 1 OR pdt_inventory IS NULL) " +
+                            "AND (pdt_name LIKE ? OR pdt_code LIKE ?) " +
+                            "AND (pdt_offer_end IS NULL OR pdt_offer_end < NOW() OR TIMEDIFF(pdt_offer_end, CURRENT_TIMESTAMP()) > '24:00:00') " +
+                            "ORDER BY " +
+                            "RAND() ";
+                    StringBuilder sb = new StringBuilder(sqlGetHomePdtsNovidades);
+                    if (limited)
+                        sb.append("LIMIT ").append(limit);
+
+                    PreparedStatement pstmt = connection.prepareStatement(sb.toString());
+                    pstmt.setString(1, "%" + strings[0] + "%");
+                    pstmt.setString(2, "%" + strings[0] + "%");
+
+                    ResultSet resultSet = pstmt.executeQuery();
+
+
+                    ArrayList<Produto> todosOsProdutos = new ArrayList<>();
+                    Produto produto;
+
+                    this.message.obj = "size: " + resultSet.getFetchSize();
+                    Log.d(MY_LOG_TAG, "Size: " + this.message.obj);
+                    this.handler.sendMessage(message);
+                    int progress = 0;
+                    while (resultSet.next()) {
+                        this.message = new Message();
+                        this.message.what = 1;
+                        this.message.obj = "progress: " + ++progress;
+                        handler.sendMessage(message);
+
+                        String id = resultSet.getString("pdt_id");
+                        String codBarra = resultSet.getString("pdt_code");
+                        String titulo = resultSet.getString("pdt_title");
+                        String pathToImage = resultSet.getString("pdt_cover");
+                        String preco = resultSet.getString("pdt_price");
+                        String estoque = resultSet.getString("pdt_inventory");
+                        String precoOferta = resultSet.getString("pdt_offer_price");
+                        String inicioOferta = resultSet.getString("pdt_offer_start");
+                        String fimOferta = resultSet.getString("pdt_offer_end");
+
+                        produto = new Produto();
+                        produto.setImagemURL(pathToImage);
+                        produto.setId(Integer.parseInt(id));
+                        produto.setNome(titulo);
+                        produto.setPreco(Double.parseDouble(preco.replace(", ", ".")));
+                        produto.setCodBarra(Long.parseLong(codBarra));
+                        produto.setEstoqueAtual(Integer.parseInt(estoque));
+                        if (precoOferta != null && !precoOferta.equals("NULL") && !precoOferta.equals("")) {
+                            produto.setDesconto(true);
+                            produto.setPrecoOferta(Double.parseDouble(precoOferta.replace(", ", ".")));
+                            produto.setInicioOferta(inicioOferta);
+                            produto.setFimOferta(fimOferta);
+                        }
+                        todosOsProdutos.add(produto);
+                    }
+
+                    //                    listaDeCategorias.add(produtosNovidades);
+//                    listaDeCategorias.add(produtosMaisVendidos);
+                    return todosOsProdutos;
+                }
+            } catch (SQLException e) {
+                Log.e(MY_LOG_TAG, "Erro de SQL");
+                message.obj = "erro_sql";
+                handler.sendMessage(message);
+                e.printStackTrace();
+            } catch (InterruptedException e) {
+                e.printStackTrace();
+            }
+            return null;
+        }
+
+        //        @Override
+//        protected void onProgressUpdate(Integer... progress) {
+//            Log.d(MY_LOG_TAG, "### ON PROGRESS UPDATE ###");
+//            super.onProgressUpdate(progress);
+//        }
+
+        @Override
+        protected void onPostExecute(ArrayList<Produto> todosOsProdutos) {
+            this.message = new Message();
+            this.message.what = 1;
+            Log.v(MY_LOG_TAG, "### ON POST EXECUTE ###");
+            message.obj = "onPostExecute";
+            handler.sendMessage(message);
+            //let HomeFragment know that we are done
+            iFetchProducts.onGetDataDone(todosOsProdutos);
+        }
+    }
 }

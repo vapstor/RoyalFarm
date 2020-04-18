@@ -8,6 +8,7 @@
     <fragment
         android:id="@+id/navigation_pesquisar"
         android:name="br.com.royalfarma.ui.pesquisar.PesquisarFragment"
+        android:launchMode="singleTop"
         android:label="@string/title_pesquisar"
         tools:layout="@layout/fragment_pesquisar" />
 
@@ -49,11 +50,17 @@
         <action
             android:id="@+id/action_navigation_carrinho_to_navigation_home"
             app:destination="@id/navigation_home" />
+        <action
+            android:id="@+id/action_navigation_carrinho_to_loginFragment"
+            app:destination="@id/navigation_login"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/navigation_carrinho" />
     </fragment>
 
     <fragment
         android:id="@+id/navigation_lista_produtos"
-        android:name="br.com.royalfarma.ui.listaDeProdutos.ListaDeProdutosFragment"
+        android:name="br.com.royalfarma.ui.listagem.ListaDeProdutosFragment"
         tools:layout="@layout/fragment_lista_de_produtos">
         <action
             android:id="@+id/action_navigation_lista_produtos_to_navigation_home"
@@ -64,4 +71,8 @@
             app:popExitAnim="@anim/fragment_close_exit"
             app:popUpTo="@id/navigation_home" />
     </fragment>
+    <fragment
+        android:id="@+id/navigation_login"
+        android:name="br.com.royalfarma.ui.login.LoginFragment"
+        android:label="@string/entrar" />
 </navigation>

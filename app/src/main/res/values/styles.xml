@@ -49,7 +49,7 @@
         <item name="android:textColor">@color/btn_carrinho_text_state_list</item>
         <item name="iconGravity">start</item>
         <item name="android:layout_height">32dp</item>
-        <item name="android:textSize">13sp</item>
+        <item name="android:textSize">11sp</item>
     </style>
 
     <style name="ButtonTextWhiteBGAccent" parent="Widget.AppCompat.Button.Colored">
@@ -84,7 +84,7 @@
     </style>
 
 
-    <style name="CollapseBarCustom" >
+    <style name="CollapseBarCustom">
         <item name="android:shadowColor">@color/colorAccent</item>
         <item name="android:shadowDx">0.0</item>
         <item name="android:shadowDy">0.0</item>
@@ -94,4 +94,20 @@
     <style name="AppTheme.AppBarOverlay" parent="ThemeOverlay.AppCompat.Dark.ActionBar" />
 
     <style name="AppTheme.PopupOverlay" parent="ThemeOverlay.AppCompat.Light" />
+
+    <style name="MaterialAlertDialog.Rounded" parent="ThemeOverlay.MaterialComponents.MaterialAlertDialog">
+        <item name="shapeAppearanceOverlay">
+            @style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded
+        </item>
+    </style>
+
+    <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="">
+        <item name="android:textAppearanceButton">@color/colorAccent</item>
+    </style>
+
+    <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar">
+        <item name="android:colorPrimary">@color/colorAccent</item>
+        <item name="android:colorAccent">@color/colorAccent</item>
+        <item name="android:textColorPrimary">@color/colorAccent</item>
+    </style>
 </resources>

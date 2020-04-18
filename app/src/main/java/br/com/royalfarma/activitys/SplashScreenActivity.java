@@ -26,7 +26,7 @@ public class SplashScreenActivity extends AppCompatActivity {
                 sleep(500);
                 SplashScreenActivity.this.runOnUiThread(() -> {
                     Bundle bundle = makeSceneTransitionAnimation(SplashScreenActivity.this).toBundle();
-                    Intent intent = new Intent(SplashScreenActivity.this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
+                    Intent intent = new Intent(SplashScreenActivity.this, MainActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
                     SplashScreenActivity.this.startActivity(intent, bundle);
                 });
             } catch (InterruptedException e) {

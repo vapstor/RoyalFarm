@@ -1,4 +1,4 @@
-package br.com.royalfarma.ui.listaDeProdutos;
+package br.com.royalfarma.ui.listagem;
 
 import androidx.lifecycle.LiveData;
 import androidx.lifecycle.MutableLiveData;

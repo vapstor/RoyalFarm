@@ -40,4 +40,8 @@
     <string name="descricao_">Descrição: </string>
     <string name="este_produto_nao_contem_descricao">Este produto não contém descrição.</string>
     <string name="version_name">${versionChanges}.${versionImproves}.${versionBugs}</string>
+    <string name="number_picker_formatter">Number Picker Formatter</string>
+    <string name="roboto_light">roboto_light</string>
+    <string name="nome_cod_barras">Nome ou Cód. Barras…</string>
+    <string name="nenhum_produto_encontrado_npor_favor_tente_novamente">Nenhum produto encontrado.\nPor favor, tente novamente</string>
 </resources>

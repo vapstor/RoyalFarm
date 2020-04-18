@@ -5,7 +5,7 @@
     android:id="@+id/fragment_lista_de_produtos"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".ui.listaDeProdutos.ListaDeProdutosFragment">
+    tools:context=".ui.listagem.ListaDeProdutosFragment">
 
     <ScrollView
         android:id="@+id/scrollViewListaProdutosContainer"

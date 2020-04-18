@@ -16,21 +16,18 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import br.com.royalfarma.R;
-import br.com.royalfarma.activitys.ProductDetailActivity;
-import br.com.royalfarma.holder.ProdutosListaViewHolder;
+import br.com.royalfarma.activitys.ProductDetailImageActivity;
+import br.com.royalfarma.holder.ProdutosCarrinhoViewHolder;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.utils.RoundedBackgroundSpan;
 import br.com.royalfarma.utils.RoundedTransformation;
@@ -40,14 +37,13 @@ import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimati
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.RSmask;
 
-public class ProdutosListaAdapter extends RecyclerView.Adapter{
+public class ProdutosPesquisaAdapter extends RecyclerView.Adapter<ProdutosCarrinhoViewHolder> {
 
-    private static final int DETALHE_DO_PDOTUO = 1;
+    private final Context context;
+    private final ArrayList<Produto> itens;
     private final Toast toast;
-    private Context context;
-    private ArrayList<Produto> itens;
 
-    public ProdutosListaAdapter(ArrayList<Produto> itens, Context context) {
+    public ProdutosPesquisaAdapter(ArrayList<Produto> itens, Context context) {
         this.context = context;
         this.itens = itens;
         toast = makeText(context, "", Toast.LENGTH_LONG);
@@ -55,69 +51,55 @@ public class ProdutosListaAdapter extends RecyclerView.Adapter{
 
     @NonNull
     @Override
-    public RecyclerView.ViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
-        View view = LayoutInflater.from(context).inflate(R.layout.item_produto_listagem, parent, false);
-        return new ProdutosListaViewHolder(view);
-    }
-
-    // Clean all elements of the recycler
-    public void clear() {
-        itens.clear();
-        notifyDataSetChanged();
-    }
-
-    // Add a list of items -- change to type used
-    public void addAll(ArrayList<Produto> list) {
-        itens.addAll(list);
-        notifyDataSetChanged();
+    public ProdutosCarrinhoViewHolder onCreateViewHolder(@NonNull ViewGroup parent, int viewType) {
+        View view = LayoutInflater.from(context).inflate(R.layout.layout_item_search, parent, false);
+        return new ProdutosCarrinhoViewHolder(view);
     }
 
     @Override
-    public void onBindViewHolder(@NonNull RecyclerView.ViewHolder holder, int position) {
-        AppCompatTextView descricaoItem, valorTotalLabel;
-
-        ProdutosListaViewHolder itemProdutoHolder = (ProdutosListaViewHolder) holder;
+    public void onBindViewHolder(@NonNull ProdutosCarrinhoViewHolder holder, int position) {
         Produto item = itens.get(position);
 
-        descricaoItem = itemProdutoHolder.tituloItemProduto;
-        AppCompatImageButton btnViewDetail = itemProdutoHolder.visualizar;
+        AppCompatTextView descricaoItem = holder.tituloItemProduto;
         descricaoItem.setText(item.getNome());
         descricaoItem.setOnLongClickListener(v -> {
             makeText(context, item.getNome(), Toast.LENGTH_SHORT).show();
             return true;
         });
 
-        valorTotalLabel = itemProdutoHolder.precoItemProduto;
-
+        AppCompatTextView preco = holder.precoItemProduto;
+        //Preco
         if (item.isDesconto()) {
             String precoNormal, precoEmOferta;
-            if (item.getQuantidade() > 0) {
-                precoNormal = RSmask(item.getPreco() * item.getQuantidade());
-                precoEmOferta = RSmask(item.getPrecoOferta() * item.getQuantidade());
+            if (item.getQtdNoCarrinho() > 1) {
+                precoNormal = RSmask(item.getPreco() * item.getQtdNoCarrinho());
+                precoEmOferta = RSmask(item.getPrecoOferta() * item.getQtdNoCarrinho());
             } else {
                 precoNormal = RSmask(item.getPreco());
                 precoEmOferta = RSmask(item.getPrecoOferta());
             }
             SpannableStringBuilder ssb = configValueWithDiscount(precoNormal, precoEmOferta);
+            preco.setText(ssb, TextView.BufferType.EDITABLE);
             item.setValorTotal(precoEmOferta);
-            valorTotalLabel.setText(ssb, TextView.BufferType.EDITABLE);
         } else {
-            if (item.getQuantidade() > 0) {
-                item.setValorTotal(RSmask(item.getQuantidade() * item.getPreco()));
-                valorTotalLabel.setText(RSmask(item.getPreco() * item.getQuantidade()));
+            if (item.getQtdNoCarrinho() > 1) {
+                item.setValorTotal(RSmask(item.getPreco() * item.getQtdNoCarrinho()));
+                preco.setText(RSmask(item.getPreco() * item.getQtdNoCarrinho()));
             } else {
                 item.setValorTotal(RSmask(item.getPreco()));
-                valorTotalLabel.setText(RSmask(item.getPreco()));
+                preco.setText(RSmask(item.getPreco()));
             }
         }
 
-        AppCompatImageView imagemItem = itemProdutoHolder.imgProduto;
+        //Imagem
+        AppCompatImageView imagemItem = holder.imgProduto;
         String url = "https://www.royalfarma.com.br/uploads/" + item.getImagemURL();
 
         //LOADER
-        itemProdutoHolder.progressBar.setVisibility(View.VISIBLE);
+        final ProgressBar progressView = holder.progressBar;
+        progressView.setVisibility(View.VISIBLE);
         imagemItem.setVisibility(View.VISIBLE);
-        final ProgressBar progressView = itemProdutoHolder.progressBar;
+
         final Callback loadedCallback = new Callback() {
             @Override
             public void onSuccess() {
@@ -151,34 +133,44 @@ public class ProdutosListaAdapter extends RecyclerView.Adapter{
                     .into(imagemItem, loadedCallback);
         }
         //FIM LOADER
+        //fim imagem
 
         //Open detail page
-        imagemItem.setOnClickListener(v -> openDetailProductActivity(item));
-        btnViewDetail.setOnClickListener(v -> openDetailProductActivity(item));
+        String finalUrl = url;
+        imagemItem.setOnClickListener(v -> openDetailImageActivity(finalUrl));
     }
 
-    private void openDetailProductActivity(Produto produto) {
-        Gson gson = new Gson();
-        Intent intent = new Intent(context, ProductDetailActivity.class);
-        Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
-        if (bundle != null) {
-            String product = gson.toJson(produto);
-            intent.putExtra("selectedProduct", product);
-            ((AppCompatActivity) context).startActivityForResult(intent, DETALHE_DO_PDOTUO, bundle);
-        } else {
-            Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
-        }
+    @Override
+    public int getItemCount() {
+        return itens.size();
     }
 
+    private void openDetailImageActivity(String url) {
+        Intent intent = new Intent(context, ProductDetailImageActivity.class);
+        Bundle bundle = makeSceneTransitionAnimation((AppCompatActivity) context).toBundle();
+        intent.putExtra("imageURL", url);
+        context.startActivity(intent, bundle);
+    }
+
+
+    // Clean all elements of the recycler
+    public void clear() {
+        itens.clear();
+        notifyDataSetChanged();
+    }
+
+    // Add a list of items -- change to type used
+    public void addAll(ArrayList<Produto> list) {
+        itens.addAll(list);
+        notifyDataSetChanged();
+    }
 
 
     private SpannableStringBuilder configValueWithDiscount(String precoNormal, String precoEmOferta) {
         // Use a SpannableStringBuilder so that both the text and the spans are mutable
         SpannableStringBuilder ssb = new SpannableStringBuilder(precoNormal);
-
         // Create a span that will strikethrough the text
         StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
-
         // Add the secondWord and apply the strikethrough span to only the second word
         ssb.setSpan(
                 strikethroughSpan,
@@ -193,15 +185,5 @@ public class ProdutosListaAdapter extends RecyclerView.Adapter{
         // Set the TextView text and denote that it is Editable
         // since it's a SpannableStringBuilder
         return ssb;
-    }
-
-    @Override
-    public long getItemId(int position) {
-        return itens.get(position).getId();
-    }
-
-    @Override
-    public int getItemCount() {
-        return itens.size();
     }
 }

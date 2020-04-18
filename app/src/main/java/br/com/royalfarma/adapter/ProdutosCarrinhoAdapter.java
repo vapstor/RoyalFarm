@@ -21,8 +21,6 @@ import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.android.material.badge.BadgeDrawable;
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -45,21 +43,18 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter<ProdutosCarrin
 
     private final Toast toast;
     private final CarrinhoViewModel carrinhoViewModel;
+    private final View navView;
     private Context context;
     private ArrayList<Produto> itens;
     private AppCompatTextView qntdItem;
     private AppCompatImageButton qntdMinus, qntdPlus;
-    private BottomNavigationView navBottomView;
-    private int badgePreviousValue;
-    private BadgeDrawable badgeDrawable;
-
 
     public ProdutosCarrinhoAdapter(ArrayList<Produto> itens, Context context, CarrinhoViewModel carrinhoViewModel) {
         this.context = context;
         this.itens = itens;
         toast = makeText(context, "", Toast.LENGTH_LONG);
-        navBottomView = ((AppCompatActivity) this.context).findViewById(R.id.nav_view);
         this.carrinhoViewModel = carrinhoViewModel;
+        navView = ((AppCompatActivity) context).findViewById(R.id.nav_view);
     }
 
     @NonNull
@@ -78,8 +73,25 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter<ProdutosCarrin
         qntdItem = holder.qntdItem;
         qntdItem.setText(String.valueOf(item.getQtdNoCarrinho()));
 
+//        //NumberPicker
+//        qntdItem.setOnClickListener(v -> {
+//
+//        });
+
         qntdMinus = holder.qntdMinus;
         qntdPlus = holder.qntdPlus;
+
+        //Botões + e - Visibilidade
+        if (item.getQtdNoCarrinho() > 1) {
+            qntdMinus.setVisibility(View.VISIBLE);
+        } else {
+            qntdMinus.setVisibility(View.GONE);
+        }
+        if (item.getQtdNoCarrinho() + 1 <= item.getEstoqueAtual()) {
+            qntdPlus.setVisibility(View.VISIBLE);
+        } else {
+            qntdPlus.setVisibility(View.GONE);
+        }
 
         descricaoItem = holder.tituloItemProduto;
         descricaoItem.setText(item.getNome());
@@ -90,53 +102,24 @@ public class ProdutosCarrinhoAdapter extends RecyclerView.Adapter<ProdutosCarrin
 
         valorTotalLabel = holder.precoItemProduto;
 
-
-        badgeDrawable = navBottomView.getBadge(R.id.navigation_carrinho);
         //Btn +
         qntdPlus.setOnClickListener(v -> {
-            if (item.getQtdNoCarrinho() + 1 < item.getEstoqueAtual()) {
-                if (qntdMinus.getVisibility() != View.VISIBLE) {
-                    qntdMinus.setVisibility(View.VISIBLE);
-                }
-                item.setQtdNoCarrinho(item.getQtdNoCarrinho() + 1);
-                badgePreviousValue = badgeDrawable.getNumber();
-                badgeDrawable.setNumber(badgePreviousValue + 1);
-                carrinhoViewModel.updateProductOnCartList(item);
-            }
+            item.setQtdNoCarrinho(item.getQtdNoCarrinho() + 1);
+            carrinhoViewModel.updateProductOnCartList(item);
+            carrinhoViewModel.updateBadgeDisplay();
         });
-
-        //Btn
+        //Btn -
         qntdMinus.setOnClickListener(v -> {
             if (item.getQtdNoCarrinho() - 1 > 0) {
-                if (qntdPlus.getVisibility() != View.VISIBLE) {
-                    qntdPlus.setVisibility(View.VISIBLE);
-                }
                 item.setQtdNoCarrinho(item.getQtdNoCarrinho() - 1);
-                badgePreviousValue = badgeDrawable.getNumber();
-                badgeDrawable.setNumber(badgePreviousValue - 1);
-                if (badgeDrawable.getNumber() == 0) {
-                    badgeDrawable.clearNumber();
-                }
                 carrinhoViewModel.updateProductOnCartList(item);
+                carrinhoViewModel.updateBadgeDisplay();
+            } else {
+                item.setQtdNoCarrinho(0);
+                carrinhoViewModel.updateProductOnCartList(item);
+                carrinhoViewModel.updateBadgeDisplay();
             }
         });
-
-
-        //Botões + e -
-        if (item.getQtdNoCarrinho() > 1) {
-            qntdMinus.setEnabled(true);
-            qntdMinus.setClickable(true);
-            qntdMinus.setVisibility(View.VISIBLE);
-        } else {
-            qntdMinus.setVisibility(View.GONE);
-        }
-        if (item.getQtdNoCarrinho() + 1 < item.getEstoqueAtual()) {
-            qntdPlus.setEnabled(true);
-            qntdPlus.setClickable(true);
-            qntdPlus.setVisibility(View.VISIBLE);
-        } else {
-            qntdPlus.setVisibility(View.GONE);
-        }
 
         //Preco
         if (item.isDesconto()) {

@@ -34,6 +34,7 @@ public class CarrinhoViewModel extends ViewModel {
         subtotal = "R$ 0,00";
         subTotalLiveData.setValue(subtotal);
         badgeNumber = 0;
+        badgeDisplayLiveData.setValue(badgeNumber);
     }
 
 
@@ -49,6 +50,11 @@ public class CarrinhoViewModel extends ViewModel {
         return produtoLiveData;
     }
 
+    public LiveData<Integer> getBadgeDisplayLiveData() {
+        return badgeDisplayLiveData;
+    }
+
+
     public void addProductToCart(Produto produtoAdd) {
         boolean atualizado = false;
         ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
@@ -59,29 +65,27 @@ public class CarrinhoViewModel extends ViewModel {
                     produtoNoCart = cartProducts.get(i);
                     //checa se já existe
                     if (produtoNoCart.getId() == produtoAdd.getId()) {
-                        if (produtoNoCart.getQtdNoCarrinho() + produtoAdd.getQtdNoCarrinho() > produtoNoCart.getEstoqueAtual()) {
-                            produtoNoCart.setQtdNoCarrinho(produtoNoCart.getEstoqueAtual());
+                        if (produtoAdd.getQtdNoCarrinho() > produtoNoCart.getEstoqueAtual()) {
+                            produtoAdd.setQtdNoCarrinho(produtoNoCart.getEstoqueAtual());
+                            cartProducts.set(i, produtoAdd);
                         } else {
                             Log.d(MY_LOG_TAG, "produtoNoCart.getQtdNoCarrinho() : " + produtoNoCart.getQtdNoCarrinho());
                             Log.d(MY_LOG_TAG, "produtoAdd.getQtdNoCarrinho() : " + produtoNoCart.getQtdNoCarrinho());
-                            produtoNoCart.setQtdNoCarrinho(produtoNoCart.getQtdNoCarrinho() + produtoAdd.getQtdNoCarrinho());
+                            produtoNoCart.setQtdNoCarrinho(produtoAdd.getQtdNoCarrinho());
+                            cartProducts.set(i, produtoNoCart);
                         }
-                        cartProducts.set(i, produtoNoCart);
-                        cartProductsLiveData.setValue(cartProducts);
-                        updateSubtotal();
                         atualizado = true;
                         break;
                     }
                 }
                 if (!atualizado) {
                     cartProducts.add(produtoAdd);
-                    cartProductsLiveData.setValue(cartProducts);
-                    updateSubtotal();
                 }
+                cartProductsLiveData.setValue(cartProducts);
+                updateSubtotal();
             } else {
                 cartProducts.add(produtoAdd);
                 cartProductsLiveData.setValue(cartProducts);
-                //badgeDisplayLiveData.setValue();
                 updateSubtotal();
             }
         } else {
@@ -91,7 +95,7 @@ public class CarrinhoViewModel extends ViewModel {
 
     public void updateSubtotal() {
         subTotalLiveData.setValue("Calculando");
-        BigDecimal newSubtotal = new BigDecimal(0);
+        BigDecimal newSubtotal = new BigDecimal(0.00);
         ArrayList<Produto> cartProducts = cartProductsLiveData.getValue();
         if (cartProducts != null) {
             for (Produto cartProduct : cartProducts) {
@@ -112,9 +116,15 @@ public class CarrinhoViewModel extends ViewModel {
         if (cartProducts != null) {
             for (int i = 0; i < cartProducts.size(); i++) {
                 if (cartProducts.get(i).getId() == produto.getId()) {
-                    cartProducts.set(i, produto);
-                    produtoLiveData.setValue(i);
-                    cartProductsLiveData.setValue(cartProducts);
+                    //Confere quantidade de itens do carrinho
+                    if (produto.getQtdNoCarrinho() == 0) {
+                        cartProducts.remove(i);
+                        updateProductsList(cartProducts);
+                    } else {
+                        cartProducts.set(i, produto);
+                        produtoLiveData.setValue(i);
+                        updateProductsList(cartProducts);
+                    }
                     updateSubtotal();
 //                    break;
                 } else {
@@ -130,6 +140,15 @@ public class CarrinhoViewModel extends ViewModel {
         cartProductsLiveData.setValue(newProducts);
     }
 
+    public void updateBadgeDisplay() {
+        int badgeValue = 0;
+        if (getCartProductsLiveData().getValue() != null) {
+            for (Produto p : getCartProductsLiveData().getValue()) {
+                badgeValue = badgeValue + p.getQtdNoCarrinho();
+            }
+        }
+        badgeDisplayLiveData.setValue(badgeValue);
+    }
 
     private double formatSubtotalString4Double(String subtotal) {
         return Double.parseDouble((subtotal).replace("-", "").replace("R$", "").replace(".", "").replace(",", "").trim()) / 100;

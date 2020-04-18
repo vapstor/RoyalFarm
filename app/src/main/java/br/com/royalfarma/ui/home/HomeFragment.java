@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -23,6 +24,9 @@ import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
@@ -32,6 +36,8 @@ import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.utils.CustomSwipeRefreshLayout;
+
+import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 
 public class HomeFragment extends Fragment implements IFetchProducts {
     private RecyclerView recyclerMaisVendidos, recyclerNovidades, recyclerPopulares;
@@ -43,6 +49,8 @@ public class HomeFragment extends Fragment implements IFetchProducts {
     private CountDownTimer countdown;
     private LinearLayoutManager linearLayoutManager;
     private CarrinhoViewModel carrinhoViewModel;
+    private BottomNavigationView navView;
+    private BadgeDrawable badge;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -68,18 +76,19 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                 }
             }
         };
-
-        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        if (getActivity() != null) {
+            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+            navView = getActivity().findViewById(R.id.nav_view);
+            badge = navView.getBadge(R.id.navigation_carrinho);
+        }
     }
 
     private void fetchProducts() {
         //resgata produtos assíncronamente
-        new Thread(() -> {
-            DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, 15, this);
-            fetchProducts.execute();
-            //Inicia counter para avisar sobre carregamento lento
-            countdown.start();
-        }).start();
+        DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, 15, this);
+        fetchProducts.execute();
+        //Inicia counter para avisar sobre carregamento lento
+        countdown.start();
     }
 
     private void updateUI(Message msg) {
@@ -150,6 +159,33 @@ public class HomeFragment extends Fragment implements IFetchProducts {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
         productsViewModel = new ViewModelProvider(requireParentFragment()).get(ProductsViewModel.class);
         carrinhoViewModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
+        carrinhoViewModel.getBadgeDisplayLiveData().observe(getViewLifecycleOwner(), badgeNumber -> {
+            if (navView != null) {
+                if (badge != null) {
+                    if (badgeNumber <= 0) {
+                        badge.setNumber(0);
+                        badge.setVisible(false);
+                    } else {
+                        badge.setVisible(true);
+                        badge.setNumber(badgeNumber);
+                    }
+                } else {
+                    badge = navView.getOrCreateBadge(R.id.navigation_carrinho);
+                    if (badge != null) {
+                        if (badgeNumber == 0) {
+                            badge.setNumber(0);
+                            badge.setVisible(false);
+                        } else {
+                            badge.setVisible(true);
+                            badge.setNumber(badgeNumber);
+                        }
+                    } else {
+                        Log.e(MY_LOG_TAG, "Falhou ao criar badge");
+                    }
+                }
+            }
+        });
+
         productsViewModel.getProductLiveData().observe(getViewLifecycleOwner(), produto -> {
             ArrayList<Produto> produtosIniciais = productsViewModel.getTodosOsProdutosLiveData().getValue();
             if (produtosIniciais != null) {

@@ -17,11 +17,8 @@ public abstract class Util {
 
     public static long elapsedTime = 0;
 
-
-    private static DecimalFormat DINHEIRO_REAL;
-
     public static String RSmask(double valor) {
-        BigDecimal bigDecimal = new BigDecimal(valor).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimal = new BigDecimal(valor).setScale(2, BigDecimal.ROUND_HALF_DOWN);
         return "R$ " + bigDecimal.toString().replace(".", ",");
     }
 
@@ -34,12 +31,12 @@ public abstract class Util {
     }
 
     public static double fromRStoDouble(String RSFormat) {
-        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(3, BigDecimal.ROUND_HALF_UP);
         return Double.parseDouble(bigDecimal.toString());
     }
 
     public static String RSmask(BigDecimal bd) {
-        return "R$ " + bd.setScale(2, RoundingMode.UP).toString().replace(".", ",");
+        return "R$ " + bd.setScale(2, BigDecimal.ROUND_HALF_DOWN).toString().replace(".", ",");
     }
 
 
@@ -75,7 +72,6 @@ public abstract class Util {
                 hashtext = "0" + hashtext;
             }
 
-            // return the HashText
             return hashtext;
         } catch (NoSuchAlgorithmException e) {
             e.printStackTrace();

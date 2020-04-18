@@ -94,11 +94,7 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
         AppCompatButton btnAddCarrinho;
         ProdutosHomeViewHolder itemProdutoHolder = (ProdutosHomeViewHolder) holder;
 
-
-        //Check Necessário pois como o modelo é um array de 15 posições porém dividido em 3 de 5
-        //todos os arrays de 5 terão a posição 0 -> 4
-        //então qualquer atualização do modelo afetara apenas o primeiro array (novidades)
-        //+4 (5 produtos) corresponde ao array correto
+        //Check Necessário pois para alterar o item correto
         int realPosition;
         if ("populares".equals(owner)) {
             realPosition = position + 5;
@@ -237,64 +233,51 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
                 }
             }
         });
+
         //Adiciona ao carrinho
         btnAddCarrinho.setOnClickListener(v -> {
             int qntdItensAdd = item.getQuantidade();
             if (qntdItensAdd + item.getQtdNoCarrinho() > item.getEstoqueAtual()) {
-                qntdItensAdd = item.getEstoqueAtual();
-                item.setQtdNoCarrinho(qntdItensAdd);
 
-                int finalQntdItensAdd1 = qntdItensAdd;
                 new MaterialAlertDialogBuilder(context)
-                    .setTitle(R.string.atencao)
-                    .setMessage("Existem apenas " + item.getEstoqueAtual() + " produtos no estoque. Deseja adicionar esta quantidade?")
-                    .setNegativeButton(R.string.cancelar, (dialog, which) -> {
-                    })
-                    .setPositiveButton(R.string.adicionar, (dialog, which) -> {
-                        item.setQtdNoCarrinho(finalQntdItensAdd1);
-
-                        //Check na quantidade adicionada
-                        item.setQtdNoCarrinho(item.getEstoqueAtual());
-                        carrinhoViewModel.updateSubtotal();
-                        carrinhoViewModel.updateProductOnCartList(item);
-
-                        String label, labelExclusao;
-                        if (finalQntdItensAdd1 > 1) {
-                            label = " Itens foram adicionados ao carrinho.";
-                            labelExclusao = " Itens removidos do carrinho.";
-                        } else {
-                            label = " Item foi adicionado ao carrinho.";
-                            labelExclusao = "Itens removidos do carrinho,";
-                        }
-
-                        carrinhoViewModel.updateSubtotal();
-
-                        Snackbar.make(v, finalQntdItensAdd1 + label, Snackbar.LENGTH_SHORT).setActionTextColor(context.getResources().getColor(R.color.colorSecondaryLight)).setAction("Desfazer", v1 -> {
-                            //Remove o último adicionado
-                            item.setQtdNoCarrinho(-finalQntdItensAdd1);
-                            carrinhoViewModel.updateProductOnCartList(item);
-                            productsViewModel.updateProduct(realPosition);
+                        .setTitle(R.string.atencao)
+                        .setMessage("Existem apenas " + item.getEstoqueAtual() + " produtos no estoque. Deseja adicionar esta quantidade?")
+                        .setNegativeButton(R.string.cancelar, (dialog, which) -> {
+                        })
+                        .setPositiveButton(R.string.adicionar, (dialog, which) -> {
+                            //Check na quantidade adicionada
+                            item.setQtdNoCarrinho(item.getEstoqueAtual());
                             carrinhoViewModel.updateSubtotal();
+                            carrinhoViewModel.updateProductOnCartList(item);
+
+                            String label, labelExclusao;
+                            if (item.getEstoqueAtual() > 1) {
+                                label = " Itens foram adicionados ao carrinho.";
+                                labelExclusao = " Itens removidos do carrinho.";
+                            } else {
+                                label = " Item foi adicionado ao carrinho.";
+                                labelExclusao = "Itens removidos do carrinho.";
+                            }
+
+                            carrinhoViewModel.updateSubtotal();
+
+                            Snackbar.make(v, item.getEstoqueAtual() + label, Snackbar.LENGTH_SHORT).setActionTextColor(context.getResources().getColor(R.color.colorSecondaryLight)).setAction("Desfazer", v1 -> {
+                                //Remove o último adicionado
+                                item.setQtdNoCarrinho(-item.getEstoqueAtual());
+                                carrinhoViewModel.updateProductOnCartList(item);
+                                productsViewModel.updateProduct(realPosition);
+                                carrinhoViewModel.updateSubtotal();
+                                carrinhoViewModel.updateBadgeDisplay();
+                                notifyItemChanged(position);
+                                makeText(context, labelExclusao, Toast.LENGTH_SHORT).show();
+                            }).show();
+
                             notifyItemChanged(position);
-                            makeText(context, labelExclusao, Toast.LENGTH_SHORT).show();
+                            item.setQtdNoCarrinho(item.getEstoqueAtual());
+                            carrinhoViewModel.updateBadgeDisplay();
                         }).show();
-
-                        navBottomView = ((AppCompatActivity) this.context).findViewById(R.id.nav_view);
-                        navBottomView.getOrCreateBadge(R.id.navigation_carrinho).setVisible(true);
-                        badgeDrawable = navBottomView.getBadge(R.id.navigation_carrinho);
-                        if (badgeDrawable == null) {
-                            Log.d(MY_LOG_TAG, "Erro na badge Drawable!");
-                        } else {
-                            badgePreviousValue = badgeDrawable.getNumber();
-                            badgeDrawable.setNumber(badgePreviousValue + item.getQtdNoCarrinho());
-                        }
-                        notifyItemChanged(position);
-
-
-                    }).show();
-
             } else {
-                item.setQtdNoCarrinho(qntdItensAdd);
+                item.setQtdNoCarrinho(item.getQtdNoCarrinho() + qntdItensAdd);
                 carrinhoViewModel.addProductToCart(item);
 
                 String label, labelExclusao;
@@ -303,32 +286,24 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
                     labelExclusao = " Itens removidos do carrinho.";
                 } else {
                     label = " Item foi adicionado ao carrinho.";
-                    labelExclusao = "Itens removidos do carrinho,";
+                    labelExclusao = "Itens removidos do carrinho.";
                 }
-
-//                carrinhoViewModel.updateSubtotal();
 
                 int finalQntdItensAdd = qntdItensAdd;
                 Snackbar.make(v, qntdItensAdd + label, Snackbar.LENGTH_SHORT).setActionTextColor(context.getResources().getColor(R.color.colorSecondaryLight)).setAction("Desfazer", v1 -> {
                     //Remove o último adicionado
-                    item.setQtdNoCarrinho(-finalQntdItensAdd);
+                    item.setQtdNoCarrinho(item.getQtdNoCarrinho() - finalQntdItensAdd);
+
                     carrinhoViewModel.updateProductOnCartList(item);
                     productsViewModel.updateProduct(realPosition);
-                    carrinhoViewModel.updateSubtotal();
                     notifyItemChanged(position);
+                    carrinhoViewModel.updateBadgeDisplay();
+
                     makeText(context, labelExclusao, Toast.LENGTH_SHORT).show();
                 }).show();
 
-                navBottomView = ((AppCompatActivity) this.context).findViewById(R.id.nav_view);
-                navBottomView.getOrCreateBadge(R.id.navigation_carrinho).setVisible(true);
-                badgeDrawable = navBottomView.getBadge(R.id.navigation_carrinho);
-                if (badgeDrawable == null) {
-                    Log.d(MY_LOG_TAG, "Erro na badge Drawable!");
-                } else {
-                    badgePreviousValue = badgeDrawable.getNumber();
-                    badgeDrawable.setNumber(badgePreviousValue + item.getQuantidade());
-                }
                 notifyItemChanged(position);
+                carrinhoViewModel.updateBadgeDisplay();
             }
         });
 

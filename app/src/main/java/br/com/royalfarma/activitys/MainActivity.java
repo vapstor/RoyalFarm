@@ -1,13 +1,20 @@
 package br.com.royalfarma.activitys;
 
+import android.app.SearchManager;
+import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
+import android.os.Handler;
+import android.os.Message;
 import android.util.Log;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.widget.Toast;
 
-import androidx.annotation.NonNull;
-import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.SearchView;
+import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
-import androidx.navigation.NavDestination;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
@@ -15,26 +22,45 @@ import androidx.navigation.ui.NavigationUI;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import br.com.royalfarma.R;
+import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.ui.pesquisar.PesquisarViewModel;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
+import static br.com.royalfarma.utils.Util.confirmQuitApp;
 
 public class MainActivity extends AppCompatActivity {
     private NavController navController;
     private AppBarConfiguration appBarConfiguration;
     private BottomNavigationView navView;
+    private Handler handler;
+    private DataBaseConnection dataBaseConnetion;
+    private PesquisarViewModel pesquisarViewModel;
+    private SearchManager searchManager;
+    private SearchView searchView;
+    private String queryAnterior;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
 
+        handler = new Handler() {
+            @Override
+            public void handleMessage(Message msg) {
+                Log.d(MY_LOG_TAG, msg.toString());
+//                updateUI(msg);
+            }
+        };
+
+        dataBaseConnetion = new DataBaseConnection(handler);
+
         navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemReselectedListener(item -> {
             if (item.getItemId() == R.id.navigation_home) {
                 finishAffinity();
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
                 startActivity(getIntent());
-                overridePendingTransition(0,0);
+                overridePendingTransition(0, 0);
 //                navController.navigate(R.id.action_navigation_main_activity_to_navigation_home);
             }
         });
@@ -42,32 +68,93 @@ public class MainActivity extends AppCompatActivity {
         // menu should be considered as top level destinations.
         appBarConfiguration = new AppBarConfiguration.Builder(R.id.navigation_pesquisar, R.id.navigation_home, R.id.navigation_carrinho).build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
-        navController.addOnDestinationChangedListener(new NavController.OnDestinationChangedListener() {
-            @Override
-            public void onDestinationChanged(@NonNull NavController controller, @NonNull NavDestination destination, @Nullable Bundle arguments) {
-                Log.d(MY_LOG_TAG, " ID -> " + destination.getId());
-                switch (destination.getId()) {
-                    case R.id.navigation_lista_produtos:
-                        getSupportActionBar().setTitle(arguments.getString("title"));
-                        break;
-                    case R.id.navigation_home:
-                        getSupportActionBar().setTitle("RoyalFarma");
-                        break;
-                }
+        navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
+            Log.d(MY_LOG_TAG, " ID -> " + destination.getId());
+            switch (destination.getId()) {
+                case R.id.navigation_lista_produtos:
+                    getSupportActionBar().setTitle(arguments.getString("title"));
+                    break;
+                case R.id.navigation_home:
+                    getSupportActionBar().setTitle("RoyalFarma");
+                    break;
             }
         });
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
         NavigationUI.setupWithNavController(navView, navController);
     }
-}
-//    @Override
-//    public void onBackPressed() {
-//        if (navView.getSelectedItemId() == R.id.navigation_home) {
-//            Bundle bundle = makeSceneTransitionAnimation(this).toBundle();
-//            Intent intent = new Intent(this, LoginActivity.class).setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_NEW_TASK);
-//            startActivity(intent, bundle);
+
+//    private void updateUI(Message msg) {
+//        // 0 = status da conexao ao banco
+//        // 1 = status da async task
+//        //também mostra ao usuario que estamos tentando conectar
+//        if (msg.what == 0) {
+//            if ("tentando_conectar".equals(msg.obj)) {
+//                toggleCircularBarBtn(true);
+//            }
+//        } else if (msg.what == 1) {
+//            switch ((String) msg.obj) {
+//                case "onPreExecute":
+//                    toggleCircularBarBtn(true);
+//                    break;
+//                case "autenticado":
+//                    resultLogin(true);
+//                    toggleCircularBarBtn(false);
+//                    break;
+//                case "erro_autenticacao":
+//                    resultLogin(false);
+//                    toggleCircularBarBtn(false);
+//                    break;
+//                case "erro_sql":
+//                    Toast.makeText(this, "Erro de SQL", Toast.LENGTH_SHORT).show();
+//                    toggleCircularBarBtn(false);
+//                case "erro_sha":
+//                    Toast.makeText(this, "Erro codificação senha", Toast.LENGTH_SHORT).show();
+//                case "onPostExecute":
+//                    toggleCircularBarBtn(false);
+//                    break;
+//            }
 //        } else {
-//            super.onBackPressed();
+//            Toast.makeText(this, "Ocorreu um erro!", Toast.LENGTH_SHORT).show();
 //        }
 //    }
-//}
+//
+//    private void toggleCircularBarBtn(boolean circularBarVisibility) {
+//        final ViewGroup root = this.findViewById(R.id.activity_login_root_layout);
+//        Button btn = findViewById(R.id.buttonLogin);
+//        TransitionManager.beginDelayedTransition(root, new Fade());
+//        if (circularBarVisibility) {
+//            circularBar.setVisibility(View.VISIBLE);
+//            btn.setVisibility(View.INVISIBLE);
+//        } else {
+//            btn.setVisibility(View.VISIBLE);
+//            circularBar.setVisibility(View.INVISIBLE);
+//        }
+//    }
+
+//    @Override
+//    public boolean onCreateOptionsMenu(Menu menu) {
+//        MenuInflater inflater = getMenuInflater();
+//        inflater.inflate(R.menu.search_option_menu, menu);
+//
+//        // Associate searchable configuration with the SearchView
+//        searchManager = (SearchManager) getSystemService(Context.SEARCH_SERVICE);
+//        searchView = (SearchView) menu.findItem(R.id.search).getActionView();
+
+//        searchView.setSubmitButtonEnabled(true);
+//        return true;
+//    }
+
+
+    @Override
+    public void onBackPressed() {
+        if (navView.getSelectedItemId() == R.id.navigation_home) {
+            if (confirmQuitApp()) {
+                finishAffinity();
+            } else {
+                Toast.makeText(this, "Clique mais uma vez para sair", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onBackPressed();
+        }
+    }
+}

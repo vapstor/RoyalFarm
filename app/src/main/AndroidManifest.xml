@@ -23,9 +23,6 @@
             android:label="@string/title_activity_product_detail"
             android:theme="@style/AppTheme.NoActionBar" />
         <activity
-            android:name=".activitys.LoginActivity"
-            android:windowSoftInputMode="adjustResize" />
-        <activity
             android:name=".activitys.SplashScreenActivity"
             android:theme="@style/Theme.AppCompat.NoActionBar">
             <intent-filter>
@@ -37,7 +34,14 @@
         <activity
             android:name=".activitys.MainActivity"
             android:label="@string/app_name"
-            android:theme="@style/AppTheme.Bridge" />
+            android:launchMode="singleTop"
+            android:theme="@style/AppTheme.Bridge">
+
+            <intent-filter>
+                <action android:name="android.intent.action.SEARCH" />
+            </intent-filter>
+
+        </activity>
 
         <meta-data
             android:name="preloaded_fonts"

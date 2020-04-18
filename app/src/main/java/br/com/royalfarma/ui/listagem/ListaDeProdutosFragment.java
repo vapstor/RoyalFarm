@@ -1,4 +1,4 @@
-package br.com.royalfarma.ui.listaDeProdutos;
+package br.com.royalfarma.ui.listagem;
 
 import android.content.Context;
 import android.os.Bundle;
