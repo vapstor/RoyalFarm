@@ -83,10 +83,12 @@ public class CarrinhoViewModel extends ViewModel {
                 }
                 cartProductsLiveData.setValue(cartProducts);
                 updateSubtotal();
+                updateBadgeDisplay();
             } else {
                 cartProducts.add(produtoAdd);
                 cartProductsLiveData.setValue(cartProducts);
                 updateSubtotal();
+                updateBadgeDisplay();
             }
         } else {
             Log.d(MY_LOG_TAG, "addProductToCart Error cartProducts == NULL");
@@ -125,12 +127,12 @@ public class CarrinhoViewModel extends ViewModel {
                         produtoLiveData.setValue(i);
                         updateProductsList(cartProducts);
                     }
-                    updateSubtotal();
-//                    break;
                 } else {
                     Log.e(MY_LOG_TAG, "ERRO: Produto não está na lista!");
                 }
             }
+            updateSubtotal();
+            updateBadgeDisplay();
         } else {
             Log.d(MY_LOG_TAG, "removeProductFromCartList Error cartProducts == NULL");
         }

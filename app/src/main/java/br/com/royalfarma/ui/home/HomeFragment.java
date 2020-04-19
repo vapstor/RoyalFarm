@@ -14,7 +14,6 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -85,7 +84,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
 
     private void fetchProducts() {
         //resgata produtos assíncronamente
-        DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, 15, this);
+        DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, "15", this);
         fetchProducts.execute();
         //Inicia counter para avisar sobre carregamento lento
         countdown.start();
@@ -215,30 +214,31 @@ public class HomeFragment extends Fragment implements IFetchProducts {
             } else {
                 //Confirm that frame don't block ui
                 toggleFrameLoadingVisibility(false);
+                if (listaDeTodosOsProdutos.size() > 5) {
+                    linearLayoutManager = new LinearLayoutManager(getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    ArrayList<Produto> novidades = new ArrayList<>(listaDeTodosOsProdutos.subList(0, 5));
+                    adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel, "novidades");
+                    adapterNovidades.setHasStableIds(true);
+                    recyclerNovidades.setLayoutManager(linearLayoutManager);
+                    recyclerNovidades.setAdapter(adapterNovidades);
 
-                linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                ArrayList<Produto> novidades = new ArrayList<>(listaDeTodosOsProdutos.subList(0, 5));
-                adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel, "novidades");
-                adapterNovidades.setHasStableIds(true);
-                recyclerNovidades.setLayoutManager(linearLayoutManager);
-                recyclerNovidades.setAdapter(adapterNovidades);
+                    linearLayoutManager = new LinearLayoutManager(getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    ArrayList<Produto> populares = new ArrayList<>(listaDeTodosOsProdutos.subList(5, 10));
+                    adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel, "populares");
+                    adapterPopulares.setHasStableIds(true);
+                    recyclerPopulares.setLayoutManager(linearLayoutManager);
+                    recyclerPopulares.setAdapter(adapterPopulares);
 
-                linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                ArrayList<Produto> populares = new ArrayList<>(listaDeTodosOsProdutos.subList(5, 10));
-                adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel, "populares");
-                adapterPopulares.setHasStableIds(true);
-                recyclerPopulares.setLayoutManager(linearLayoutManager);
-                recyclerPopulares.setAdapter(adapterPopulares);
-
-                linearLayoutManager = new LinearLayoutManager(getContext());
-                linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
-                ArrayList<Produto> mais_vendidos = new ArrayList<>(listaDeTodosOsProdutos.subList(10, 15));
-                adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel, "mais_vendidos");
-                adapterMaisVendidos.setHasStableIds(true);
-                recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
-                recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
+                    linearLayoutManager = new LinearLayoutManager(getContext());
+                    linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
+                    ArrayList<Produto> mais_vendidos = new ArrayList<>(listaDeTodosOsProdutos.subList(10, 15));
+                    adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel, "mais_vendidos");
+                    adapterMaisVendidos.setHasStableIds(true);
+                    recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
+                    recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
+                }
             }
         });
         return root;
@@ -254,35 +254,30 @@ public class HomeFragment extends Fragment implements IFetchProducts {
             recyclerMaisVendidos = view.findViewById(R.id.recyclerMaisVendidos);
 
             swipeContainer = view.findViewById(R.id.swipe_container);
-            // Setup refresh listener which triggers new data loading
-            // Your code to refresh the list here.
-            // Make sure you call swipeContainer.setRefreshing(false)
-            // once the network request has completed successfully.
             swipeContainer.setOnRefreshListener(this::fetchProducts);
             swipeContainer.setColorSchemeResources(R.color.colorAccent);
 
-            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisNovidades).setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    Bundle extras = new Bundle();
-                    extras.putString("title", "Novidades");
-                    navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
-                }
+            view.findViewById(R.id.btnVerMaisNovidades).setOnClickListener(v -> {
+                Bundle extras = new Bundle();
+                extras.putString("title", "Novidades");
+                ArrayList<Produto> produtosNovidades = new ArrayList<>(productsViewModel.getTodosOsProdutosLiveData().getValue().subList(0, 5));
+                extras.putParcelableArrayList("initialProducts", produtosNovidades);
+                navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
 
-            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisPopulares).setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    Bundle extras = new Bundle();
-                    extras.putString("title", "Populares");
-                    navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
-                }
+            view.findViewById(R.id.btnVerMaisPopulares).setOnClickListener(v -> {
+                Bundle extras = new Bundle();
+                extras.putString("title", "Populares");
+
+                navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
 
-            ((AppCompatActivity) context).findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
-                if (getActivity() != null) {
-                    Bundle extras = new Bundle();
-                    extras.putString("title", "Mais Vendidos");
-                    navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
-                }
+            view.findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
+                Bundle extras = new Bundle();
+                extras.putString("title", "Mais Vendidos");
+                ArrayList<Produto> produtosMaisVendidos = (ArrayList<Produto>) productsViewModel.getTodosOsProdutosLiveData().getValue().subList(10, 15);
+                extras.putParcelableArrayList("initialProducts", produtosMaisVendidos);
+                navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
         }
 

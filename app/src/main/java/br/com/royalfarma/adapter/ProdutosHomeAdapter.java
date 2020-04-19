@@ -1,7 +1,6 @@
 package br.com.royalfarma.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -26,7 +25,6 @@ import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.snackbar.Snackbar;
-import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
@@ -34,7 +32,6 @@ import java.util.ArrayList;
 import java.util.Objects;
 
 import br.com.royalfarma.R;
-import br.com.royalfarma.activitys.ProductDetailActivity;
 import br.com.royalfarma.holder.ProdutosHomeViewHolder;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
@@ -333,16 +330,16 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
     }
 
     private void openDetailProductActivity(Produto produto) {
-        Gson gson = new Gson();
-        Intent intent = new Intent(context, ProductDetailActivity.class);
         Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
         if (bundle != null) {
-            String product = gson.toJson(produto);
-            intent.putExtra("selectedProduct", product);
-            context.startActivity(intent, bundle);
+            bundle.putParcelable("selectedProduct", produto);
+//            //T
+//            context.startActivity(intent, bundle);
         } else {
             Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
         }
+        //TODO navigation
+
     }
 
     @Override

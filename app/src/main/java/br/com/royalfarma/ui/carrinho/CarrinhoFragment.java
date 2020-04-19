@@ -22,6 +22,8 @@ import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.ItemTouchHelper;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+import androidx.transition.Fade;
+import androidx.transition.TransitionManager;
 
 import com.google.android.material.badge.BadgeDrawable;
 import com.google.android.material.bottomnavigation.BottomNavigationView;
@@ -47,26 +49,25 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
     private BottomNavigationView navView;
     private AppCompatTextView subtotal;
     private ArrayList<Produto> cartProducts;
-    private BadgeDrawable badgeDrawable;
+    private BadgeDrawable badge;
     private AppCompatButton finalizarCompraButton;
     private LoginViewModel loginViewModel;
     private Usuario usuario;
     private NavController navController;
+    private View layoutEmptyCart;
+    private LinearLayoutManager linearLayoutManager;
+    private DividerItemDecoration dividerItemDecoration;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         navView = ((AppCompatActivity) getContext()).findViewById(R.id.nav_view);
         if (navView != null) {
-            badgeDrawable = navView.getBadge(R.id.navigation_carrinho);
-            navView.setVisibility(View.GONE);
+            badge = navView.getBadge(R.id.navigation_carrinho);
         }
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        if (navView != null) {
-            navView.setVisibility(View.GONE);
-        }
         carrinhoViewModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
         loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
         View root = inflater.inflate(R.layout.fragment_carrinho, container, false);
@@ -76,12 +77,39 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
                 recyclerCart.post(() -> adapter.notifyItemChanged(position));
             }
         });
+        carrinhoViewModel.getBadgeDisplayLiveData().observe(getViewLifecycleOwner(), badgeNumber -> {
+            if (navView != null) {
+                if (badge != null) {
+                    if (badgeNumber <= 0) {
+                        badge.setNumber(0);
+                        badge.setVisible(false);
+                    } else {
+                        badge.setVisible(true);
+                        badge.setNumber(badgeNumber);
+                    }
+                } else {
+                    badge = navView.getOrCreateBadge(R.id.navigation_carrinho);
+                    if (badge != null) {
+                        if (badgeNumber == 0) {
+                            badge.setNumber(0);
+                            badge.setVisible(false);
+                        } else {
+                            badge.setVisible(true);
+                            badge.setNumber(badgeNumber);
+                        }
+                    } else {
+                        Log.e(MY_LOG_TAG, "Falhou ao criar badge");
+                    }
+                }
+            }
+        });
         carrinhoViewModel.getCartProductsLiveData().observe(getViewLifecycleOwner(), produtos -> {
             if (produtos.size() == 0) {
-                Toast.makeText(getContext(), "Carrinho vazio!", Toast.LENGTH_SHORT).show();
+                toggleRecyclerVisibility(false);
             } else {
-                if (cartProducts != null && adapter != null) {
-                    Produto p;
+                toggleRecyclerVisibility(true);
+                Produto p;
+                if (cartProducts != null) {
                     for (int i = 0; i < cartProducts.size(); i++) {
                         p = cartProducts.get(i);
                         if (p.getQtdNoCarrinho() == 0) {
@@ -90,49 +118,52 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
                             carrinhoViewModel.updateProductsList(produtos);
                         }
                     }
-                } else {
-                    LinearLayoutManager linearLayoutManager = new LinearLayoutManager(getContext());
-                    linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-                    adapter = new ProdutosCarrinhoAdapter(produtos, getContext(), carrinhoViewModel);
-                    adapter.setHasStableIds(true);
-                    recyclerCart.setLayoutManager(linearLayoutManager);
-                    DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recyclerCart.getContext(), linearLayoutManager.getOrientation());
-                    recyclerCart.addItemDecoration(dividerItemDecoration);
-                    recyclerCart.setAdapter(adapter);
                 }
+                adapter.clear();
+                adapter.addAll(produtos);
+                adapter.notifyDataSetChanged();
             }
         });
-        loginViewModel.getUsuarioMutableLiveData().observe(getViewLifecycleOwner(), usuario -> {
-            this.usuario = usuario;
-        });
+        loginViewModel.getUsuarioMutableLiveData().observe(getViewLifecycleOwner(), usuario -> this.usuario = usuario);
+
         return root;
     }
 
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (navView != null) {
-            navView.setVisibility(View.VISIBLE);
-        }
-    }
 
-    @Override
-    public void onResume() {
-        if (navView != null) {
-            navView.setVisibility(View.GONE);
+    private void toggleRecyclerVisibility(boolean recyclerVisibility) {
+        final ViewGroup root = getActivity().findViewById(R.id.layout_carrinho);
+        TransitionManager.beginDelayedTransition(root, new Fade());
+        if (recyclerVisibility) {
+            recyclerCart.setVisibility(View.VISIBLE);
+            layoutEmptyCart.setVisibility(View.GONE);
+        } else {
+            layoutEmptyCart.setVisibility(View.VISIBLE);
+            recyclerCart.setVisibility(View.GONE);
         }
-        super.onResume();
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
-        recyclerCart = getActivity().findViewById(R.id.recyclerCarrinho);
-        subtotal = getActivity().findViewById(R.id.subtotal);
+        recyclerCart = view.findViewById(R.id.recyclerCarrinho);
+        layoutEmptyCart = view.findViewById(R.id.layout_empty_cart);
+        subtotal = view.findViewById(R.id.subtotal);
+
+        linearLayoutManager = new LinearLayoutManager(getContext());
+        linearLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+
+        cartProducts = new ArrayList<>();
+
+        adapter = new ProdutosCarrinhoAdapter(cartProducts, getContext(), carrinhoViewModel);
+        adapter.setHasStableIds(true);
+        recyclerCart.setLayoutManager(linearLayoutManager);
+        dividerItemDecoration = new DividerItemDecoration(recyclerCart.getContext(), linearLayoutManager.getOrientation());
+        recyclerCart.addItemDecoration(dividerItemDecoration);
+        recyclerCart.setAdapter(adapter);
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
 
-        finalizarCompraButton = getActivity().findViewById(R.id.finalizarCompraButton);
+        finalizarCompraButton = view.findViewById(R.id.finalizarCompraButton);
         finalizarCompraButton.setOnClickListener(v -> {
             if (getActivity() != null) {
                 ArrayList<Produto> produtosCarrinho = carrinhoViewModel.getCartProductsLiveData().getValue();
@@ -199,15 +230,9 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
                 .setPositiveButton(R.string.excluir, (dialog, which) -> {
                     cartProducts = carrinhoViewModel.getCartProductsLiveData().getValue();
                     if (cartProducts != null) {
-                        if (badgeDrawable != null) {
-                            carrinhoViewModel.updateBadgeDisplay();
-                        }
                         cartProducts.get(position).setQtdNoCarrinho(0);
-
-                        //não existe navview no carrinho
                         carrinhoViewModel.updateProductOnCartList(cartProducts.get(position));
                         adapter.notifyItemRemoved(position);
-
                     }
                 }).setOnDismissListener(dialog -> adapter.notifyItemChanged(position)).show();
     }

@@ -8,9 +8,9 @@
     <fragment
         android:id="@+id/navigation_pesquisar"
         android:name="br.com.royalfarma.ui.pesquisar.PesquisarFragment"
-        android:launchMode="singleTop"
         android:label="@string/title_pesquisar"
-        tools:layout="@layout/fragment_pesquisar" />
+        android:launchMode="singleTop"
+        tools:layout="@layout/fragment_pesquisar"/>
 
     <fragment
         android:id="@+id/navigation_home"

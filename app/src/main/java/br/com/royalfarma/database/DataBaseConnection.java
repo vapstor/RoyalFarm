@@ -180,10 +180,10 @@ public class DataBaseConnection {
         private final Handler handler;
         private final IFetchProducts iFetchProducts;
         private final boolean limited;
-        private final int limit;
+        private final String limit;
         private Message message;
 
-        public FetchProducts(Handler handler, boolean limited, int limit, IFetchProducts iFetchProducts) {
+        public FetchProducts(Handler handler, boolean limited, String limit, IFetchProducts iFetchProducts) {
             this.iFetchProducts = iFetchProducts;
             this.handler = handler;
             this.limited = limited;
@@ -209,8 +209,7 @@ public class DataBaseConnection {
                     Log.v(MY_LOG_TAG, "doInBackground");
                     this.message = new Message();
                     this.message.what = 1;
-                    Date currentTime = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO ANTES DO SELECT" + currentTime.toString());
+
                     String sqlGetHomePdtsNovidades = "SELECT " +
                             "pdt_id, " +
                             "pdt_code, " +
@@ -229,25 +228,13 @@ public class DataBaseConnection {
                             "ORDER BY " +
                             "RAND() ";
                     StringBuilder sb = new StringBuilder(sqlGetHomePdtsNovidades);
-                    if (limited)
-                        sb.append("LIMIT ").append(limit);
-
-                    currentTime = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DO SELECT " + currentTime.toString());
+                    if (limited) sb.append("LIMIT ").append(limit);
 
                     PreparedStatement pstmt = connection.prepareStatement(sb.toString());
-
-                    Date currentTime1 = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO ANTES DE EXECUTAR A QUERY: " + currentTime.getTime());
                     ResultSet resultSet = pstmt.executeQuery();
 
-                    Date currentTime2 = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DE EXECUTAR A QUERY: " + currentTime.getTime());
-                    Log.v(MY_LOG_TAG, "OU SEJA: " + (currentTime1.getTime() - currentTime2.getTime()));
                     ArrayList<Produto> todosOsProdutos = new ArrayList<>();
                     Produto produto;
-                    currentTime = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO ANTES DO WHILE: " + currentTime.getTime());
                     while (resultSet.next()) {
                         String id = resultSet.getString("pdt_id");
                         String codBarra = resultSet.getString("pdt_code");
@@ -275,11 +262,8 @@ public class DataBaseConnection {
                         todosOsProdutos.add(produto);
                     }
 
-//                    listaDeCategorias.add(produtosNovidades);
+                    //                    listaDeCategorias.add(produtosNovidades);
 //                    listaDeCategorias.add(produtosMaisVendidos);
-                    currentTime2 = Calendar.getInstance().getTime();
-                    Log.v(MY_LOG_TAG, "HORARIO DEPOIS DO WHILE: " + currentTime.getTime());
-                    Log.v(MY_LOG_TAG, "OU SEJA: " + (currentTime.getTime() - currentTime2.getTime()));
                     return todosOsProdutos;
                 }
             } catch (SQLException e) {

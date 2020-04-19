@@ -16,6 +16,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
@@ -28,6 +29,7 @@ import java.util.ArrayList;
 import br.com.royalfarma.R;
 import br.com.royalfarma.activitys.ProductDetailImageActivity;
 import br.com.royalfarma.holder.ProdutosCarrinhoViewHolder;
+import br.com.royalfarma.interfaces.OnDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.utils.RoundedBackgroundSpan;
 import br.com.royalfarma.utils.RoundedTransformation;
@@ -42,10 +44,12 @@ public class ProdutosPesquisaAdapter extends RecyclerView.Adapter<ProdutosCarrin
     private final Context context;
     private final ArrayList<Produto> itens;
     private final Toast toast;
+    private final OnDetailViewClick pesquisarFragment;
 
-    public ProdutosPesquisaAdapter(ArrayList<Produto> itens, Context context) {
+    public ProdutosPesquisaAdapter(ArrayList<Produto> itens, Context context, OnDetailViewClick pesquisarFragment) {
         this.context = context;
         this.itens = itens;
+        this.pesquisarFragment = pesquisarFragment;
         toast = makeText(context, "", Toast.LENGTH_LONG);
     }
 
@@ -59,6 +63,11 @@ public class ProdutosPesquisaAdapter extends RecyclerView.Adapter<ProdutosCarrin
     @Override
     public void onBindViewHolder(@NonNull ProdutosCarrinhoViewHolder holder, int position) {
         Produto item = itens.get(position);
+        //Workaround para não ter que criar mais um Holder
+        AppCompatImageButton imageButton = holder.qntdPlus;
+        imageButton.setOnClickListener(v -> {
+            pesquisarFragment.onDetailViewClick(item);
+        });
 
         AppCompatTextView descricaoItem = holder.tituloItemProduto;
         descricaoItem.setText(item.getNome());

@@ -1,8 +1,11 @@
 package br.com.royalfarma.ui.pesquisar;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -19,21 +22,31 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.recyclerview.widget.DividerItemDecoration;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
+
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
 
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.activitys.MainActivity;
+import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.IFetchProducts;
+import br.com.royalfarma.interfaces.OnDetailViewClick;
 import br.com.royalfarma.model.Produto;
+import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.utils.ItemClickSupport;
 
-public class PesquisarFragment extends Fragment implements IFetchProducts {
+import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
+
+public class PesquisarFragment extends Fragment implements IFetchProducts, OnDetailViewClick {
 
     private PesquisarViewModel pesquisarViewModel;
     private String query;
@@ -44,6 +57,11 @@ public class PesquisarFragment extends Fragment implements IFetchProducts {
     private AppCompatImageView semItensDrawable;
     private AppCompatTextView semItensLabel;
     private int progresBarSize;
+    private NavController navController;
+    private CarrinhoViewModel carrinhoVieModel;
+    private BottomNavigationView navView;
+    private BadgeDrawable badge;
+    private ArrayList<Produto> searchProductsList;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -52,7 +70,12 @@ public class PesquisarFragment extends Fragment implements IFetchProducts {
         if (arguments != null) {
             query = arguments.getString("query");
         }
-
+        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        if (getActivity() != null) {
+            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+            navView = getActivity().findViewById(R.id.nav_view);
+            badge = navView.getBadge(R.id.navigation_carrinho);
+        }
         handler = new Handler() {
             @Override
             public void handleMessage(Message msg) {
@@ -88,29 +111,49 @@ public class PesquisarFragment extends Fragment implements IFetchProducts {
         });
         searchView.setQueryHint(getString(R.string.nome_cod_barras));
         searchView.setOnClickListener(v -> {
-                }
-        );
+        });
     }
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
-        pesquisarViewModel = new ViewModelProvider(requireParentFragment()).get(PesquisarViewModel.class);
         View root = inflater.inflate(R.layout.fragment_pesquisar, container, false);
+        pesquisarViewModel = new ViewModelProvider(requireParentFragment()).get(PesquisarViewModel.class);
+        carrinhoVieModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
+        carrinhoVieModel.getBadgeDisplayLiveData().observe(getViewLifecycleOwner(), badgeNumber -> {
+            if (navView != null) {
+                if (badge != null) {
+                    if (badgeNumber <= 0) {
+                        badge.setNumber(0);
+                        badge.setVisible(false);
+                    } else {
+                        badge.setVisible(true);
+                        badge.setNumber(badgeNumber);
+                    }
+                } else {
+                    badge = navView.getOrCreateBadge(R.id.navigation_carrinho);
+                    if (badge != null) {
+                        if (badgeNumber == 0) {
+                            badge.setNumber(0);
+                            badge.setVisible(false);
+                        } else {
+                            badge.setVisible(true);
+                            badge.setNumber(badgeNumber);
+                        }
+                    } else {
+                        Log.e(MY_LOG_TAG, "Falhou ao criar badge");
+                    }
+                }
+            }
+        });
         pesquisarViewModel.getAllSearchedProductsLiveData().observe(getViewLifecycleOwner(), produtos -> {
             if (produtos.size() > 0) {
                 toggleRecyclerVisibility(true);
-                adapter = new ProdutosPesquisaAdapter(produtos, getContext());
-                adapter.setHasStableIds(true);
-                LinearLayoutManager linearLayout = new LinearLayoutManager(getContext());
-                linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
-                DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), linearLayout.getOrientation());
-                recycler.addItemDecoration(dividerItemDecoration);
-                recycler.setLayoutManager(linearLayout);
-                recycler.setAdapter(adapter);
+                searchProductsList.clear();
+                searchProductsList.addAll(produtos);
+                adapter.notifyDataSetChanged();
             } else {
                 toggleRecyclerVisibility(false);
             }
         });
-
         return root;
     }
 
@@ -179,12 +222,27 @@ public class PesquisarFragment extends Fragment implements IFetchProducts {
         recycler = view.findViewById(R.id.recyclerPesquisa);
         semItensDrawable = view.findViewById(R.id.noItensDrawable);
         semItensLabel = view.findViewById(R.id.noItensLabel);
+
+        searchProductsList = new ArrayList<>();
+        adapter = new ProdutosPesquisaAdapter(searchProductsList, getContext(), this);
+        adapter.setHasStableIds(true);
+        LinearLayoutManager linearLayout = new LinearLayoutManager(getContext());
+        linearLayout.setOrientation(LinearLayoutManager.VERTICAL);
+        DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), linearLayout.getOrientation());
+        recycler.addItemDecoration(dividerItemDecoration);
+        recycler.setLayoutManager(linearLayout);
+        recycler.setAdapter(adapter);
+
         toggleRecyclerVisibility(false);
 //        ItemTouchHelper.SimpleCallback itemTouchHelperCallback = new RecyclerItemTouchHelper(0, ItemTouchHelper.LEFT, this);
 //        new ItemTouchHelper(itemTouchHelperCallback).attachToRecyclerView(recycler);
 
         ItemClickSupport.addTo(recycler).setOnItemClickListener((recyclerView, position, v) -> {
-            Toast.makeText(getContext(), "Fui Clicado", Toast.LENGTH_SHORT).show();
+            if (getActivity() != null) {
+                Intent intent = new Intent(getActivity(), ProductDetail.class);
+                intent.putExtra("selectedProduct", pesquisarViewModel.getAllSearchedProductsLiveData().getValue().get(position));
+                startActivityForResult(intent, 1);
+            }
         });
     }
 
@@ -201,7 +259,28 @@ public class PesquisarFragment extends Fragment implements IFetchProducts {
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+            Produto produto = data.getParcelableExtra("selectedProduct");
+            if (produto != null) {
+                int qntdAddCart = data.getIntExtra("qntdAddCart", 0);
+                produto.setQtdNoCarrinho(qntdAddCart);
+                carrinhoVieModel.addProductToCart(produto);
+            }
+        }
+        Log.d(MY_LOG_TAG, "on Activity Result");
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public void onGetDataDone(ArrayList<Produto> listaDeProdutos) {
         pesquisarViewModel.updateProductsList(listaDeProdutos);
+    }
+
+    @Override
+    public void onDetailViewClick(Produto produto) {
+        Intent intent = new Intent(getContext(), ProductDetail.class);
+        intent.putExtra("selectedProduct", produto);
+        startActivityForResult(intent, 1);
     }
 }

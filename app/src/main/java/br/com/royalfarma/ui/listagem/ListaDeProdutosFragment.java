@@ -1,13 +1,17 @@
 package br.com.royalfarma.ui.listagem;
 
+import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.transition.Fade;
 import android.transition.Slide;
+import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -25,17 +29,25 @@ import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import androidx.transition.TransitionManager;
 
+import com.google.android.material.badge.BadgeDrawable;
+import com.google.android.material.bottomnavigation.BottomNavigationView;
+
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
+import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosListaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.IFetchProducts;
+import br.com.royalfarma.interfaces.OnDetailViewClick;
 import br.com.royalfarma.model.Produto;
+import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.ui.home.ProductsViewModel;
 import br.com.royalfarma.utils.EndlessRecyclerViewScrollListener;
 
-public class ListaDeProdutosFragment extends Fragment implements IFetchProducts {
+import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
+
+public class ListaDeProdutosFragment extends Fragment implements IFetchProducts, OnDetailViewClick {
 
     private ProductsViewModel productsViewModel;
     private RecyclerView recycler;
@@ -44,12 +56,14 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
     private String pageTitle;
     // Store a member variable for the listener
     private EndlessRecyclerViewScrollListener scrollListener;
-    private ArrayList<Produto> produtosShort;
     private Handler handler;
     private CountDownTimer countdown;
-    private ArrayList<Produto> listaDeProdutosClean = new ArrayList<>();
     private int myPage;
-    private ArrayList<Produto> productsInPersistence;
+    private ArrayList<Produto> initialProducts;
+    private ListaDeProdutosViewModel pagedProductsViewModel;
+    private CarrinhoViewModel carrinhoVieModel;
+    private BottomNavigationView navView;
+    private BadgeDrawable badge;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -59,7 +73,11 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
             pageTitle = extras.getString("title");
         }
 
-        navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+        if (getActivity() != null) {
+            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+            navView = getActivity().findViewById(R.id.nav_view);
+            badge = navView.getBadge(R.id.navigation_carrinho);
+        }
 
         // This callback will only be called when MyFragment is at least Started.
         OnBackPressedCallback callback = new OnBackPressedCallback(true /* enabled by default */) {
@@ -89,6 +107,13 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
             }
         };
 
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        navController.navigate(R.id.action_navigation_lista_produtos_to_navigation_home);
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
@@ -128,37 +153,110 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
     private void toggleFrameLoadingVisibility(boolean frameVisibility) {
         if (getActivity() != null) {
             final ViewGroup root = getActivity().findViewById(R.id.scrollViewListaProdutosContainer);
-            FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
-            TransitionManager.beginDelayedTransition(root, new androidx.transition.Fade().setDuration(750));
-            if (frameVisibility) {
-                frameLayout.setVisibility(View.VISIBLE);
-                frameLayout.setClickable(true);
-                frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
-            } else {
-                frameLayout.setVisibility(View.INVISIBLE);
+            if (root != null) {
+                FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
+                TransitionManager.beginDelayedTransition(root, new androidx.transition.Fade().setDuration(750));
+                if (frameVisibility) {
+                    frameLayout.setVisibility(View.VISIBLE);
+                    frameLayout.setClickable(true);
+                    frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
+                } else {
+                    frameLayout.setVisibility(View.INVISIBLE);
+                }
             }
         }
     }
 
     @Override
+    public void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+            Produto produto = data.getParcelableExtra("selectedProduct");
+            if (produto != null) {
+                int qntdAddCart = data.getIntExtra("qntdAddCart", 0);
+                produto.setQtdNoCarrinho(qntdAddCart);
+                carrinhoVieModel.addProductToCart(produto);
+            }
+        }
+        Log.d(MY_LOG_TAG, "on Activity Result");
+        super.onActivityResult(requestCode, resultCode, data);
+    }
+
+    @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         productsViewModel = new ViewModelProvider(requireParentFragment()).get(ProductsViewModel.class);
-        productsViewModel.getTodosOsProdutosLiveData().observe(getViewLifecycleOwner(), produtos -> {
+        pagedProductsViewModel = new ViewModelProvider(requireParentFragment()).get(ListaDeProdutosViewModel.class);
+        carrinhoVieModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
+        carrinhoVieModel.getBadgeDisplayLiveData().observe(getViewLifecycleOwner(), badgeNumber -> {
+            if (navView != null) {
+                if (badge != null) {
+                    if (badgeNumber <= 0) {
+                        badge.setNumber(0);
+                        badge.setVisible(false);
+                    } else {
+                        badge.setVisible(true);
+                        badge.setNumber(badgeNumber);
+                    }
+                } else {
+                    badge = navView.getOrCreateBadge(R.id.navigation_carrinho);
+                    if (badge != null) {
+                        if (badgeNumber == 0) {
+                            badge.setNumber(0);
+                            badge.setVisible(false);
+                        } else {
+                            badge.setVisible(true);
+                            badge.setNumber(badgeNumber);
+                        }
+                    } else {
+                        Log.e(MY_LOG_TAG, "Falhou ao criar badge");
+                    }
+                }
+            }
+        });
 
+
+        ArrayList<Produto> homeProductsBackup = productsViewModel.getTodosOsProdutosLiveData().getValue();
+        if (pageTitle.equals("Novidades")) {
+            initialProducts = new ArrayList<>(homeProductsBackup.subList(0, 5));
+            pagedProductsViewModel.setListaDeProdutos(initialProducts);
+        } else if (pageTitle.equals("Populares")) {
+            initialProducts = new ArrayList<>(homeProductsBackup.subList(5, 10));
+            pagedProductsViewModel.setListaDeProdutos(initialProducts);
+        } else {
+            initialProducts = new ArrayList<>(homeProductsBackup.subList(10, 15));
+            pagedProductsViewModel.setListaDeProdutos(initialProducts);
+        }
+
+        pagedProductsViewModel.getListaDeProdutos().observe(getViewLifecycleOwner(), produtos -> {
+            ArrayList<Produto> teste = new ArrayList<>(produtos);
+            if (teste.size() > 5) {
+                adapter.clear();
+                adapter.addAll(teste);
+                adapter.notifyItemRangeInserted(adapter.getItemCount() - 10, 10);
+            }
+        });
+        View view = inflater.inflate(R.layout.fragment_lista_de_produtos, container, false);
+        return view;
+    }
+
+    private void fetchProducts(int page) {
+        //resgata produtos assíncronamente
+        DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, "10 OFFSET " + page * 10, this);
+        fetchProducts.execute();
+        //Inicia counter para avisar sobre carregamento lento
+        countdown.start();
+    }
+
+    @Override
+    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
+        super.onViewCreated(view, savedInstanceState);
+        Context context = getContext();
+        if (context != null) {
+            toggleFrameLoadingVisibility(false);
+
+            recycler = view.findViewById(R.id.recyclerListaDeProdutos);
             GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
             gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
-
-            if (produtos.size() == 15) {
-                if (pageTitle.equals("Novidades")) {
-                    adapter = new ProdutosListaAdapter(new ArrayList<>(produtos.subList(0, 5)), getContext());
-                } else if (pageTitle.equals("Populares")) {
-                    adapter = new ProdutosListaAdapter(new ArrayList<>(produtos.subList(5, 10)), getContext());
-                } else {
-                    adapter = new ProdutosListaAdapter(new ArrayList<>(produtos.subList(10, 15)), getContext());
-                }
-            } else {
-                adapter = new ProdutosListaAdapter(produtos, getContext());
-            }
+            adapter = new ProdutosListaAdapter(initialProducts, getContext(), this);
             adapter.setHasStableIds(true);
             recycler.setLayoutManager(gridLayoutManager);
             recycler.setAdapter(adapter);
@@ -167,43 +265,18 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
             scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
                 @Override
                 public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                    // Triggered only when new data needs to be appended to the list
-                    // Add whatever code is needed to append new items to the bottom of the list
-                    getMoreItens();
+                    recycler.post(() -> fetchProducts(page));
                 }
             };
-
-
-            // Adds the scroll listener to RecyclerView
             recycler.addOnScrollListener(scrollListener);
-
-        });
-        View view = inflater.inflate(R.layout.fragment_lista_de_produtos, container, false);
-        return view;
-    }
-
-    //A cada 10 itens = 1 página
-    private void getMoreItens() {
-        recycler.post(this::fetchProducts);
-    }
-
-    private void fetchProducts() {
-        //resgata produtos assíncronamente
-        new Thread(() -> {
-            DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, 10, this);
-            fetchProducts.execute();
-            //Inicia counter para avisar sobre carregamento lento
-            countdown.start();
-        }).start();
+        }
     }
 
     @Override
-    public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
-        super.onViewCreated(view, savedInstanceState);
-        Context context = getContext();
-        if (context != null) {
-            recycler = view.findViewById(R.id.recyclerListaDeProdutos);
-        }
+    public void onDestroyView() {
+        toggleFrameLoadingVisibility(false);
+        pagedProductsViewModel.setListaDeProdutos(new ArrayList<>());
+        super.onDestroyView();
     }
 
     private void setupWindowAnimations() {
@@ -226,24 +299,32 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts 
 
     @Override
     public void onGetDataDone(ArrayList<Produto> listaDeProdutos) {
-        productsInPersistence = productsViewModel.getTodosOsProdutosLiveData().getValue();
+        ArrayList<Produto> productsInPersistence = pagedProductsViewModel.getListaDeProdutos().getValue();
+//        ArrayList<Produto> listaDeProdutosClean = new ArrayList<>();
         if (productsInPersistence != null) {
-            for (Produto produtoPersistent : productsInPersistence) {
-                for (Produto p : listaDeProdutos) {
-                    if (p.getId() != produtoPersistent.getId()) {
-                        listaDeProdutosClean.add(p);
-                    }
-                }
-            }
-            if (listaDeProdutosClean.size() > 0) {
-                boolean success = productsInPersistence.addAll(listaDeProdutosClean);
-                if (success) {
-                    productsViewModel.setTodosOsProdutos(productsInPersistence);
-                }
-                adapter.notifyItemRangeInserted(productsInPersistence.size(), listaDeProdutosClean.size());
+//            for (Produto p : listaDeProdutos) {
+//                for (Produto produtoPersistent : productsInPersistence) {
+//                    if (p.getId() != produtoPersistent.getId()) {
+//                        Log.d(MY_LOG_TAG, p.getNome());
+//                        listaDeProdutosClean.add(p);
+//                    }
+//                }
+//            }
+//            if (listaDeProdutos.size() > 0) {
+            boolean success = productsInPersistence.addAll(listaDeProdutos);
+            if (success) {
+                pagedProductsViewModel.setListaDeProdutos(productsInPersistence);
+            } else {
+                pagedProductsViewModel.setListaDeProdutos(productsInPersistence);
             }
         } else {
-            productsViewModel.setTodosOsProdutos(listaDeProdutos);
+            pagedProductsViewModel.setListaDeProdutos(listaDeProdutos);
         }
+    }
+
+    public void onDetailViewClick(Produto produto) {
+        Intent intent = new Intent(getContext(), ProductDetail.class);
+        intent.putExtra("selectedProduct", produto);
+        startActivityForResult(intent, 1);
     }
 }

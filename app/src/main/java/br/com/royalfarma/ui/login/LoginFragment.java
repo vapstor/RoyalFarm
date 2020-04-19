@@ -143,12 +143,7 @@ public class LoginFragment extends Fragment {
             passInput = fragmentActivity.findViewById(R.id.senhaInput);
             cadastrarBtn = fragmentActivity.findViewById(R.id.btnCadastreSe);
             buttonLogin = fragmentActivity.findViewById(R.id.buttonLogin);
-            buttonLogin.setOnClickListener(new View.OnClickListener() {
-                @Override
-                public void onClick(View v) {
-                    Toast.makeText(fragmentActivity, "Tela de finalizar não implementada!", Toast.LENGTH_SHORT).show();
-                }
-            });
+            buttonLogin.setOnClickListener(v -> Toast.makeText(fragmentActivity, "Tela de finalizar não implementada!", Toast.LENGTH_SHORT).show());
             handler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {

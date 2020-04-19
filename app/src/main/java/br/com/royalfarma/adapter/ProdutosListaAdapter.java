@@ -1,8 +1,6 @@
 package br.com.royalfarma.adapter;
 
 import android.content.Context;
-import android.content.Intent;
-import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
 import android.text.style.StrikethroughSpan;
@@ -15,41 +13,38 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import androidx.annotation.NonNull;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageButton;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.google.gson.Gson;
 import com.squareup.picasso.Callback;
 import com.squareup.picasso.Picasso;
 
 import java.util.ArrayList;
-import java.util.Objects;
 
 import br.com.royalfarma.R;
-import br.com.royalfarma.activitys.ProductDetailActivity;
 import br.com.royalfarma.holder.ProdutosListaViewHolder;
+import br.com.royalfarma.interfaces.OnDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.utils.RoundedBackgroundSpan;
 import br.com.royalfarma.utils.RoundedTransformation;
 
 import static android.widget.Toast.makeText;
-import static androidx.core.app.ActivityOptionsCompat.makeSceneTransitionAnimation;
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.RSmask;
 
-public class ProdutosListaAdapter extends RecyclerView.Adapter{
+public class ProdutosListaAdapter extends RecyclerView.Adapter {
 
-    private static final int DETALHE_DO_PDOTUO = 1;
     private final Toast toast;
+    private final OnDetailViewClick listaDeProdutosFragment;
     private Context context;
     private ArrayList<Produto> itens;
 
-    public ProdutosListaAdapter(ArrayList<Produto> itens, Context context) {
+    public ProdutosListaAdapter(ArrayList<Produto> itens, Context context, OnDetailViewClick listaDeProdutosFragment) {
         this.context = context;
         this.itens = itens;
+        this.listaDeProdutosFragment = listaDeProdutosFragment;
         toast = makeText(context, "", Toast.LENGTH_LONG);
     }
 
@@ -158,46 +153,23 @@ public class ProdutosListaAdapter extends RecyclerView.Adapter{
     }
 
     private void openDetailProductActivity(Produto produto) {
-        Gson gson = new Gson();
-        Intent intent = new Intent(context, ProductDetailActivity.class);
-        Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
-        if (bundle != null) {
-            String product = gson.toJson(produto);
-            intent.putExtra("selectedProduct", product);
-            ((AppCompatActivity) context).startActivityForResult(intent, DETALHE_DO_PDOTUO, bundle);
-        } else {
-            Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
-        }
+        listaDeProdutosFragment.onDetailViewClick(produto);
     }
 
 
-
     private SpannableStringBuilder configValueWithDiscount(String precoNormal, String precoEmOferta) {
-        // Use a SpannableStringBuilder so that both the text and the spans are mutable
         SpannableStringBuilder ssb = new SpannableStringBuilder(precoNormal);
-
-        // Create a span that will strikethrough the text
         StrikethroughSpan strikethroughSpan = new StrikethroughSpan();
-
-        // Add the secondWord and apply the strikethrough span to only the second word
-        ssb.setSpan(
-                strikethroughSpan,
-                0,
-                ssb.length(),
-                Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-
+        ssb.setSpan(strikethroughSpan, 0, ssb.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
         ssb.append("  ").append(precoEmOferta).append(" ");
-
         ssb.setSpan(new RoundedBackgroundSpan(context), ssb.length() - precoNormal.length() - 2, ssb.length() - precoNormal.length() + precoEmOferta.length(), Spanned.SPAN_EXCLUSIVE_EXCLUSIVE);
-        // SPAN_EXCLUSIVE_EXCLUSIVE means to not extend the span when additional
-        // Set the TextView text and denote that it is Editable
-        // since it's a SpannableStringBuilder
         return ssb;
     }
 
     @Override
     public long getItemId(int position) {
-        return itens.get(position).getId();
+//        return itens.get(position).getId();
+        return position;
     }
 
     @Override

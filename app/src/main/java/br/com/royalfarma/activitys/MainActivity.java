@@ -1,19 +1,14 @@
 package br.com.royalfarma.activitys;
 
 import android.app.SearchManager;
-import android.content.Context;
-import android.content.Intent;
 import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
-import android.view.Menu;
-import android.view.MenuInflater;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.SearchView;
-import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
 import androidx.navigation.ui.AppBarConfiguration;
@@ -56,12 +51,10 @@ public class MainActivity extends AppCompatActivity {
 
         navView = findViewById(R.id.nav_view);
         navView.setOnNavigationItemReselectedListener(item -> {
-            if (item.getItemId() == R.id.navigation_home) {
-                finishAffinity();
-                overridePendingTransition(0, 0);
-                startActivity(getIntent());
-                overridePendingTransition(0, 0);
-//                navController.navigate(R.id.action_navigation_main_activity_to_navigation_home);
+            if (navController.getCurrentDestination().getId() == R.id.navigation_lista_produtos) {
+                navController.navigate(R.id.action_navigation_lista_produtos_to_navigation_home);
+            } else if (navController.getCurrentDestination().getId() == R.id.navigation_home) {
+                navController.navigate(R.id.action_navigation_home_self);
             }
         });
         // Passing each menu ID as a set of Ids because each

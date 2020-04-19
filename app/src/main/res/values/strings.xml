@@ -44,4 +44,5 @@
     <string name="roboto_light">roboto_light</string>
     <string name="nome_cod_barras">Nome ou Cód. Barras…</string>
     <string name="nenhum_produto_encontrado_npor_favor_tente_novamente">Nenhum produto encontrado.\nPor favor, tente novamente</string>
+    <string name="seu_carrinho_esta_vazio">Seu carrinho está vazio!\n</string>
 </resources>
