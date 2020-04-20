@@ -10,6 +10,7 @@ import android.os.Message;
 import android.os.SystemClock;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.MenuItem;
 import android.view.MotionEvent;
 import android.view.View;
 import android.view.ViewGroup;
@@ -24,11 +25,12 @@ import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AlertDialog;
-import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.fragment.app.Fragment;
 import androidx.fragment.app.FragmentActivity;
 import androidx.lifecycle.ViewModelProvider;
+import androidx.navigation.NavController;
+import androidx.navigation.Navigation;
 import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
@@ -59,35 +61,18 @@ public class LoginFragment extends Fragment {
     private AlertDialog webViewDialog;
     private DataBaseConnection dataBaseConnetion;
 
-
     private LoginViewModel loginViewModel;
-    private String subtotal;
-    private BottomNavigationView navView;
     private AppCompatButton cadastrarBtn, buttonLogin;
+    private NavController navController;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        navView = ((AppCompatActivity) getContext()).findViewById(R.id.nav_view);
-        if (navView != null) {
-            navView.setVisibility(View.GONE);
-        }
-        Bundle extras = getArguments();
-        if (extras != null) {
-            subtotal = extras.getString("subtotal");
-        }
-
-    }
-
-    public static LoginFragment newInstance() {
-        return new LoginFragment();
+        setHasOptionsMenu(true);
     }
 
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
-        if (navView != null) {
-            navView.setVisibility(View.GONE);
-        }
         loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
         loginViewModel.getUsuarioMutableLiveData().observe(getViewLifecycleOwner(), usuario -> {
             if (usuario != null)
@@ -99,34 +84,15 @@ public class LoginFragment extends Fragment {
     }
 
     @Override
-    public void onActivityCreated(@Nullable Bundle savedInstanceState) {
-        super.onActivityCreated(savedInstanceState);
-        // TODO: Use the ViewModel
-    }
-
-
-    @Override
-    public void onResume() {
-        if (navView != null) {
-            navView.setVisibility(View.GONE);
-        }
-        super.onResume();
-    }
-
-
-    @Override
-    public void onDestroyView() {
-        super.onDestroyView();
-        if (navView != null) {
-            navView.setVisibility(View.VISIBLE);
-        }
+    public boolean onOptionsItemSelected(@NonNull MenuItem item) {
+        navController.navigate(R.id.action_navigation_login_to_navigation_carrinho);
+        return super.onOptionsItemSelected(item);
     }
 
     @Override
     public void onViewCreated(@NonNull View view, @Nullable Bundle savedInstanceState) {
         super.onViewCreated(view, savedInstanceState);
         instanceViews();
-        Toast.makeText(getContext(), "Subtotal: " + subtotal, Toast.LENGTH_SHORT).show();
     }
 
     private void instanceViews() {
@@ -143,7 +109,7 @@ public class LoginFragment extends Fragment {
             passInput = fragmentActivity.findViewById(R.id.senhaInput);
             cadastrarBtn = fragmentActivity.findViewById(R.id.btnCadastreSe);
             buttonLogin = fragmentActivity.findViewById(R.id.buttonLogin);
-            buttonLogin.setOnClickListener(v -> Toast.makeText(fragmentActivity, "Tela de finalizar não implementada!", Toast.LENGTH_SHORT).show());
+            buttonLogin.setOnClickListener(this::entrar);
             handler = new Handler() {
                 @Override
                 public void handleMessage(Message msg) {
@@ -152,6 +118,7 @@ public class LoginFragment extends Fragment {
             };
 
             dataBaseConnetion = new DataBaseConnection(handler);
+            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
         }
     }
 
@@ -192,7 +159,7 @@ public class LoginFragment extends Fragment {
 
 
     private void toggleCircularBarBtn(boolean circularBarVisibility) {
-        final ViewGroup root = getActivity().findViewById(R.id.activity_login_root_layout);
+        final ViewGroup root = getActivity().findViewById(R.id.login_root_layout);
         Button btn = getActivity().findViewById(R.id.buttonLogin);
         TransitionManager.beginDelayedTransition(root, new Fade());
         if (circularBarVisibility) {
@@ -361,7 +328,7 @@ public class LoginFragment extends Fragment {
     }
 
     private void debugApp() {
-        //navigate to
+        navController.navigate(R.id.action_navigation_login_to_finalizarCompraFragment);
     }
 
 }

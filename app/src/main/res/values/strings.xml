@@ -45,4 +45,67 @@
     <string name="nome_cod_barras">Nome ou Cód. Barras…</string>
     <string name="nenhum_produto_encontrado_npor_favor_tente_novamente">Nenhum produto encontrado.\nPor favor, tente novamente</string>
     <string name="seu_carrinho_esta_vazio">Seu carrinho está vazio!\n</string>
+    <string name="aceito">Aceito</string>
+    <string name="finalizado">Finalizado</string>
+    <string name="seu_pedido_foi_realizado_acompanhe_o_progresso_abaixo">Seu pedido foi realizado! Acompanhe o progresso abaixo.</string>
+    <string name="pedido_realizado">Pedido Realizado</string>
+    <string name="em_transporte">Em transporte</string>
+    <string name="confira_seu_pedido">Confira seu pedido</string>
+    <string name="revise_as_informa_es_de_seu_pedido">Revise as informações de seu pedido.</string>
+    <string name="precisa_de_ajuda_entre_em_contato_31_3441_4933">Precisa de ajuda? Entre em contato – (31) 3441–4933</string>
+    <string name="ligar">Ligar</string>
+    <string name="itens">Itens:</string>
+    <string name="troco_para">Troco Para:</string>
+    <string name="pagamento">Pagamento:</string>
+    <string name="hifen">-</string>
+    <string name="endere_o_para_entrega">Endereço para entrega:</string>
+    <string name="endere_o">Endereço</string>
+    <string name="numero">Número</string>
+    <string name="informa_es_da_entrega">Informações da Entrega:</string>
+    <string name="salvar">Salvar</string>
+    <string name="editar">Editar</string>
+    <string name="uf">UF</string>
+    <string name="forma_de_pagamento">Forma de Pagamento:</string>
+    <string name="troco_para_quanto">Troco para quanto</string>
+    <string name="dinheiro">Dinheiro</string>
+    <string name="cartao_maquina">Cartão (Máquina)</string>
+    <string name="finalizar">Finalizar</string>
+    <string name="preciso_de_troco">Preciso de troco</string>
+    <string name="prosseguir">Prosseguir</string>
+    <string name="avancar">Avançar</string>
+    <string name="r_0_00">R$ 0,00</string>
+    <string name="voce_tem_certeza_que_nao_deseja_informar_um_valor_para_o_motoboy_levar_troco_">Você tem certeza que não deseja informar um valor para o motoboy levar troco?</string>
+    <string name="informar_valor">Informar Valor</string>
+    <string name="tenho_a_quantia_exata">Tenho a quantia exata</string>
+    <string name="necessidade_de_troco">Necessidade de troco</string>
+    <string name="utilize_para_especificar_ao_motoboy_quanto_ele_precisara_levar_de_troco">Utilize para especificar ao motoboy quanto ele precisará levar de troco.</string>
+    <string-array name="ufs">
+        <item>AC</item>
+        <item>AL</item>
+        <item>AM</item>
+        <item>AP</item>
+        <item>BA</item>
+        <item>CE</item>
+        <item>DF</item>
+        <item>ES</item>
+        <item>GO</item>
+        <item>MA</item>
+        <item>MG</item>
+        <item>MS</item>
+        <item>MT</item>
+        <item>PA</item>
+        <item>PB</item>
+        <item>PE</item>
+        <item>PI</item>
+        <item>PR</item>
+        <item>RJ</item>
+        <item>RN</item>
+        <item>RO</item>
+        <item>RR</item>
+        <item>RS</item>
+        <item>SC</item>
+        <item>SE</item>
+        <item>SP</item>
+        <item>TO</item>
+    </string-array>
 </resources>

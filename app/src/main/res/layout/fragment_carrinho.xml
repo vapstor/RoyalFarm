@@ -84,16 +84,16 @@
             android:elevation="1dp"
             android:fontFamily="@font/roboto_light"
             android:gravity="center"
-            android:text="R$ 0,00"
+            android:text="@string/r_0_00"
             android:textColor="@color/colorAccent"
             android:textSize="18sp"
             app:layout_constraintBottom_toBottomOf="parent"
-            app:layout_constraintEnd_toStartOf="@+id/finalizarCompraButton"
+            app:layout_constraintEnd_toStartOf="@+id/prosseguir"
             app:layout_constraintStart_toStartOf="parent"
             app:layout_constraintTop_toTopOf="parent" />
 
         <androidx.appcompat.widget.AppCompatButton
-            android:id="@+id/finalizarCompraButton"
+            android:id="@+id/prosseguir"
             android:layout_width="0dp"
             android:layout_height="0dp"
             android:backgroundTint="@color/colorAccent"
@@ -103,7 +103,7 @@
             android:paddingStart="16dp"
             android:paddingEnd="16dp"
             android:stateListAnimator="@null"
-            android:text="Finalizar"
+            android:text="@string/avancar"
             android:textColor="@color/white"
             app:layout_constraintBottom_toBottomOf="parent"
             app:layout_constraintEnd_toEndOf="parent"

@@ -1,5 +1,7 @@
 package br.com.royalfarma.ui.carrinho;
 
+import android.app.Activity;
+import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -163,15 +165,12 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
 
         navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
 
-        finalizarCompraButton = view.findViewById(R.id.finalizarCompraButton);
+        finalizarCompraButton = view.findViewById(R.id.prosseguir);
         finalizarCompraButton.setOnClickListener(v -> {
             if (getActivity() != null) {
                 ArrayList<Produto> produtosCarrinho = carrinhoViewModel.getCartProductsLiveData().getValue();
                 if (produtosCarrinho != null && produtosCarrinho.size() > 0) {
-                    String subtotal = carrinhoViewModel.getSubtotalLiveData().getValue();
-                    Bundle extras = new Bundle();
-                    extras.putString("subtotal", subtotal);
-                    navController.navigate(R.id.action_navigation_carrinho_to_loginFragment, extras);
+                    navController.navigate(R.id.action_navigation_carrinho_to_loginFragment);
                 } else {
                     Toast.makeText(getContext(), "Adicione itens ao carrinho para prosseguir!", Toast.LENGTH_SHORT).show();
                 }

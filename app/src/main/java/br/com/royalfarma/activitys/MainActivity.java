@@ -5,6 +5,7 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.View;
 import android.widget.Toast;
 
 import androidx.appcompat.app.AppCompatActivity;
@@ -62,14 +63,30 @@ public class MainActivity extends AppCompatActivity {
         appBarConfiguration = new AppBarConfiguration.Builder(R.id.navigation_pesquisar, R.id.navigation_home, R.id.navigation_carrinho).build();
         navController = Navigation.findNavController(this, R.id.nav_host_fragment);
         navController.addOnDestinationChangedListener((controller, destination, arguments) -> {
-            Log.d(MY_LOG_TAG, " ID -> " + destination.getId());
             switch (destination.getId()) {
                 case R.id.navigation_lista_produtos:
+                    if (navView != null) {
+                        navView.setVisibility(View.VISIBLE);
+                    }
                     getSupportActionBar().setTitle(arguments.getString("title"));
                     break;
                 case R.id.navigation_home:
+                    if (navView != null) {
+                        navView.setVisibility(View.VISIBLE);
+                    }
                     getSupportActionBar().setTitle("RoyalFarma");
                     break;
+                case R.id.navigation_login:
+                case R.id.navigation_finalizar:
+                case R.id.navigation_acompanhamento:
+                    if (navView != null) {
+                        navView.setVisibility(View.GONE);
+                    }
+                    break;
+                default:
+                    if (navView != null) {
+                        navView.setVisibility(View.VISIBLE);
+                    }
             }
         });
         NavigationUI.setupActionBarWithNavController(this, navController, appBarConfiguration);
@@ -147,6 +164,12 @@ public class MainActivity extends AppCompatActivity {
                 Toast.makeText(this, "Clique mais uma vez para sair", Toast.LENGTH_SHORT).show();
             }
         } else {
+            if (navController.getCurrentDestination().getId() == R.id.navigation_acompanhamento) {
+
+            } else {
+
+            }
+
             super.onBackPressed();
         }
     }

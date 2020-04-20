@@ -1,0 +1,392 @@
+<?xml version="1.0" encoding="utf-8"?>
+<androidx.constraintlayout.widget.ConstraintLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:id="@+id/layout_acompanhamento_compra_root"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context=".ui.acompanhamento.AcompanhamentoCompraFragment">
+
+    <ScrollView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:background="@color/whiteSmoke"
+        android:fitsSystemWindows="true"
+        android:orientation="vertical"
+        app:layout_constraintBottom_toTopOf="@+id/card_contact"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent">
+
+        <androidx.constraintlayout.widget.ConstraintLayout
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:elevation="1dp">
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="8dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/pedido_realizado"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toTopOf="parent" />
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/textView2"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:layout_marginEnd="8dp"
+                android:fontFamily="@font/roboto_light"
+                android:text="@string/seu_pedido_foi_realizado_acompanhe_o_progresso_abaixo"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/textView"
+                app:layout_constraintTop_toBottomOf="@+id/textView" />
+
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_status_pedido"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="8dp"
+                android:layout_marginTop="16dp"
+                android:layout_marginEnd="8dp"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/textView2">
+
+                <ProgressBar
+                    android:id="@+id/progressBarPedido"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/iconeEmTransporte"
+                    app:layout_constraintEnd_toStartOf="@+id/iconeEmTransporte"
+                    app:layout_constraintStart_toEndOf="@+id/iconeAceito"
+                    app:layout_constraintTop_toTopOf="@+id/iconeEmTransporte" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconeAceito"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="64dp"
+                    android:elevation="2dp"
+                    android:src="@drawable/ic_thumb_up_black_24dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/progressBarPedido"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedido"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/progressBarPedido" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconeEmTransporte"
+                    android:layout_width="30dp"
+                    android:layout_height="30dp"
+                    android:layout_marginTop="2dp"
+                    android:elevation="2dp"
+                    android:src="@drawable/ic_motorcycle_grey_24dp"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBar3"
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedido"
+                    app:layout_constraintTop_toBottomOf="@+id/textViewEmTransporte" />
+
+                <ProgressBar
+                    android:id="@+id/progressBar3"
+                    style="?android:attr/progressBarStyleHorizontal"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="@+id/iconeEmTransporte"
+                    app:layout_constraintEnd_toStartOf="@+id/iconeFinalizado"
+                    app:layout_constraintStart_toEndOf="@+id/iconeEmTransporte"
+                    app:layout_constraintTop_toTopOf="@+id/iconeEmTransporte" />
+
+                <androidx.appcompat.widget.AppCompatImageView
+                    android:id="@+id/iconeFinalizado"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginEnd="64dp"
+                    android:elevation="2dp"
+                    android:src="@drawable/ic_check_circle_grey_24dp"
+                    app:layout_constraintBottom_toBottomOf="@+id/progressBar3"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/progressBar3"
+                    app:layout_constraintTop_toTopOf="@+id/progressBar3" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textViewEmTransporte"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:text="@string/em_transporte"
+                    app:layout_constraintEnd_toEndOf="@+id/iconeEmTransporte"
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedido"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textViewRealizado"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:text="@string/finalizado"
+                    app:layout_constraintEnd_toEndOf="@+id/iconeFinalizado"
+                    app:layout_constraintStart_toEndOf="@+id/progressBar3"
+                    app:layout_constraintTop_toBottomOf="@+id/iconeFinalizado" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textViewAceito"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="2dp"
+                    android:layout_marginBottom="1dp"
+                    android:text="@string/aceito"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedido"
+                    app:layout_constraintStart_toStartOf="@+id/iconeAceito"
+                    app:layout_constraintTop_toBottomOf="@+id/iconeAceito" />
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/appCompatTextView"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginStart="16dp"
+                android:layout_marginTop="16dp"
+                android:fontFamily="@font/roboto_medium"
+                android:text="@string/confira_seu_pedido"
+                android:textSize="20sp"
+                app:layout_constraintStart_toStartOf="parent"
+                app:layout_constraintTop_toBottomOf="@+id/card_status_pedido" />
+
+            <androidx.appcompat.widget.AppCompatTextView
+                android:id="@+id/appCompatTextView2"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="4dp"
+                android:fontFamily="@font/roboto_light"
+                android:text="@string/revise_as_informa_es_de_seu_pedido"
+                app:layout_constraintStart_toStartOf="@+id/appCompatTextView"
+                app:layout_constraintTop_toBottomOf="@+id/appCompatTextView" />
+
+            <androidx.constraintlayout.widget.ConstraintLayout
+                android:id="@+id/card_infos_pedido"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_marginTop="8dp"
+                android:layout_marginEnd="8dp"
+                android:paddingStart="8dp"
+                android:paddingEnd="8dp"
+                app:layout_constraintBottom_toBottomOf="parent"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintStart_toStartOf="@+id/appCompatTextView2"
+                app:layout_constraintTop_toBottomOf="@+id/appCompatTextView2">
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView7"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:text="@string/endere_o_para_entrega"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/ruaValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:elevation="0dp"
+                    android:ellipsize="end"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Rua Francisco Cândido Xavier"
+                    app:layout_constraintEnd_toStartOf="@+id/numeroValue"
+                    app:layout_constraintStart_toStartOf="@+id/textView7"
+                    app:layout_constraintTop_toBottomOf="@+id/textView7" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/numeroValue"
+                    android:layout_width="100dp"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="360"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="@+id/ruaValue"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/ruaValue"
+                    app:layout_constraintTop_toTopOf="@+id/ruaValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cepValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="88040-240"
+                    app:layout_constraintStart_toStartOf="@+id/ruaValue"
+                    app:layout_constraintTop_toBottomOf="@+id/ruaValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/cidadeValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Florianópolis"
+                    app:layout_constraintBottom_toBottomOf="@+id/cepValue"
+                    app:layout_constraintStart_toEndOf="@+id/cepValue"
+                    app:layout_constraintTop_toTopOf="@+id/cepValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/estadoValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="SC"
+                    app:layout_constraintBottom_toBottomOf="@+id/cidadeValue"
+                    app:layout_constraintStart_toEndOf="@+id/textView13"
+                    app:layout_constraintTop_toTopOf="@+id/cidadeValue"
+                    app:layout_constraintVertical_bias="0.0" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView13"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="@string/hifen"
+                    android:textAlignment="center"
+                    app:layout_constraintBottom_toBottomOf="@+id/cidadeValue"
+                    app:layout_constraintStart_toEndOf="@+id/cidadeValue"
+                    app:layout_constraintTop_toTopOf="@+id/cidadeValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView14"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/pagamento"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="@+id/cepValue"
+                    app:layout_constraintTop_toBottomOf="@+id/cepValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/formaDePagamentoValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="4dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Dinheiro"
+                    app:layout_constraintStart_toStartOf="@+id/textView14"
+                    app:layout_constraintTop_toBottomOf="@+id/textView14" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView16"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="16dp"
+                    android:text="@string/troco_para"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/formaDePagamentoValue"
+                    app:layout_constraintStart_toEndOf="@+id/formaDePagamentoValue"
+                    app:layout_constraintTop_toTopOf="@+id/formaDePagamentoValue" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/trocoParaQntValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="4dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="R$ 50,00"
+                    android:visibility="gone"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView16"
+                    app:layout_constraintStart_toEndOf="@+id/textView16"
+                    app:layout_constraintTop_toTopOf="@+id/textView16" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/subtotalValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:fontFamily="@font/roboto_medium"
+                    android:text="Subtotal:"
+                    android:textColor="@color/colorPrimary"
+                    android:textSize="16sp"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView19"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textView19" />
+
+                <androidx.appcompat.widget.AppCompatTextView
+                    android:id="@+id/textView19"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:text="@string/itens"
+                    android:textSize="16sp"
+                    app:layout_constraintStart_toStartOf="@+id/formaDePagamentoValue"
+                    app:layout_constraintTop_toBottomOf="@+id/formaDePagamentoValue" />
+
+                <androidx.recyclerview.widget.RecyclerView
+                    android:id="@+id/recyclerViewItensCompra"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="1dp"
+                    android:layout_marginBottom="16dp"
+                    android:clickable="false"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintHorizontal_bias="0.125"
+                    app:layout_constraintStart_toStartOf="@+id/textView19"
+                    app:layout_constraintTop_toBottomOf="@+id/textView19"
+                    app:layout_constraintVertical_bias="1.0" />
+
+            </androidx.constraintlayout.widget.ConstraintLayout>
+
+        </androidx.constraintlayout.widget.ConstraintLayout>
+    </ScrollView>
+
+    <androidx.constraintlayout.widget.ConstraintLayout
+        android:id="@+id/card_contact"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:animateLayoutChanges="true"
+        android:background="@drawable/shape_rounded_top_white_bg"
+        android:elevation="2dp"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent">
+
+        <androidx.appcompat.widget.AppCompatTextView
+            android:id="@+id/textViewContato"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_marginTop="12dp"
+            android:layout_marginBottom="12dp"
+            android:fontFamily="@font/roboto_light"
+            android:text="@string/precisa_de_ajuda_entre_em_contato_31_3441_4933"
+            android:textSize="13sp"
+            app:layout_constraintBottom_toBottomOf="parent"
+            app:layout_constraintEnd_toEndOf="parent"
+            app:layout_constraintStart_toStartOf="parent"
+            app:layout_constraintTop_toTopOf="parent" />
+
+    </androidx.constraintlayout.widget.ConstraintLayout>
+
+    <androidx.appcompat.widget.AppCompatImageView
+        android:id="@+id/iconArrow"
+        android:layout_width="22dp"
+        android:layout_height="22dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginBottom="8dp"
+        android:background="@drawable/arrow_state_list_down"
+        android:clickable="true"
+        android:elevation="3dp"
+        android:focusable="true"
+        android:foregroundGravity="center"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent" />
+
+</androidx.constraintlayout.widget.ConstraintLayout>

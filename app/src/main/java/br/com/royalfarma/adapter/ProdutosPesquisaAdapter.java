@@ -65,9 +65,13 @@ public class ProdutosPesquisaAdapter extends RecyclerView.Adapter<ProdutosCarrin
         Produto item = itens.get(position);
         //Workaround para não ter que criar mais um Holder
         AppCompatImageButton imageButton = holder.qntdPlus;
-        imageButton.setOnClickListener(v -> {
-            pesquisarFragment.onDetailViewClick(item);
-        });
+        if (pesquisarFragment == null) {
+            imageButton.setVisibility(View.GONE);
+        } else {
+            imageButton.setOnClickListener(v -> {
+                pesquisarFragment.onDetailViewClick(item);
+            });
+        }
 
         AppCompatTextView descricaoItem = holder.tituloItemProduto;
         descricaoItem.setText(item.getNome());

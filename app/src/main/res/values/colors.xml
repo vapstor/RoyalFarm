@@ -17,6 +17,7 @@
     <color name="whiteSmoke">#F5F5F5</color>
 
     <color name="silver">#C0C0C0</color>
+    <color name="transparent">#00FFFFFF</color>
 
     <!--    <color name="colorAccent">#70edcc</color>-->
 </resources>

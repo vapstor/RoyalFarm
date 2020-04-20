@@ -4,10 +4,8 @@ import android.os.SystemClock;
 
 import java.math.BigDecimal;
 import java.math.BigInteger;
-import java.math.RoundingMode;
 import java.security.MessageDigest;
 import java.security.NoSuchAlgorithmException;
-import java.text.DecimalFormat;
 
 public abstract class Util {
     public final static String CONNECTION = "CONNECTION";
@@ -31,7 +29,7 @@ public abstract class Util {
     }
 
     public static double fromRStoDouble(String RSFormat) {
-        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(3, BigDecimal.ROUND_HALF_UP);
+        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
         return Double.parseDouble(bigDecimal.toString());
     }
 
@@ -81,12 +79,16 @@ public abstract class Util {
 
     public static String unmask(String s) {
         return s.replaceAll("[.]", "")
+                .replaceAll("[,]", "")
                 .replaceAll("[-]", "")
                 .replaceAll("[/]", "")
                 .replaceAll("[(]", "")
                 .replaceAll("[)]", "")
-                .replaceAll("R", "")
-                .replaceAll("[$]", "");
+                .replaceAll("[R$]", "")
+                .replaceAll("[$]", "")
+                .replaceAll("[ ]", "")
+                .replaceAll("[ ]", "")
+                .replaceAll("[ ]", "");
     }
 
 }

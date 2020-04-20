@@ -10,7 +10,7 @@
         android:name="br.com.royalfarma.ui.pesquisar.PesquisarFragment"
         android:label="@string/title_pesquisar"
         android:launchMode="singleTop"
-        tools:layout="@layout/fragment_pesquisar"/>
+        tools:layout="@layout/fragment_pesquisar" />
 
     <fragment
         android:id="@+id/navigation_home"
@@ -35,11 +35,10 @@
         <action
             android:id="@+id/action_navigation_home_self"
             app:destination="@id/navigation_home"
-            app:enterAnim="@anim/fragment_fade_enter"
+            app:enterAnim="@android:anim/slide_in_left"
             app:exitAnim="@anim/fragment_fade_exit"
-            app:launchSingleTop="false"
-            app:popEnterAnim="@android:anim/fade_in"
-            app:popExitAnim="@android:anim/fade_out" />
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
     </fragment>
 
     <fragment
@@ -49,12 +48,19 @@
         tools:layout="@layout/fragment_carrinho">
         <action
             android:id="@+id/action_navigation_carrinho_to_navigation_home"
-            app:destination="@id/navigation_home" />
+            app:destination="@id/navigation_home"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:popUpTo="@id/navigation_home" />
         <action
             android:id="@+id/action_navigation_carrinho_to_loginFragment"
             app:destination="@id/navigation_login"
             app:enterAnim="@android:anim/slide_in_left"
-            app:exitAnim="@android:anim/slide_out_right"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
             app:popUpTo="@id/navigation_carrinho" />
     </fragment>
 
@@ -65,14 +71,72 @@
         <action
             android:id="@+id/action_navigation_lista_produtos_to_navigation_home"
             app:destination="@id/navigation_home"
-            app:enterAnim="@anim/fragment_open_enter"
-            app:exitAnim="@anim/fragment_open_exit"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
             app:popEnterAnim="@android:anim/slide_in_left"
-            app:popExitAnim="@anim/fragment_close_exit"
+            app:popExitAnim="@android:anim/slide_out_right"
             app:popUpTo="@id/navigation_home" />
     </fragment>
     <fragment
         android:id="@+id/navigation_login"
         android:name="br.com.royalfarma.ui.login.LoginFragment"
-        android:label="@string/entrar" />
+        android:label="@string/entrar"
+        tools:layout="@layout/fragment_login">
+        <action
+            android:id="@+id/action_navigation_login_to_navigation_carrinho"
+            app:destination="@id/navigation_carrinho"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            />
+        <action
+            android:id="@+id/action_navigation_login_to_finalizarCompraFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:destination="@id/navigation_finalizar" />
+    </fragment>
+
+    <fragment
+        android:id="@+id/navigation_finalizar"
+        android:name="br.com.royalfarma.ui.finalizacao.FinalizarCompraFragment"
+        android:label="Finalizar Compra"
+        tools:layout="@layout/finalizar_compra_fragment">
+        <action
+            android:id="@+id/action_finalizarCompraFragment_to_navigation_carrinho"
+            app:destination="@id/navigation_carrinho"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_finalizarCompraFragment_to_navigation_login"
+            app:destination="@id/navigation_login"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+        <action
+            android:id="@+id/action_finalizarCompraFragment_to_acompanhamentoCompraFragment"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right"
+            app:destination="@id/navigation_acompanhamento" />
+    </fragment>
+    <fragment
+        android:id="@+id/navigation_acompanhamento"
+        android:name="br.com.royalfarma.ui.acompanhamento.AcompanhamentoCompraFragment"
+        android:label="Compra Efetuada"
+        tools:layout="@layout/acompanhamento_compra_fragment">
+        <action
+            android:id="@+id/action_acompanhamentoCompraFragment_to_navigation_home"
+            app:destination="@id/navigation_home"
+            app:enterAnim="@android:anim/slide_in_left"
+            app:exitAnim="@anim/fragment_fade_exit"
+            app:popEnterAnim="@android:anim/slide_in_left"
+            app:popExitAnim="@android:anim/slide_out_right" />
+    </fragment>
 </navigation>
