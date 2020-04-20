@@ -5,9 +5,9 @@
 <p align="center">
   <strong>Repositório para centralizar o Ambiente de Desenvolvimento</strong>
   <p align="center">
-<!--     <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." /> -->
-     <img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." />
-    <img src="https://img.shields.io/badge/version-8.2.4-blue.svg" alt="Current APP version." />  
+    <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." />
+<!--      <img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." /> -->
+    <img src="https://img.shields.io/badge/version-11.4.3-blue.svg" alt="Current APP version." />  
   </p>
 </p>
 
@@ -41,6 +41,9 @@
   <img src="app/screenshots/screen3.png?raw=true" width="250"/> 
   <img src="app/screenshots/screen4.png?raw=true" width="250"/> 
   <img src="app/screenshots/screen5.png?raw=true" width="250"/> 
+  <img src="app/screenshots/screen6.png?raw=true" width="250"/> 
+  <img src="app/screenshots/screen7.png?raw=true" width="250"/> 
+  <img src="app/screenshots/screen8.png?raw=true" width="250"/> 
 </div>
 
 ## 👏 Todo (Desenvolvimento)
@@ -76,8 +79,8 @@
   -  [x] Implementar SwipeRefresh
       
 * Desenvolver Pesquisar
-  - [ ] Implementar tela com VerticalScrollView de produtos com palavra chave 
-  - [ ] Implementar botão para limpar seção de pesquisa
+  - [x] Implementar tela com VerticalScrollView de produtos com Nome/Cod Barra 
+  - [] ~Implementar botão para limpar seção de pesquisa~
 
 * Desenvolver CarrinhoPage
   - [x] Implementar Badge no menu de carrinho com quantidade de itens selecionados 
@@ -86,11 +89,14 @@
   - [x] Implementar Botão para FinalizarCompra
   
 * Desenvolver FinalizaCompraPage
-  - [ ] Implementar RadioButton para Dinheiro ou Cartão
-  - [ ] ~Implementar Linha do Tempo de Pedido~
-  - [ ] Implementar ImageView para bandeiras aceitas caso Cartão
-  - [ ] Implementar CheckBox para necessidade de troco caso opção "Dinheiro": 
-    - [ ] Implementar Input "Troco para quanto"
+  - [ ] Implementar EditTexts para recuperação do endereço de entrega 
+  - [ ] ~Implementar ImageView para bandeiras aceitas caso Cartão~
+  - [x] Implementar CheckBox para necessidade de troco caso opção "Dinheiro": 
+    - [x] Implementar Input "Troco para quanto"
+  - [x] Implementar RadioButton para Dinheiro ou Cartão
+  - [x] Implementar Linha do Tempo de Pedido
+
+* Desenvolver tela de Compra Efetuada
   - [ ] Implementar Diálogo de confirmação da compra
   - [ ] Configurar INSERT via JDBC
   - [ ] Implementar View "Sucesso de Compra"
