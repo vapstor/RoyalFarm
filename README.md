@@ -83,7 +83,7 @@
       
 * Desenvolver Pesquisar
   - [x] Implementar tela com VerticalScrollView de produtos com Nome/Cod Barra 
-  - [] ~Implementar botão para limpar seção de pesquisa~
+  - [ ] ~Implementar botão para limpar seção de pesquisa~
 
 * Desenvolver CarrinhoPage
   - [x] Implementar Badge no menu de carrinho com quantidade de itens selecionados 
