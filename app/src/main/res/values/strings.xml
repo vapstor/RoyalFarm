@@ -47,12 +47,12 @@
     <string name="seu_carrinho_esta_vazio">Seu carrinho está vazio!\n</string>
     <string name="aceito">Aceito</string>
     <string name="finalizado">Finalizado</string>
-    <string name="seu_pedido_foi_realizado_acompanhe_o_progresso_abaixo">Seu pedido foi realizado! Acompanhe o progresso abaixo.</string>
+    <string name="acompanhe_o_progresso_abaixo">Acompanhe o progresso abaixo.</string>
     <string name="pedido_realizado">Pedido Realizado</string>
     <string name="em_transporte">Em transporte</string>
     <string name="confira_seu_pedido">Confira seu pedido</string>
     <string name="revise_as_informa_es_de_seu_pedido">Revise as informações de seu pedido.</string>
-    <string name="precisa_de_ajuda_entre_em_contato_31_3441_4933">Precisa de ajuda? Entre em contato – (31) 3441–4933</string>
+    <string name="precisa_de_ajuda_entre_em_contato_31_3441_4933">Ajuda? Entre em contato: (31) 3441–4933</string>
     <string name="ligar">Ligar</string>
     <string name="itens">Itens:</string>
     <string name="troco_para">Troco Para:</string>
@@ -79,6 +79,19 @@
     <string name="tenho_a_quantia_exata">Tenho a quantia exata</string>
     <string name="necessidade_de_troco">Necessidade de troco</string>
     <string name="utilize_para_especificar_ao_motoboy_quanto_ele_precisara_levar_de_troco">Utilize para especificar ao motoboy quanto ele precisará levar de troco.</string>
+    <string name="endereco_encontrado">Endereço encontrado</string>
+    <string name="em_seu_perfil_foi_encontrado_um_endereço_previamente_cadastrado">Em seu perfil foi encontrado um endereço previamente cadastrado!</string>
+    <string name="complemento">Complemento</string>
+    <string name="cep">CEP</string>
+    <string name="bairro">Bairro</string>
+    <string name="cidade">Cidade</string>
+    <string name="endereco_inserido_com_sucesso">Endereço inserido com sucesso</string>
+    <string name="falhou_ao_inserir_endereco">Falhou ao inserir endereço</string>
+    <string name="falhou_ao_processar_o_pedido">Falhou ao processar o pedido</string>
+    <string name="adresses">Adresses</string>
+    <string name="nome_do_endere_o">Nome do Endereço</string>
+    <string name="endereco_atualizado_com_sucesso">Endereço atualizado com sucesso</string>
+    <string name="pedido_efetuado_com_sucesso">Pedido efetuado com sucesso</string>
     <string-array name="ufs">
         <item>AC</item>
         <item>AL</item>

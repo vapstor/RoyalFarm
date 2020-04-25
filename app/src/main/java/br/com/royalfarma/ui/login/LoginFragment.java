@@ -34,7 +34,6 @@ import androidx.navigation.Navigation;
 import androidx.transition.Fade;
 import androidx.transition.TransitionManager;
 
-import com.google.android.material.bottomnavigation.BottomNavigationView;
 import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.textfield.TextInputEditText;
 import com.google.android.material.textfield.TextInputLayout;
@@ -44,13 +43,13 @@ import java.io.IOException;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.interfaces.ILoginInfos;
 import br.com.royalfarma.model.Usuario;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.elapsedTime;
-import static br.com.royalfarma.utils.Util.getSha512FromString;
 
-public class LoginFragment extends Fragment {
+public class LoginFragment extends Fragment implements ILoginInfos {
 
     private Handler handler;
     private ActionBar toolbar;
@@ -64,6 +63,7 @@ public class LoginFragment extends Fragment {
     private LoginViewModel loginViewModel;
     private AppCompatButton cadastrarBtn, buttonLogin;
     private NavController navController;
+    private boolean resultLogin = false;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -74,12 +74,6 @@ public class LoginFragment extends Fragment {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
-        loginViewModel.getUsuarioMutableLiveData().observe(getViewLifecycleOwner(), usuario -> {
-            if (usuario != null)
-                loginViewModel.updateUsuarioInfo(usuario);
-            else
-                Log.e(MY_LOG_TAG, "Usuario Nulo!");
-        });
         return inflater.inflate(R.layout.fragment_login, container, false);
     }
 
@@ -107,7 +101,10 @@ public class LoginFragment extends Fragment {
             loginInput = fragmentActivity.findViewById(R.id.loginInput);
             passLayout = fragmentActivity.findViewById(R.id.senhaInputLayout);
             passInput = fragmentActivity.findViewById(R.id.senhaInput);
+
             cadastrarBtn = fragmentActivity.findViewById(R.id.btnCadastreSe);
+            cadastrarBtn.setOnClickListener(v -> cadastrarUsuario());
+
             buttonLogin = fragmentActivity.findViewById(R.id.buttonLogin);
             buttonLogin.setOnClickListener(this::entrar);
             handler = new Handler() {
@@ -123,9 +120,6 @@ public class LoginFragment extends Fragment {
     }
 
     private void updateUI(Message msg) {
-        // 0 = status da conexao ao banco
-        // 1 = status da async task
-        //também mostra ao usuario que estamos tentando conectar
         if (msg.what == 0) {
             if ("tentando_conectar".equals(msg.obj)) {
                 toggleCircularBarBtn(true);
@@ -136,11 +130,11 @@ public class LoginFragment extends Fragment {
                     toggleCircularBarBtn(true);
                     break;
                 case "autenticado":
-                    resultLogin(true);
+                    resultLogin = true;
                     toggleCircularBarBtn(false);
                     break;
                 case "erro_autenticacao":
-                    resultLogin(false);
+                    resultLogin = false;
                     toggleCircularBarBtn(false);
                     break;
                 case "erro_sql":
@@ -172,38 +166,38 @@ public class LoginFragment extends Fragment {
     }
 
     public void entrar(View v) {
-//        if (passInput.getText() != null) {
-//            pass = passInput.getText().toString();
-//            if (pass.equals("")) {
-//                passLayout.setErrorEnabled(true);
-//                passLayout.setError("insira sua senha");
-//            } else {
-//                passLayout.setErrorEnabled(false);
-//            }
-//        } else {
-//            passLayout.setErrorEnabled(true);
-//            passLayout.setError("nulo");
-//        }
-//
-//        if (loginInput.getText() != null) {
-//            login = loginInput.getText().toString();
-//            if (login.equals("")) {
-//                loginLayout.setErrorEnabled(true);
-//                loginLayout.setError("insira seu e-mail");
-//            } else {
-//                loginLayout.setErrorEnabled(false);
-//            }
-//        } else {
-//            loginLayout.setErrorEnabled(true);
-//            loginLayout.setError("nulo");
-//        }
-//
-//        if (!loginLayout.isErrorEnabled() && !passLayout.isErrorEnabled()) {
-//            authenticateLogin();
-//        } else {
-//            Toast.makeText(getContext(), "Confira as informações!", Toast.LENGTH_SHORT).show();
-//        }
-        debugApp();
+        if (passInput.getText() != null) {
+            pass = passInput.getText().toString();
+            if (pass.equals("")) {
+                passLayout.setErrorEnabled(true);
+                passLayout.setError(" ");
+            } else {
+                passLayout.setErrorEnabled(false);
+            }
+        } else {
+            passLayout.setErrorEnabled(true);
+            passLayout.setError("nulo");
+        }
+
+        if (loginInput.getText() != null) {
+            login = loginInput.getText().toString();
+            if (login.equals("")) {
+                loginLayout.setErrorEnabled(true);
+                loginLayout.setError(" ");
+            } else {
+                loginLayout.setErrorEnabled(false);
+            }
+        } else {
+            loginLayout.setErrorEnabled(true);
+            loginLayout.setError("nulo");
+        }
+
+        if (!loginLayout.isErrorEnabled() && !passLayout.isErrorEnabled()) {
+            authenticateLogin();
+        } else {
+            Toast.makeText(getContext(), "Confira as informações!", Toast.LENGTH_SHORT).show();
+        }
+//        debugApp();
     }
 
     public void cadastrarUsuario() {
@@ -296,16 +290,13 @@ public class LoginFragment extends Fragment {
 
     //tenta autenticar assíncronamente
     private void authenticateLogin() {
-        DataBaseConnection.AuthenticateLogin authenticateLogin = new DataBaseConnection.AuthenticateLogin(handler);
-        authenticateLogin.execute(login, pass);
+        DataBaseConnection.GetClientInfo getClientInfo = new DataBaseConnection.GetClientInfo(handler, this);
+        getClientInfo.execute(login, pass);
     }
 
     private void resultLogin(boolean success) {
         if (success) {
             try {
-                //Atualiza modelo com info do usuario
-                loginViewModel.updateUsuarioInfo(new Usuario(login, getSha512FromString(pass)));
-
                 final AssetFileDescriptor afd = getResources().openRawResourceFd(R.raw.beep_login);
                 final FileDescriptor fileDescriptor = afd.getFileDescriptor();
                 MediaPlayer player = new MediaPlayer();
@@ -313,11 +304,9 @@ public class LoginFragment extends Fragment {
                 player.setLooping(false);
                 player.prepare();
                 player.start();
-//                Bundle bundle = makeSceneTransitionAnimation(LoginActivity.this).toBundle();
-//                Intent intent = new Intent(LoginActivity.this, MainActivity.class);
-//                startActivity(intent, bundle);
                 Log.d(MY_LOG_TAG, "Logado com sucesso!");
-//                toggleCircularBarBtn(false);
+                toggleCircularBarBtn(false);
+                navController.navigate(R.id.action_navigation_login_to_finalizarCompraFragment);
             } catch (IOException ex) {
                 Log.e(MY_LOG_TAG, "Erro: " + ex.getLocalizedMessage());
                 ex.printStackTrace();
@@ -331,4 +320,11 @@ public class LoginFragment extends Fragment {
         navController.navigate(R.id.action_navigation_login_to_finalizarCompraFragment);
     }
 
+
+    @Override
+    public void onInfosLoginResult(Usuario cliente) {
+        //Atualiza modelo com infos do usuario
+        loginViewModel.getUsuarioMutableLiveData().setValue(cliente);
+        resultLogin(resultLogin);
+    }
 }

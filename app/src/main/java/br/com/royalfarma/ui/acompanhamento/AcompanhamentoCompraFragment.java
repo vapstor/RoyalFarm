@@ -6,7 +6,6 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
-import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
@@ -26,10 +25,13 @@ import androidx.transition.Slide;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
+import com.google.gson.Gson;
+
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
+import br.com.royalfarma.model.Endereco;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 
@@ -81,7 +83,7 @@ public class AcompanhamentoCompraFragment extends Fragment {
 
         arrowImage = view.findViewById(R.id.iconArrow);
         arrowImage.setOnClickListener(v -> {
-            if(showContact) {
+            if (showContact) {
                 arrowImage.setBackgroundResource(R.drawable.arrow_state_list_down);
                 arrowAnimation = (AnimationDrawable) arrowImage.getBackground();
                 arrowAnimation.start();
@@ -106,13 +108,6 @@ public class AcompanhamentoCompraFragment extends Fragment {
     }
 
 
-    private void toggle(boolean show) {
-        if(show) {
-            arrowImage.setBackgroundResource(R.drawable.arrow_state_list_down);
-        }
-
-    }
-
     private void initViews(View view) {
         AppCompatTextView ruaValue = view.findViewById(R.id.ruaValue);
         AppCompatTextView numeroValue = view.findViewById(R.id.numeroValue);
@@ -121,15 +116,22 @@ public class AcompanhamentoCompraFragment extends Fragment {
         AppCompatTextView estadoValue = view.findViewById(R.id.estadoValue);
         AppCompatTextView formaDePagamentoValue = view.findViewById(R.id.formaDePagamentoValue);
         AppCompatTextView subtotalValue = view.findViewById(R.id.subtotalValue);
+        AppCompatTextView complementValue = view.findViewById(R.id.complementoValue);
         AppCompatTextView trocoParaQntValue = view.findViewById(R.id.trocoParaQntValue);
+        AppCompatTextView bairroValue = view.findViewById(R.id.bairroValue);
+        AppCompatTextView paisValue = view.findViewById(R.id.paisValue);
         recycler = view.findViewById(R.id.recyclerViewItensCompra);
 
         if (infosEntrega != null) {
-            String rua = infosEntrega.getString("ruaValue");
-            String numero = infosEntrega.getString("numeroValue");
-            String cep = infosEntrega.getString("cepValue");
-            String cidade = infosEntrega.getString("cidadeValue");
-            String estado = infosEntrega.getString("estadoValue");
+            Gson g = new Gson();
+            Endereco endereco = g.fromJson(infosEntrega.getString("enderecoJson"), Endereco.class);
+            String rua = endereco.getAddrStreet();
+            String numero = endereco.getAddrNumber();
+            String cep = endereco.getAddrZipCode();
+            String cidade = endereco.getAddrCity();
+            String estado = endereco.getAddrState();
+            String complement = endereco.getAddrComplement();
+            String bairro = endereco.getAddrDistrict();
             String formaDePagamento = infosEntrega.getString("formaPagamentoValue");
             String subtotal = infosEntrega.getString("subtotalValue");
             String trocoParaQuanto = infosEntrega.getString("trocoParaQuantoValue");
@@ -146,6 +148,9 @@ public class AcompanhamentoCompraFragment extends Fragment {
             estadoValue.setText(estado);
             formaDePagamentoValue.setText(formaDePagamento);
             subtotalValue.setText("Subtotal: " + subtotal);
+            bairroValue.setText(bairro);
+            paisValue.setText("Brasil");
+            complementValue.setText(complement);
         }
 
         DividerItemDecoration dividerItemDecoration = new DividerItemDecoration(recycler.getContext(), linearLayout.getOrientation());

@@ -4,6 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
+    android:animateLayoutChanges="true"
     tools:context=".ui.finalizacao.FinalizarCompraFragment">
 
 
@@ -28,24 +29,98 @@
                 android:id="@+id/container_info_entrega"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="32dp"
+                android:paddingStart="16dp"
                 android:paddingTop="8dp"
-                android:paddingEnd="32dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintBottom_toTopOf="@id/container_forma_pagamento"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toTopOf="parent">
 
 
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnAddEndereco"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginEnd="4dp"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:src="@drawable/ic_add_circle_accent_24dp"
+                    android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                    app:layout_constraintEnd_toStartOf="@+id/button_edit_infos"
+                    app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/btnClearAddEndereco"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:paddingLeft="0dp"
+                    android:paddingRight="0dp"
+                    android:src="@drawable/ic_clear_all_accent_24dp"
+                    android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@+id/btnAddEndereco"
+                    app:layout_constraintEnd_toEndOf="@+id/btnAddEndereco"
+                    app:layout_constraintStart_toStartOf="@+id/btnAddEndereco"
+                    app:layout_constraintTop_toTopOf="@+id/btnAddEndereco" />
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutInputNomeEndereco"
+                    android:layout_width="match_parent"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="16dp"
+                    android:visibility="invisible"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/inputNomeEndereco"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_light"
+                        android:hint="@string/nome_do_endere_o"
+                        android:inputType="text"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutInputSpinnerEndereco"
+                    style="@style/Widget.MaterialComponents.TextInputLayout.OutlinedBox.ExposedDropdownMenu"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:hint="@string/nome_do_endere_o"
+                    android:theme="@style/SpinnerAutoComplete"
+                    app:boxBackgroundMode="outline"
+                    app:boxStrokeWidth="0dp"
+                    app:layout_constraintEnd_toEndOf="@+id/button_edit_infos"
+                    app:layout_constraintStart_toStartOf="@+id/textView4"
+                    app:layout_constraintTop_toBottomOf="@+id/textView4">
+
+                    <br.com.royalfarma.utils.CustomAutoCompleteTextView
+                        android:id="@+id/inputSpinnerEndereco"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:background="@color/transparent"
+                        android:focusable="false"
+                        android:fontFamily="@font/roboto_light"
+                        android:inputType="none"
+                        android:maxLines="1"
+                        android:textAllCaps="false"
+                        android:textSize="16sp" />
+
+                </com.google.android.material.textfield.TextInputLayout>
+
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layoutInputEndereco"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="8dp"
-                    app:layout_constraintEnd_toStartOf="@+id/layoutInputNumero"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/textView4">
+                    app:layout_constraintTop_toBottomOf="@id/layoutInputNomeEndereco">
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/inputEndereco"
@@ -59,11 +134,11 @@
 
                 <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layoutInputNumero"
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/layoutInputEndereco"
-                    app:layout_constraintTop_toTopOf="@+id/layoutInputEndereco">
+                    app:layout_constraintStart_toEndOf="@+id/layoutInputComplemento"
+                    app:layout_constraintTop_toTopOf="@+id/layoutInputComplemento">
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/inputNumero"
@@ -76,21 +151,40 @@
                 </com.google.android.material.textfield.TextInputLayout>
 
                 <com.google.android.material.textfield.TextInputLayout
+                    android:id="@+id/layoutInputComplemento"
+                    android:layout_width="0dp"
+                    android:layout_height="match_parent"
+                    android:layout_marginTop="8dp"
+                    app:layout_constraintEnd_toStartOf="@+id/layoutInputNumero"
+                    app:layout_constraintStart_toStartOf="@+id/layoutInputEndereco"
+                    app:layout_constraintTop_toBottomOf="@+id/layoutInputEndereco">
+
+                    <androidx.appcompat.widget.AppCompatEditText
+                        android:id="@+id/inputComplemento"
+                        android:layout_width="match_parent"
+                        android:layout_height="wrap_content"
+                        android:fontFamily="@font/roboto_light"
+                        android:hint="@string/complemento"
+                        android:inputType="text"
+                        android:textSize="16sp" />
+                </com.google.android.material.textfield.TextInputLayout>
+
+                <com.google.android.material.textfield.TextInputLayout
                     android:id="@+id/layoutInputBairro"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="4dp"
                     app:layout_constraintEnd_toStartOf="@+id/layoutInputCEP"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layoutInputNumero">
+                    app:layout_constraintTop_toBottomOf="@+id/layoutInputComplemento">
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/inputBairro"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_light"
-                        android:hint="Bairro"
+                        android:hint="@string/bairro"
                         android:inputType="text"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -109,8 +203,9 @@
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_light"
-                        android:hint="CEP"
+                        android:hint="@string/cep"
                         android:inputType="number"
+                        android:maxLength="9"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
 
@@ -118,18 +213,18 @@
                     android:id="@+id/layoutInputCidade"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="12dp"
+                    android:layout_marginTop="8dp"
                     android:layout_marginEnd="8dp"
                     app:layout_constraintEnd_toStartOf="@+id/layoutInputUF"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toBottomOf="@+id/layoutInputCEP">
+                    app:layout_constraintTop_toBottomOf="@+id/layoutInputBairro">
 
                     <androidx.appcompat.widget.AppCompatEditText
                         android:id="@+id/inputCidade"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:fontFamily="@font/roboto_light"
-                        android:hint="Cidade"
+                        android:hint="@string/cidade"
                         android:inputType="text"
                         android:textSize="16sp" />
                 </com.google.android.material.textfield.TextInputLayout>
@@ -149,14 +244,15 @@
                     app:layout_constraintTop_toTopOf="@+id/layoutInputCidade"
                     app:layout_constraintVertical_bias="0.65999997">
 
-                    <AutoCompleteTextView
+                    <br.com.royalfarma.utils.CustomAutoCompleteTextView
                         android:id="@+id/inputUF"
                         android:layout_width="match_parent"
                         android:layout_height="wrap_content"
                         android:background="@color/transparent"
                         android:focusable="false"
-                        android:fontFamily="@font/roboto"
+                        android:fontFamily="@font/roboto_light"
                         android:inputType="none"
+                        android:labelFor="@string/uf"
                         android:maxLines="1"
                         android:textAllCaps="true" />
 
@@ -167,9 +263,43 @@
                     android:id="@+id/textView4"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
                     android:text="@string/informa_es_da_entrega"
                     android:textSize="18sp"
                     app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toTopOf="parent" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/button_edit_infos"
+                    android:layout_width="50dp"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/edit_image_button_selector"
+                    android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    app:layout_constraintBottom_toBottomOf="@+id/textView4"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintTop_toTopOf="@+id/textView4" />
+
+                <androidx.appcompat.widget.AppCompatImageButton
+                    android:id="@+id/button_save_infos"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:src="@drawable/ic_done_accent_24dp"
+                    android:theme="@style/Widget.MaterialComponents.Button.OutlinedButton"
+                    android:visibility="invisible"
+                    app:layout_constraintBottom_toBottomOf="@+id/button_edit_infos"
+                    app:layout_constraintEnd_toEndOf="@+id/button_edit_infos"
+                    app:layout_constraintStart_toStartOf="@+id/button_edit_infos"
+                    app:layout_constraintTop_toTopOf="@+id/button_edit_infos" />
+
+                <ProgressBar
+                    android:id="@+id/progressBarSaveAddress"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="26dp"
+                    android:layout_height="26dp"
+                    android:layout_marginTop="8dp"
+                    android:layout_marginEnd="32dp"
+                    android:visibility="gone"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintTop_toTopOf="parent" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -178,9 +308,9 @@
                 android:id="@+id/container_forma_pagamento"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
-                android:paddingStart="32dp"
+                android:paddingStart="16dp"
                 android:paddingTop="16dp"
-                android:paddingEnd="32dp"
+                android:paddingEnd="16dp"
                 app:layout_constraintBottom_toBottomOf="parent"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
@@ -296,6 +426,16 @@
                     app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="parent"
                     app:layout_constraintTop_toBottomOf="@+id/formaDePagamentoRadioGroup" />
+
+                <ProgressBar
+                    android:id="@+id/progressBarFinaliza"
+                    style="?android:attr/progressBarStyle"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="@+id/btnFinalizarCompra"
+                    app:layout_constraintStart_toStartOf="@+id/btnFinalizarCompra"
+                    app:layout_constraintTop_toTopOf="@+id/btnFinalizarCompra" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
         </androidx.constraintlayout.widget.ConstraintLayout>

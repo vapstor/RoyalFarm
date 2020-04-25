@@ -25,7 +25,7 @@ import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.holder.ProdutosListaViewHolder;
-import br.com.royalfarma.interfaces.OnDetailViewClick;
+import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.utils.RoundedBackgroundSpan;
 import br.com.royalfarma.utils.RoundedTransformation;
@@ -37,11 +37,11 @@ import static br.com.royalfarma.utils.Util.RSmask;
 public class ProdutosListaAdapter extends RecyclerView.Adapter {
 
     private final Toast toast;
-    private final OnDetailViewClick listaDeProdutosFragment;
+    private final IDetailViewClick listaDeProdutosFragment;
     private Context context;
     private ArrayList<Produto> itens;
 
-    public ProdutosListaAdapter(ArrayList<Produto> itens, Context context, OnDetailViewClick listaDeProdutosFragment) {
+    public ProdutosListaAdapter(ArrayList<Produto> itens, Context context, IDetailViewClick listaDeProdutosFragment) {
         this.context = context;
         this.itens = itens;
         this.listaDeProdutosFragment = listaDeProdutosFragment;

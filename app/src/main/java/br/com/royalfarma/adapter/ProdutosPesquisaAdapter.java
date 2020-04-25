@@ -29,7 +29,7 @@ import java.util.ArrayList;
 import br.com.royalfarma.R;
 import br.com.royalfarma.activitys.ProductDetailImageActivity;
 import br.com.royalfarma.holder.ProdutosCarrinhoViewHolder;
-import br.com.royalfarma.interfaces.OnDetailViewClick;
+import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.utils.RoundedBackgroundSpan;
 import br.com.royalfarma.utils.RoundedTransformation;
@@ -44,9 +44,9 @@ public class ProdutosPesquisaAdapter extends RecyclerView.Adapter<ProdutosCarrin
     private final Context context;
     private final ArrayList<Produto> itens;
     private final Toast toast;
-    private final OnDetailViewClick pesquisarFragment;
+    private final IDetailViewClick pesquisarFragment;
 
-    public ProdutosPesquisaAdapter(ArrayList<Produto> itens, Context context, OnDetailViewClick pesquisarFragment) {
+    public ProdutosPesquisaAdapter(ArrayList<Produto> itens, Context context, IDetailViewClick pesquisarFragment) {
         this.context = context;
         this.itens = itens;
         this.pesquisarFragment = pesquisarFragment;

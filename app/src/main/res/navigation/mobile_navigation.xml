@@ -103,7 +103,7 @@
         android:id="@+id/navigation_finalizar"
         android:name="br.com.royalfarma.ui.finalizacao.FinalizarCompraFragment"
         android:label="Finalizar Compra"
-        tools:layout="@layout/finalizar_compra_fragment">
+        tools:layout="@layout/fragment_finalizar_compra">
         <action
             android:id="@+id/action_finalizarCompraFragment_to_navigation_carrinho"
             app:destination="@id/navigation_carrinho"

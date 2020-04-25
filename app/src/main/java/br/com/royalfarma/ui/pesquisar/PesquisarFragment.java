@@ -39,14 +39,14 @@ import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.IFetchProducts;
-import br.com.royalfarma.interfaces.OnDetailViewClick;
+import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.utils.ItemClickSupport;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 
-public class PesquisarFragment extends Fragment implements IFetchProducts, OnDetailViewClick {
+public class PesquisarFragment extends Fragment implements IFetchProducts, IDetailViewClick {
 
     private PesquisarViewModel pesquisarViewModel;
     private String query;

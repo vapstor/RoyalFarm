@@ -43,7 +43,7 @@
                 android:layout_marginTop="4dp"
                 android:layout_marginEnd="8dp"
                 android:fontFamily="@font/roboto_light"
-                android:text="@string/seu_pedido_foi_realizado_acompanhe_o_progresso_abaixo"
+                android:text="@string/acompanhe_o_progresso_abaixo"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="@+id/textView"
                 app:layout_constraintTop_toBottomOf="@+id/textView" />
@@ -56,6 +56,8 @@
                 android:layout_marginStart="8dp"
                 android:layout_marginTop="16dp"
                 android:layout_marginEnd="8dp"
+                android:paddingTop="12dp"
+                android:paddingBottom="12dp"
                 app:layout_constraintEnd_toEndOf="parent"
                 app:layout_constraintStart_toStartOf="parent"
                 app:layout_constraintTop_toBottomOf="@+id/textView2">
@@ -187,7 +189,7 @@
                     android:id="@+id/textView7"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="8dp"
                     android:text="@string/endere_o_para_entrega"
                     android:textSize="16sp"
                     app:layout_constraintStart_toStartOf="parent"
@@ -197,47 +199,47 @@
                     android:id="@+id/ruaValue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
+                    android:layout_marginTop="8dp"
                     android:elevation="0dp"
                     android:ellipsize="end"
                     android:fontFamily="@font/roboto_light"
                     android:text="Rua Francisco Cândido Xavier"
-                    app:layout_constraintEnd_toStartOf="@+id/numeroValue"
+                    app:layout_constraintEnd_toEndOf="parent"
                     app:layout_constraintStart_toStartOf="@+id/textView7"
                     app:layout_constraintTop_toBottomOf="@+id/textView7" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/numeroValue"
-                    android:layout_width="100dp"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:fontFamily="@font/roboto_light"
                     android:text="360"
-                    android:textAlignment="center"
-                    app:layout_constraintBottom_toBottomOf="@+id/ruaValue"
+                    android:textAlignment="viewStart"
+                    app:layout_constraintBottom_toBottomOf="@+id/complementoValue"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/ruaValue"
-                    app:layout_constraintTop_toTopOf="@+id/ruaValue" />
+                    app:layout_constraintStart_toEndOf="@+id/complementoValue"
+                    app:layout_constraintTop_toTopOf="@+id/complementoValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/cepValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
                     android:fontFamily="@font/roboto_light"
                     android:text="88040-240"
-                    app:layout_constraintStart_toStartOf="@+id/ruaValue"
-                    app:layout_constraintTop_toBottomOf="@+id/ruaValue" />
+                    app:layout_constraintBottom_toBottomOf="@+id/bairroValue"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toEndOf="@+id/bairroValue"
+                    app:layout_constraintTop_toTopOf="@+id/bairroValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/cidadeValue"
                     android:layout_width="wrap_content"
-                    android:layout_height="wrap_content"
-                    android:layout_marginStart="8dp"
+                    android:layout_height="0dp"
+                    android:layout_marginTop="8dp"
                     android:fontFamily="@font/roboto_light"
                     android:text="Florianópolis"
-                    app:layout_constraintBottom_toBottomOf="@+id/cepValue"
-                    app:layout_constraintStart_toEndOf="@+id/cepValue"
-                    app:layout_constraintTop_toTopOf="@+id/cepValue" />
+                    app:layout_constraintStart_toStartOf="@+id/bairroValue"
+                    app:layout_constraintTop_toBottomOf="@+id/bairroValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/estadoValue"
@@ -267,19 +269,21 @@
                     android:id="@+id/textView14"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="@string/pagamento"
                     android:textSize="16sp"
-                    app:layout_constraintStart_toStartOf="@+id/cepValue"
-                    app:layout_constraintTop_toBottomOf="@+id/cepValue" />
+                    app:layout_constraintStart_toStartOf="@+id/cidadeValue"
+                    app:layout_constraintTop_toBottomOf="@+id/cidadeValue" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/formaDePagamentoValue"
-                    android:layout_width="wrap_content"
+                    android:layout_width="0dp"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="4dp"
-                    android:fontFamily="@font/roboto_light"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/roboto_medium"
                     android:text="Dinheiro"
+                    android:textColor="@color/colorPrimary"
+                    app:layout_constraintEnd_toEndOf="@+id/textView14"
                     app:layout_constraintStart_toStartOf="@+id/textView14"
                     app:layout_constraintTop_toBottomOf="@+id/textView14" />
 
@@ -299,8 +303,9 @@
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginStart="4dp"
-                    android:fontFamily="@font/roboto_light"
+                    android:fontFamily="@font/roboto_medium"
                     android:text="R$ 50,00"
+                    android:textColor="@color/colorPrimary"
                     android:visibility="gone"
                     app:layout_constraintBottom_toBottomOf="@+id/textView16"
                     app:layout_constraintStart_toEndOf="@+id/textView16"
@@ -322,26 +327,69 @@
                     android:id="@+id/textView19"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
-                    android:layout_marginTop="8dp"
+                    android:layout_marginTop="16dp"
                     android:text="@string/itens"
                     android:textSize="16sp"
                     app:layout_constraintStart_toStartOf="@+id/formaDePagamentoValue"
                     app:layout_constraintTop_toBottomOf="@+id/formaDePagamentoValue" />
 
-                <androidx.recyclerview.widget.RecyclerView
-                    android:id="@+id/recyclerViewItensCompra"
+                <androidx.constraintlayout.widget.ConstraintLayout
+                    android:layout_width="match_parent"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="16dp"
+                    android:layout_marginBottom="16dp"
+                    android:background="@drawable/shape_rounded_white_bg"
+                    app:layout_constraintBottom_toBottomOf="parent"
+                    app:layout_constraintEnd_toEndOf="parent"
+                    app:layout_constraintStart_toStartOf="parent"
+                    app:layout_constraintTop_toBottomOf="@+id/textView19">
+
+                    <androidx.recyclerview.widget.RecyclerView
+                        android:id="@+id/recyclerViewItensCompra"
+                        android:layout_width="0dp"
+                        android:layout_height="wrap_content"
+                        android:layout_marginTop="4dp"
+                        android:clickable="false"
+                        app:layout_constraintBottom_toBottomOf="parent"
+                        app:layout_constraintEnd_toEndOf="parent"
+                        app:layout_constraintStart_toStartOf="parent"
+                        app:layout_constraintTop_toTopOf="parent" />
+                </androidx.constraintlayout.widget.ConstraintLayout>
+
+                <TextView
+                    android:id="@+id/complementoValue"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="8dp"
-                    android:layout_marginEnd="1dp"
-                    android:layout_marginBottom="16dp"
-                    android:clickable="false"
-                    app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintHorizontal_bias="0.125"
-                    app:layout_constraintStart_toStartOf="@+id/textView19"
-                    app:layout_constraintTop_toBottomOf="@+id/textView19"
-                    app:layout_constraintVertical_bias="1.0" />
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Casa"
+                    app:layout_constraintEnd_toStartOf="@+id/numeroValue"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/ruaValue"
+                    app:layout_constraintTop_toBottomOf="@+id/ruaValue" />
+
+                <TextView
+                    android:id="@+id/bairroValue"
+                    android:layout_width="0dp"
+                    android:layout_height="wrap_content"
+                    android:layout_marginTop="8dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Campeche"
+                    app:layout_constraintEnd_toStartOf="@+id/cepValue"
+                    app:layout_constraintHorizontal_bias="0.0"
+                    app:layout_constraintStart_toStartOf="@+id/complementoValue"
+                    app:layout_constraintTop_toBottomOf="@+id/complementoValue" />
+
+                <TextView
+                    android:id="@+id/paisValue"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="8dp"
+                    android:fontFamily="@font/roboto_light"
+                    android:text="Brasil"
+                    app:layout_constraintBottom_toBottomOf="@+id/cidadeValue"
+                    app:layout_constraintStart_toEndOf="@+id/estadoValue"
+                    app:layout_constraintTop_toTopOf="@+id/cidadeValue" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
 
