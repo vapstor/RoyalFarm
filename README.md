@@ -22,17 +22,19 @@
 ```
    implementation fileTree(include: ['*.jar'], dir: 'libs')
     implementation 'androidx.appcompat:appcompat:1.1.0'
-    implementation 'com.google.android.material:material:1.2.0-alpha05'
+    implementation 'com.android.support.constraint:constraint-layout:2.0.0-beta4'
+    implementation 'com.google.android.material:material:1.2.0-alpha06'
     implementation 'androidx.lifecycle:lifecycle-viewmodel-savedstate:2.3.0-alpha01'
     implementation 'androidx.swiperefreshlayout:swiperefreshlayout:1.0.0'
     implementation 'androidx.transition:transition:1.3.1'
     implementation 'androidx.constraintlayout:constraintlayout:1.1.3'
     implementation 'com.squareup.picasso:picasso:2.71828'
-    implementation 'androidx.navigation:navigation-fragment:2.2.1'
+    implementation 'androidx.navigation:navigation-fragment:2.2.2'
     implementation 'com.google.code.gson:gson:2.8.6'
-    implementation 'androidx.navigation:navigation-ui:2.2.1'
+    implementation 'androidx.navigation:navigation-ui:2.2.2'
     implementation 'androidx.lifecycle:lifecycle-extensions:2.2.0'
-
+    implementation 'androidx.legacy:legacy-support-v4:1.0.0'
+    implementation 'androidx.paging:paging-runtime:2.1.2'8
 ```
 
 ## 🚀 ScreensShots
@@ -92,7 +94,7 @@
   - [x] Implementar Botão para FinalizarCompra
   
 * Desenvolver FinalizaCompraPage
-  - [ ] Implementar EditTexts para recuperação do endereço de entrega 
+  - [x] Implementar EditTexts para recuperação do endereço de entrega 
   - [ ] ~Implementar ImageView para bandeiras aceitas caso Cartão~
   - [x] Implementar CheckBox para necessidade de troco caso opção "Dinheiro": 
     - [x] Implementar Input "Troco para quanto"
@@ -100,9 +102,10 @@
   - [x] Implementar Linha do Tempo de Pedido
 
 * Desenvolver tela de Compra Efetuada
-  - [ ] Implementar Diálogo de confirmação da compra
-  - [ ] Configurar INSERT via JDBC
-  - [ ] Implementar View "Sucesso de Compra"
+  - [ ] ~Implementar Diálogo de confirmação da compra~
+  - [x] Configurar INSERT via JDBC
+  - [x] Implementar View "Sucesso de Compra"
+  - [ ] Implementar SELECT para status da Venda
   
 ## How to version
 
