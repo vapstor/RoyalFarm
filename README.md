@@ -58,9 +58,9 @@
 - [x] Utilizar Fundamentos do Material Design
 - [x] Utilizar JDBC MySQL
 - [x] Configurar botões de BottomNavigation:
-      - [x] Pesquisa
-      - [x] Home
-      - [x] Carrinho
+  - [x] Pesquisa
+  - [x] Home
+  - [x] Carrinho
 - [X] Utilizar MVVM Architeture 
 
 * Desenvolver LoginPage ["LOGIN"]
