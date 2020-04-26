@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <selector xmlns:android="http://schemas.android.com/apk/res/android">
-    <item android:drawable="@drawable/ic_remove_circle_outline_accent_24dp" android:state_pressed="true" /> <!-- pressed -->
-    <item android:drawable="@drawable/ic_remove_circle_grey_24dp" android:state_enabled="false" android:state_pressed="false"/> <!-- enabled -->
-    <item android:drawable="@drawable/ic_remove_circle_white_24dp" android:state_enabled="true" android:state_pressed="false"/> <!-- default -->
+    <item android:drawable="@drawable/ic_remove_circle_accent_24dp" android:state_pressed="true" /> <!-- pressed -->
+    <item android:drawable="@drawable/ic_remove_circle_grey_24dp" android:state_enabled="false" android:state_pressed="false" /> <!-- enabled -->
+    <item android:drawable="@drawable/ic_remove_circle_outline_accent_24dp" android:state_enabled="true" android:state_pressed="false" /> <!-- default -->
 </selector>

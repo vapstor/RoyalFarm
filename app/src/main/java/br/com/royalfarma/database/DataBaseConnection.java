@@ -685,7 +685,7 @@ public class DataBaseConnection {
                             pstmt = connection.prepareStatement(insertOrder, PreparedStatement.RETURN_GENERATED_KEYS);
                             pstmt.setInt(1, Integer.parseInt(infosCompra.get(0))); //id
                             pstmt.setInt(2, NULL); //order id
-                            pstmt.setInt(3, NULL); //status
+                            pstmt.setInt(3, 3); //status 3 = novo pedido
                             pstmt.setString(4, infosCompra.get(1)); //payment
                             pstmt.setBigDecimal(5, new BigDecimal(infosCompra.get(2).replace(",", "."))); //price
                             pstmt.setInt(6, NULL); //installment

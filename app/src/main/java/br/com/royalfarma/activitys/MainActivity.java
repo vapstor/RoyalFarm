@@ -5,10 +5,13 @@ import android.os.Bundle;
 import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
+import android.view.Gravity;
 import android.view.View;
 import android.widget.Toast;
 
+import androidx.appcompat.app.ActionBar;
 import androidx.appcompat.app.AppCompatActivity;
+import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.SearchView;
 import androidx.navigation.NavController;
 import androidx.navigation.Navigation;
@@ -34,6 +37,7 @@ public class MainActivity extends AppCompatActivity {
     private SearchManager searchManager;
     private SearchView searchView;
     private String queryAnterior;
+    private static int displayOption;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -68,13 +72,28 @@ public class MainActivity extends AppCompatActivity {
                     if (navView != null) {
                         navView.setVisibility(View.VISIBLE);
                     }
-                    getSupportActionBar().setTitle(arguments.getString("title"));
+                    if (getSupportActionBar() != null) {
+                        getSupportActionBar().setDisplayOptions(displayOption);
+                        getSupportActionBar().setTitle(arguments.getString("title"));
+                    }
                     break;
                 case R.id.navigation_home:
                     if (navView != null) {
                         navView.setVisibility(View.VISIBLE);
                     }
-                    getSupportActionBar().setTitle("RoyalFarma");
+                    if (getSupportActionBar() != null) {
+                        displayOption = getSupportActionBar().getDisplayOptions();
+                        AppCompatTextView mTitleTextView = new AppCompatTextView(getApplicationContext());
+                        mTitleTextView.setSingleLine();
+                        ActionBar.LayoutParams layoutParams = new ActionBar.LayoutParams(ActionBar.LayoutParams.WRAP_CONTENT, ActionBar.LayoutParams.WRAP_CONTENT);
+                        layoutParams.gravity = Gravity.CENTER;
+                        getSupportActionBar().setCustomView(mTitleTextView, layoutParams);
+                        getSupportActionBar().setDisplayOptions(ActionBar.DISPLAY_SHOW_CUSTOM | ActionBar.DISPLAY_HOME_AS_UP);
+                        mTitleTextView.setText("RoyalFarma");
+//                        mTitleTextView.setTextAppearance(getApplicationContext(), android.R.style.TextAppearance_Medium);
+                        mTitleTextView.setTextColor(getResources().getColor(R.color.white));
+                        mTitleTextView.setTextSize(20);
+                    }
                     break;
                 case R.id.navigation_login:
                 case R.id.navigation_finalizar:

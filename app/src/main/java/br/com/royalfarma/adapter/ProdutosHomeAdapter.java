@@ -152,7 +152,7 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
                 btnAddCarrinho.setEnabled(false);
             }
         } else {
-            qntdItem.setTextColor(context.getResources().getColor(R.color.white));
+            qntdItem.setTextColor(context.getResources().getColor(R.color.silver));
             btnAddCarrinho.setEnabled(false);
         }
 

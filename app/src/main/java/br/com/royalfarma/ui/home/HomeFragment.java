@@ -275,7 +275,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
             view.findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
                 Bundle extras = new Bundle();
                 extras.putString("title", "Mais Vendidos");
-                ArrayList<Produto> produtosMaisVendidos = (ArrayList<Produto>) productsViewModel.getTodosOsProdutosLiveData().getValue().subList(10, 15);
+                ArrayList<Produto> produtosMaisVendidos = new ArrayList<>(productsViewModel.getTodosOsProdutosLiveData().getValue().subList(10, 15));
                 extras.putParcelableArrayList("initialProducts", produtosMaisVendidos);
                 navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });

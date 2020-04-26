@@ -6,14 +6,17 @@
     android:layout_height="wrap_content"
     android:layout_marginStart="8dp"
     android:layout_marginTop="8dp"
-    android:background="@drawable/colored_gradient_corner">
+    android:layout_marginBottom="8dp"
+    android:background="@drawable/shape_rounded_white_bg_primary_border"
+    android:clipToPadding="false"
+    android:elevation="2dp">
 
     <androidx.appcompat.widget.AppCompatImageView
         android:id="@+id/image_item_produto"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_marginTop="8dp"
-        android:elevation="4dp"
+        android:elevation="1dp"
         app:layout_constraintEnd_toStartOf="@+id/btn_add_item_produto"
         app:layout_constraintStart_toEndOf="@+id/btn_remove_item_produto"
         app:layout_constraintTop_toBottomOf="@+id/preco_item_produto"
@@ -23,6 +26,7 @@
         android:id="@+id/header_item_produto"
         android:layout_width="0dp"
         android:layout_height="36dp"
+        android:layout_marginTop="-2dp"
         android:background="@drawable/shape_title_product"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintStart_toStartOf="parent"
@@ -77,6 +81,7 @@
         android:gravity="center"
         android:padding="3dp"
         android:text="@string/r_10_80"
+        android:textAlignment="center"
         android:textColor="@color/colorAccentLight"
         android:textSize="12sp"
         app:layout_constraintEnd_toEndOf="parent"
@@ -121,7 +126,7 @@
         android:fontFamily="@font/roboto_bold"
         android:gravity="center"
         android:text="@string/zero"
-        android:textColor="@android:color/white"
+        android:textColor="@color/colorPrimary"
         app:layout_constraintEnd_toEndOf="@+id/image_item_produto"
         app:layout_constraintStart_toStartOf="@+id/image_item_produto"
         app:layout_constraintTop_toBottomOf="@+id/image_item_produto" />
