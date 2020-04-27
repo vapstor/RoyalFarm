@@ -1,6 +1,7 @@
 package br.com.royalfarma.ui.home;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Bundle;
 import android.os.CountDownTimer;
 import android.os.Handler;
@@ -29,8 +30,10 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
+import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosHomeAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
@@ -38,7 +41,7 @@ import br.com.royalfarma.utils.CustomSwipeRefreshLayout;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 
-public class HomeFragment extends Fragment implements IFetchProducts {
+public class HomeFragment extends Fragment implements IFetchProducts, IDetailViewClick {
     private RecyclerView recyclerMaisVendidos, recyclerNovidades, recyclerPopulares;
     private ProdutosHomeAdapter adapterNovidades, adapterPopulares, adapterMaisVendidos;
     private ProductsViewModel productsViewModel;
@@ -218,7 +221,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                     linearLayoutManager = new LinearLayoutManager(getContext());
                     linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     ArrayList<Produto> novidades = new ArrayList<>(listaDeTodosOsProdutos.subList(0, 5));
-                    adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel, "novidades");
+                    adapterNovidades = new ProdutosHomeAdapter(novidades, getContext(), carrinhoViewModel, productsViewModel, "novidades", this);
                     adapterNovidades.setHasStableIds(true);
                     recyclerNovidades.setLayoutManager(linearLayoutManager);
                     recyclerNovidades.setAdapter(adapterNovidades);
@@ -226,7 +229,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                     linearLayoutManager = new LinearLayoutManager(getContext());
                     linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     ArrayList<Produto> populares = new ArrayList<>(listaDeTodosOsProdutos.subList(5, 10));
-                    adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel, "populares");
+                    adapterPopulares = new ProdutosHomeAdapter(populares, getContext(), carrinhoViewModel, productsViewModel, "populares", this);
                     adapterPopulares.setHasStableIds(true);
                     recyclerPopulares.setLayoutManager(linearLayoutManager);
                     recyclerPopulares.setAdapter(adapterPopulares);
@@ -234,7 +237,7 @@ public class HomeFragment extends Fragment implements IFetchProducts {
                     linearLayoutManager = new LinearLayoutManager(getContext());
                     linearLayoutManager.setOrientation(LinearLayoutManager.HORIZONTAL);
                     ArrayList<Produto> mais_vendidos = new ArrayList<>(listaDeTodosOsProdutos.subList(10, 15));
-                    adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel, "mais_vendidos");
+                    adapterMaisVendidos = new ProdutosHomeAdapter(mais_vendidos, getContext(), carrinhoViewModel, productsViewModel, "mais_vendidos", this);
                     adapterMaisVendidos.setHasStableIds(true);
                     recyclerMaisVendidos.setLayoutManager(linearLayoutManager);
                     recyclerMaisVendidos.setAdapter(adapterMaisVendidos);
@@ -317,6 +320,12 @@ public class HomeFragment extends Fragment implements IFetchProducts {
         productsViewModel.setTodosOsProdutos(todosOsProdutos);
         // Now we call setRefreshing(false) to signal refresh has finished
         swipeContainer.setRefreshing(false);
+    }
+
+    public void onDetailViewClick(Produto produto) {
+        Intent intent = new Intent(getContext(), ProductDetail.class);
+        intent.putExtra("selectedProduct", produto);
+        startActivityForResult(intent, 1);
     }
 }
 

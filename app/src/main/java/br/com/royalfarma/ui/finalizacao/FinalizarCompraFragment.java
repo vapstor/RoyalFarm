@@ -17,9 +17,9 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.AlertDialog;
 import androidx.appcompat.widget.AppCompatButton;
 import androidx.appcompat.widget.AppCompatEditText;
-import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.SwitchCompat;
 import androidx.constraintlayout.widget.ConstraintLayout;
 import androidx.fragment.app.Fragment;
@@ -37,6 +37,7 @@ import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.interfaces.iCEPHelper;
 import br.com.royalfarma.model.Endereco;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.model.Usuario;
@@ -49,24 +50,22 @@ import br.com.royalfarma.utils.MoneyTextWatcher;
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.fromRStoDouble;
 
-public class FinalizarCompraFragment extends Fragment {
+public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
 
     private AppCompatEditText inputTroco, inputRua, inputNumero, inputCEP, inputBairro, inputCidade, inputComplemento, inputNomeEndereco;
     private CustomAutoCompleteTextView inputEstado, inputSpinnerEndereco;
     private TextInputLayout layoutEndereco, layoutNumero, layoutCEP, layoutBairro, layoutCidade, layoutEstado, layoutTroco, layoutInputSpinnerEndereco, layoutInputNomeEndereco;
-    private RadioGroup formaPagamentoRadioGroup;
+    private RadioGroup formaPagamentoRadioGroup, freteRadioGroup;
     private SwitchCompat switchTroco;
-    private AppCompatButton btnFinaliza;
+    private AppCompatButton btnAvancar;
     private Endereco endereco;
     private String nomeEndereco, rua, numero, cep, bairro, cidade, estado, dinheiroDoCliente, labelFormaPagamento, complemento;
     private int radioButtonCartaoID, radioButtonDinheiroID;
     private CarrinhoViewModel carrinhoViewModel;
     private String subtotal;
     private NavController navController;
-    private AppCompatImageView iconeInfoTroco;
     private String[] arrayEstadosBR;
-    private MoneyTextWatcher moneyTextWatcher;
-    private int orderPayment;
+    private int orderPayment, formaFrete;
     private LoginViewModel loginViewModel;
     private Usuario usuario;
     private ImageButton btnSaveInfos, btnEditInfos, btnClearAddEndereco, btnAddEndereco;
@@ -75,7 +74,7 @@ public class FinalizarCompraFragment extends Fragment {
     private CepTextWatcher cepTextWatcher;
     private boolean erro;
     private boolean finalizado;
-
+    private AlertDialog formaPagamentoEFrereDialog;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -148,7 +147,6 @@ public class FinalizarCompraFragment extends Fragment {
 //        }
 //
         initViews(view);
-        toggleVisibilityInputLayoutTroco();
     }
 
     private void configSpinnerWithAdress(ArrayList<Endereco> enderecos) {
@@ -165,7 +163,7 @@ public class FinalizarCompraFragment extends Fragment {
                 }
             }
             if (getActivity() != null) {
-                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup__item, nomesEnderecos);
+                ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup_item, nomesEnderecos);
                 inputSpinnerEndereco.setAdapter(adapter);
                 setInfosUserOnViews(endereco);
                 inputSpinnerEndereco.setText(inputSpinnerEndereco.getAdapter().getItem(enderecos.size() - 1).toString(), false);
@@ -203,11 +201,11 @@ public class FinalizarCompraFragment extends Fragment {
                     toggleButtonEditVisibility(false, true);
                     break;
                 case "onPreExecuteInsereOrdem":
-                    toggleBtnFinalizarVisibility(false);
+                    toggleBtnAvancarVisibility(false);
                     break;
                 case "pedidoInserido":
                     finalizado = true;
-                    toggleBtnFinalizarVisibility(true);
+                    toggleBtnAvancarVisibility(true);
                     Toast.makeText(getContext(), R.string.pedido_efetuado_com_sucesso, Toast.LENGTH_LONG).show();
                     navigateToAcompanhamento();
                     break;
@@ -252,19 +250,19 @@ public class FinalizarCompraFragment extends Fragment {
         }
     }
 
-    private void toggleBtnFinalizarVisibility(boolean visibility) {
+    private void toggleBtnAvancarVisibility(boolean visibility) {
         final ViewGroup root = getActivity().findViewById(R.id.container_info_entrega);
         TransitionManager.beginDelayedTransition(root, new Fade());
         if (visibility) {
-            if (btnFinaliza.getVisibility() != View.VISIBLE)
-                btnFinaliza.setVisibility(View.VISIBLE);
+            if (btnAvancar.getVisibility() != View.VISIBLE)
+                btnAvancar.setVisibility(View.VISIBLE);
             if (progressBarFinaliza.getVisibility() != View.INVISIBLE)
                 progressBarFinaliza.setVisibility(View.INVISIBLE);
         } else {
             if (progressBarFinaliza.getVisibility() != View.VISIBLE)
                 progressBarFinaliza.setVisibility(View.VISIBLE);
-            if (btnFinaliza.getVisibility() != View.INVISIBLE)
-                btnFinaliza.setVisibility(View.INVISIBLE);
+            if (btnAvancar.getVisibility() != View.INVISIBLE)
+                btnAvancar.setVisibility(View.INVISIBLE);
         }
     }
 
@@ -312,7 +310,7 @@ public class FinalizarCompraFragment extends Fragment {
 
     private void resetInputEstados() {
         arrayEstadosBR = getResources().getStringArray(R.array.ufs);
-        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup__item, arrayEstadosBR);
+        ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup_item, arrayEstadosBR);
         inputEstado.setAdapter(adapter);
     }
 
@@ -322,19 +320,14 @@ public class FinalizarCompraFragment extends Fragment {
         return super.onOptionsItemSelected(item);
     }
 
-    private void toggleVisibilityCtnrTroco(boolean containerVisibility) {
-        if (getActivity() != null) {
-            final ViewGroup root = getActivity().findViewById(R.id.scrollViewCntrFinalizar);
-            if (root != null) {
-                ConstraintLayout containerTroco = root.findViewById(R.id.container_troco);
-                TransitionManager.beginDelayedTransition(root, new Fade().setDuration(500));
-                if (containerVisibility) {
-                    containerTroco.setVisibility(View.VISIBLE);
-                    iconeInfoTroco.setVisibility(View.VISIBLE);
-                } else {
-                    containerTroco.setVisibility(View.INVISIBLE);
-                    iconeInfoTroco.setVisibility(View.INVISIBLE);
-                }
+    private void toggleVisibilityCtnrTroco(ViewGroup root, boolean containerVisibility) {
+        if (root != null) {
+            ConstraintLayout containerTroco = root.findViewById(R.id.container_troco);
+            TransitionManager.beginDelayedTransition(root, new Fade().setDuration(500));
+            if (containerVisibility) {
+                containerTroco.setVisibility(View.VISIBLE);
+            } else {
+                containerTroco.setVisibility(View.GONE);
             }
         }
     }
@@ -357,8 +350,7 @@ public class FinalizarCompraFragment extends Fragment {
 
     }
 
-    private void toggleVisibilityInputLayoutTroco() {
-        final ViewGroup root = getActivity().findViewById(R.id.container_troco);
+    private void toggleVisibilityInputLayoutTroco(ViewGroup root) {
         if (root != null) {
             TransitionManager.beginDelayedTransition(root, new Fade().setDuration(500));
             if (switchTroco.isChecked()) {
@@ -366,8 +358,8 @@ public class FinalizarCompraFragment extends Fragment {
                     layoutTroco.setVisibility(View.VISIBLE);
             } else {
                 layoutTroco.setErrorEnabled(false);
-                if (layoutTroco.getVisibility() != View.INVISIBLE)
-                    layoutTroco.setVisibility(View.INVISIBLE);
+                if (layoutTroco.getVisibility() != View.GONE)
+                    layoutTroco.setVisibility(View.GONE);
             }
         }
     }
@@ -415,7 +407,7 @@ public class FinalizarCompraFragment extends Fragment {
         }
     }
 
-    private boolean validateFormaDePagamento() {
+    private boolean validateFormaDePagamento(ViewGroup root) {
         int checkedId = formaPagamentoRadioGroup.getCheckedRadioButtonId();
         if (checkedId != -1) {
             ((RadioButton) formaPagamentoRadioGroup.getChildAt(0)).setError(null);
@@ -427,12 +419,12 @@ public class FinalizarCompraFragment extends Fragment {
                             .setTitle(R.string.atencao)
                             .setMessage(R.string.voce_tem_certeza_que_nao_deseja_informar_um_valor_para_o_motoboy_levar_troco_)
                             .setNegativeButton(R.string.tenho_a_quantia_exata, (dialog, which) -> {
-                                userChoose(true);
+                                userChoose(root, true);
                             })
                             .setPositiveButton(R.string.informar_valor, (dialog, which) -> {
-                                toggleVisibilityInputLayoutTroco();
+                                toggleVisibilityInputLayoutTroco(root);
                                 inputTroco.requestFocus();
-                                userChoose(false);
+                                userChoose(root, false);
                             })
                             .setCancelable(false);
                     builder.show();
@@ -460,6 +452,15 @@ public class FinalizarCompraFragment extends Fragment {
             ((RadioButton) formaPagamentoRadioGroup.getChildAt(0)).setError("Escolha uma opção");
         }
         return false;
+    }
+
+    private boolean validateFrete() {
+        if (formaFrete == 0) {
+            ((RadioButton) freteRadioGroup.getChildAt(0)).setError("Escolha uma opção");
+            return false;
+        } else {
+            return true;
+        }
     }
 
     private boolean validateFieldsEntrega() {
@@ -579,16 +580,17 @@ public class FinalizarCompraFragment extends Fragment {
                 layoutEstado.isErrorEnabled()
         ) {
             return false;
+        } else {
+            return true;
         }
-        return true;
     }
 
-    public void userChoose(boolean quantiaExata) {
+    public void userChoose(ViewGroup root, boolean quantiaExata) {
         if (quantiaExata) {
             insereCompraNoBanco();
         } else {
             switchTroco.setChecked(true);
-            toggleVisibilityInputLayoutTroco();
+            toggleVisibilityInputLayoutTroco(root);
         }
     }
 
@@ -599,7 +601,6 @@ public class FinalizarCompraFragment extends Fragment {
         inputBairro = view.findViewById(R.id.inputBairro);
         inputCidade = view.findViewById(R.id.inputCidade);
         inputEstado = view.findViewById(R.id.inputUF);
-        inputTroco = view.findViewById(R.id.inputTroco);
         inputComplemento = view.findViewById(R.id.inputComplemento);
 
         layoutEndereco = view.findViewById(R.id.layoutInputEndereco);
@@ -608,7 +609,7 @@ public class FinalizarCompraFragment extends Fragment {
         layoutBairro = view.findViewById(R.id.layoutInputBairro);
         layoutCidade = view.findViewById(R.id.layoutInputCidade);
         layoutEstado = view.findViewById(R.id.layoutInputUF);
-        layoutTroco = view.findViewById(R.id.layoutInputTroco);
+
 
         layoutInputSpinnerEndereco = view.findViewById(R.id.layoutInputSpinnerEndereco);
         inputSpinnerEndereco = view.findViewById(R.id.inputSpinnerEndereco);
@@ -632,62 +633,33 @@ public class FinalizarCompraFragment extends Fragment {
             toggleSpinnerEnderecoVisibility(true);
             toggleBtnAddEnderecoVisibility(true);
             inputSpinnerEndereco.setListSelection(usuario.getEnderecos().size() - 1);
+            endereco = usuario.getEnderecos().get(usuario.getEnderecos().size() - 1);
             setInfosUserOnViews(usuario.getEnderecos().get(usuario.getEnderecos().size() - 1));
+            setInputsEnabled(false);
+            toggleButtonEditVisibility(true, false);
         });
 
 
         btnSaveInfos = view.findViewById(R.id.button_save_infos);
         btnEditInfos = view.findViewById(R.id.button_edit_infos);
         progressBarSaveAddr = view.findViewById(R.id.progressBarSaveAddress);
-        progressBarFinaliza = view.findViewById(R.id.progressBarFinaliza);
+        progressBarFinaliza = view.findViewById(R.id.progressBarAvancarFinalizacaoCompra);
 
-        iconeInfoTroco = view.findViewById(R.id.iconeInfoTroco);
-
-        formaPagamentoRadioGroup = view.findViewById(R.id.formaDePagamentoRadioGroup);
-        radioButtonCartaoID = view.findViewById(R.id.radioBtnCartao).getId();
-        radioButtonDinheiroID = view.findViewById(R.id.radioBtnDinheiro).getId();
-
-        switchTroco = view.findViewById(R.id.switchCompat);
-        btnFinaliza = view.findViewById(R.id.btnFinalizarCompra);
+        btnAvancar = view.findViewById(R.id.btnAvancarFinalizacaoCompra);
+        btnAvancar.setOnClickListener(v -> {
+            avancaFinalizacaoCompra();
+        });
 
         if (getActivity() != null) {
             arrayEstadosBR = getResources().getStringArray(R.array.ufs);
-            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup__item, arrayEstadosBR);
+            ArrayAdapter<String> adapter = new ArrayAdapter<>(getActivity(), R.layout.dropdown_menu_popup_item, arrayEstadosBR);
             inputEstado.setAdapter(adapter);
         } else {
             Log.e(MY_LOG_TAG, "Atividade Nula!");
         }
 
-        moneyTextWatcher = new MoneyTextWatcher(inputTroco);
         cepTextWatcher = new CepTextWatcher(inputCEP);
-        inputTroco.addTextChangedListener(moneyTextWatcher);
         inputCEP.addTextChangedListener(cepTextWatcher);
-
-        formaPagamentoRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
-            ((RadioButton) formaPagamentoRadioGroup.getChildAt(0)).setError(null);
-            if (checkedId == group.findViewById(R.id.radioBtnDinheiro).getId()) {
-                labelFormaPagamento = "Dinheiro";
-                orderPayment = 103;
-                toggleVisibilityCtnrTroco(true);
-            } else {
-                labelFormaPagamento = "Cartão (Máquina)";
-                orderPayment = 104;
-                toggleVisibilityCtnrTroco(false);
-            }
-        });
-        iconeInfoTroco.setOnClickListener(v -> {
-            new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded)
-                    .setTitle(R.string.necessidade_de_troco)
-                    .setMessage(R.string.utilize_para_especificar_ao_motoboy_quanto_ele_precisara_levar_de_troco)
-                    .setPositiveButton(android.R.string.ok, (dialog, which) -> {
-                    })
-                    .setCancelable(true)
-                    .show();
-        });
-        switchTroco.setOnClickListener(v -> toggleVisibilityInputLayoutTroco());
-        btnFinaliza.setOnClickListener(v -> {
-            finalizaCompra();
-        });
 
         btnEditInfos.setOnClickListener(v -> {
             toggleSpinnerEnderecoVisibility(true);
@@ -706,6 +678,7 @@ public class FinalizarCompraFragment extends Fragment {
                         newEndereco.setAddrID(endereco.getAddrID());
                     }
                 } else {
+                    //Add ou Cancelou Add
                     newEndereco.setAddrName(endereco.getAddrName());
                     newEndereco.setAddrID(endereco.getAddrID());
                 }
@@ -739,11 +712,11 @@ public class FinalizarCompraFragment extends Fragment {
         };
     }
 
-    private void finalizaCompra() {
-        boolean validatedFields = validateFieldsEntrega();
-        boolean validatedFormaDePagamento = validateFormaDePagamento();
-        if (validatedFormaDePagamento && validatedFields) {
-            insereCompraNoBanco();
+    private void avancaFinalizacaoCompra() {
+        if (validateFieldsEntrega()) {
+            toggleBtnAvancarVisibility(false);
+            DataBaseConnection.ValidateCEPBH validateCEPBH = new DataBaseConnection.ValidateCEPBH(this);
+            validateCEPBH.execute(cep);
         } else {
             Toast.makeText(getContext(), "Confira as informações", Toast.LENGTH_SHORT).show();
         }
@@ -758,6 +731,7 @@ public class FinalizarCompraFragment extends Fragment {
 //        String valorPago = getValorPago();
 //        infosCompra.add(valorPago);//valorpago
         infosCompra.add(String.valueOf(endereco.getAddrID()));//idendereco
+        infosCompra.add(String.valueOf(formaFrete));
         if (switchTroco.isChecked()) {
             String valorDoTroco = String.valueOf(fromRStoDouble(dinheiroDoCliente) - fromRStoDouble(subtotal)).replace("R$", "").trim().replace(".", ",");
             infosCompra.add(valorDoTroco); //troco
@@ -799,4 +773,65 @@ public class FinalizarCompraFragment extends Fragment {
         }
     }
 
+
+    public void openDialogPagamentoFrete() {
+        // create an alert builder
+        MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
+        // set the custom layout
+        final View customLayout = getLayoutInflater().inflate(R.layout.layout_dialog_pagamento_frete, null);
+        final ViewGroup root = customLayout.findViewById(R.id.scrollViewCntrFinalizar);
+        formaPagamentoRadioGroup = customLayout.findViewById(R.id.formaDePagamentoRadioGroup);
+        freteRadioGroup = customLayout.findViewById(R.id.freteRadioGroup);
+        AppCompatButton btnFinalizarCompra = customLayout.findViewById(R.id.btnFinalizarCompra);
+        radioButtonCartaoID = customLayout.findViewById(R.id.radioBtnCartao).getId();
+        radioButtonDinheiroID = customLayout.findViewById(R.id.radioBtnDinheiro).getId();
+        switchTroco = customLayout.findViewById(R.id.switchCompat);
+        inputTroco = customLayout.findViewById(R.id.inputTroco);
+        layoutTroco = customLayout.findViewById(R.id.layoutInputTroco);
+        MoneyTextWatcher moneyTextWatcher = new MoneyTextWatcher(inputTroco);
+        inputTroco.addTextChangedListener(moneyTextWatcher);
+        formaPagamentoRadioGroup.setOnCheckedChangeListener((group, checkedId) -> {
+            ((RadioButton) formaPagamentoRadioGroup.getChildAt(0)).setError(null);
+            if (checkedId == group.findViewById(R.id.radioBtnDinheiro).getId()) {
+                labelFormaPagamento = "Dinheiro";
+                orderPayment = 103;
+                toggleVisibilityCtnrTroco(root, true);
+            } else {
+                labelFormaPagamento = "Cartão (Máquina)";
+                orderPayment = 104;
+                toggleVisibilityCtnrTroco(root, false);
+            }
+        });
+
+        freteRadioGroup.setOnCheckedChangeListener(((group, checkedId) -> {
+            ((RadioButton) freteRadioGroup.getChildAt(0)).setError(null);
+            if (checkedId == group.findViewById(R.id.radioBtn1DiaUtil).getId()) {
+                formaFrete = 10002;
+            } else {
+                formaFrete = 10003;
+            }
+        }));
+
+        switchTroco.setOnClickListener(v -> toggleVisibilityInputLayoutTroco(root));
+        btnFinalizarCompra.setOnClickListener(v -> {
+            if (!validateFormaDePagamento(root) && !validateFrete()) {
+            } else {
+                insereCompraNoBanco();
+                formaPagamentoEFrereDialog.dismiss();
+            }
+        });
+        builder.setView(customLayout);
+        formaPagamentoEFrereDialog = builder.create();
+        formaPagamentoEFrereDialog.show();
+    }
+
+    @Override
+    public void onCEPResult(String cidade) {
+        if (cidade.equals("Belo Horizonte")) {
+            openDialogPagamentoFrete();
+        } else {
+            Toast.makeText(getContext(), "CEP Fora de Belo Horizonte!", Toast.LENGTH_SHORT).show();
+        }
+        toggleBtnAvancarVisibility(true);
+    }
 }

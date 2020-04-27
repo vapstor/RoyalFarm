@@ -7,6 +7,7 @@ import android.util.Log;
 
 import androidx.annotation.NonNull;
 
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.sql.Connection;
 import java.sql.DriverManager;
@@ -17,12 +18,15 @@ import java.util.ArrayList;
 
 import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.interfaces.ILoginInfos;
+import br.com.royalfarma.interfaces.iCEPHelper;
 import br.com.royalfarma.model.Endereco;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.model.Usuario;
+import br.com.royalfarma.utils.BuscaCEPHelper;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 import static br.com.royalfarma.utils.Util.getSha512FromString;
+import static br.com.royalfarma.utils.Util.unmask;
 import static java.sql.Types.NULL;
 
 public class DataBaseConnection {
@@ -695,14 +699,14 @@ public class DataBaseConnection {
                             pstmt.setInt(10, NULL); //billet
                             pstmt.setInt(11, NULL); //code
                             pstmt.setInt(12, Integer.parseInt(infosCompra.get(3))); //addrid
-                            pstmt.setInt(13, NULL); //shipcode
+                            pstmt.setInt(13, Integer.parseInt(infosCompra.get(4))); //shipcode
                             pstmt.setBigDecimal(14, new BigDecimal("0.00")); //shipprice
                             pstmt.setInt(15, NULL); //ordertackin
                             pstmt.setInt(16, NULL); //nfe
                             pstmt.setInt(17, NULL); //nfe
                             pstmt.setInt(18, NULL); //mail processing
                             pstmt.setInt(19, NULL); //completed
-                            pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(4).replace(",", "."))); //troco
+                            pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(5).replace(",", "."))); //troco
 
                             int affectedLines = pstmt.executeUpdate();
                             if (affectedLines == 1) {
@@ -772,5 +776,49 @@ public class DataBaseConnection {
         }
     }
 
+    public static class GetOrderStatus extends AsyncTask<Void, Void, Void> {
 
+        @Override
+        protected Void doInBackground(Void... voids) {
+            try {
+                synchronized (lock) {
+                    new Thread(DataBaseConnection::createConnection).start();
+                    lock.wait();
+
+                    String sqlGet = "";
+                    PreparedStatement pstm = connection.prepareStatement(sqlGet, PreparedStatement.RETURN_GENERATED_KEYS);
+                    pstm.setString(1, "");
+                    pstm.executeQuery();
+                }
+            } catch (SQLException | InterruptedException e) {
+
+            }
+            return null;
+        }
+    }
+
+    public static class ValidateCEPBH extends AsyncTask<String, Void, String> {
+        private final iCEPHelper iCEPHelper;
+        String city = "";
+
+        public ValidateCEPBH(iCEPHelper iCEPHelper) {
+            this.iCEPHelper = iCEPHelper;
+        }
+
+        @Override
+        protected String doInBackground(String... strings) {
+            try {
+                return BuscaCEPHelper.getCidadeByCEP(unmask(strings[0]));
+            } catch (IOException e) {
+                e.printStackTrace();
+                return "";
+            }
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            iCEPHelper.onCEPResult(s);
+            super.onPostExecute(s);
+        }
+    }
 }

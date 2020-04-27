@@ -33,6 +33,7 @@ import java.util.Objects;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.holder.ProdutosHomeViewHolder;
+import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.ui.home.ProductsViewModel;
@@ -47,6 +48,7 @@ import static br.com.royalfarma.utils.Util.RSmask;
 public class ProdutosHomeAdapter extends RecyclerView.Adapter {
 
     private final String owner;
+    private final IDetailViewClick iDetailViewClick;
     private ProductsViewModel productsViewModel;
     private CarrinhoViewModel carrinhoViewModel;
     private final Toast toast;
@@ -56,13 +58,16 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
     private BottomNavigationView navBottomView;
     private BadgeDrawable badgeDrawable;
 
-    public ProdutosHomeAdapter(ArrayList<Produto> itens, Context context, CarrinhoViewModel carrinhoViewModel, ProductsViewModel productsViewModel, String owner) {
+    public ProdutosHomeAdapter(ArrayList<Produto> itens, Context context, CarrinhoViewModel carrinhoViewModel, ProductsViewModel productsViewModel, String owner, IDetailViewClick iDetailViewClick) {
         this.context = context;
         this.itens = itens;
         toast = makeText(context, "", Toast.LENGTH_LONG);
         this.carrinhoViewModel = carrinhoViewModel;
         this.productsViewModel = productsViewModel;
+
         this.owner = owner;
+
+        this.iDetailViewClick = iDetailViewClick;
     }
 
     @NonNull
@@ -89,6 +94,7 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
         AppCompatTextView qntdItem, descricaoItem, valorTotalLabel;
         AppCompatImageButton qntdMinus, qntdPlus;
         AppCompatButton btnAddCarrinho;
+        AppCompatImageView imagemItem;
         ProdutosHomeViewHolder itemProdutoHolder = (ProdutosHomeViewHolder) holder;
 
         //Check Necessário pois para alterar o item correto
@@ -156,7 +162,7 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
             btnAddCarrinho.setEnabled(false);
         }
 
-        AppCompatImageView imagemItem = itemProdutoHolder.imgProduto;
+        imagemItem = itemProdutoHolder.imgProduto;
         String url = "https://www.royalfarma.com.br/uploads/" + item.getImagemURL();
 
         //LOADER
@@ -198,7 +204,9 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
         //FIM LOADER
 
         //Open detail page
-        imagemItem.setOnClickListener(v -> openDetailProductActivity(item));
+        imagemItem.setOnClickListener(v -> {
+            openDetailProductActivity(item);
+        });
 
         //Add QTD do item
         qntdPlus.setOnClickListener(v -> {
@@ -330,16 +338,17 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
     }
 
     private void openDetailProductActivity(Produto produto) {
-        Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
-        if (bundle != null) {
-            bundle.putParcelable("selectedProduct", produto);
-//            //T
+        iDetailViewClick.onDetailViewClick(produto);
+//
+//        Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
+//        if (bundle != null) {
+//            bundle.putParcelable("selectedProduct", produto);
+//
 //            context.startActivity(intent, bundle);
-        } else {
-            Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
-        }
-        //TODO navigation
-
+//        } else {
+//            Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
+//        }
+//        //TODO navigation
     }
 
     @Override
