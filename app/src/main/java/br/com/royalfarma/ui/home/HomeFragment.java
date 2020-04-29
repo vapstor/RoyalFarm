@@ -1,5 +1,6 @@
 package br.com.royalfarma.ui.home;
 
+import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
@@ -8,6 +9,9 @@ import android.os.Handler;
 import android.os.Message;
 import android.util.Log;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
 import android.widget.FrameLayout;
@@ -15,6 +19,7 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.widget.SearchView;
 import androidx.fragment.app.Fragment;
 import androidx.lifecycle.ViewModelProvider;
 import androidx.navigation.NavController;
@@ -30,6 +35,7 @@ import com.google.android.material.bottomnavigation.BottomNavigationView;
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
+import br.com.royalfarma.activitys.MainActivity;
 import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosHomeAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
@@ -37,6 +43,7 @@ import br.com.royalfarma.interfaces.IDetailViewClick;
 import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
+import br.com.royalfarma.ui.pesquisar.PesquisarViewModel;
 import br.com.royalfarma.utils.CustomSwipeRefreshLayout;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
@@ -53,6 +60,7 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
     private CarrinhoViewModel carrinhoViewModel;
     private BottomNavigationView navView;
     private BadgeDrawable badge;
+    private PesquisarViewModel pesquisarViewModel;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -78,11 +86,36 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
                 }
             }
         };
-        if (getActivity() != null) {
-            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
-            navView = getActivity().findViewById(R.id.nav_view);
-            badge = navView.getBadge(R.id.navigation_carrinho);
-        }
+
+        setHasOptionsMenu(true);
+    }
+
+    @Override
+    public void onCreateOptionsMenu(@NonNull Menu menu, @NonNull MenuInflater inflater) {
+        menu.clear();
+        inflater.inflate(R.menu.search_option_menu, menu);
+        MenuItem item = menu.findItem(R.id.action_search);
+        SearchView searchView = new SearchView(((MainActivity) getContext()).getSupportActionBar().getThemedContext());
+        searchView.setQueryHint(getString(R.string.nome_cod_barras));
+        item.setActionView(searchView);
+        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
+            @Override
+            public boolean onQueryTextSubmit(String query) {
+                Bundle bundle = new Bundle();
+                bundle.putString("query", query);
+                navController.navigate(R.id.action_navigation_home_to_navigation_pesquisar, bundle);
+                item.collapseActionView();
+                return false;
+            }
+
+            @Override
+            public boolean onQueryTextChange(String newText) {
+                if (!newText.equals("")) {
+                    pesquisarViewModel.setNewQuery(newText);
+                }
+                return false;
+            }
+        });
     }
 
     private void fetchProducts() {
@@ -159,8 +192,16 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
 
     public View onCreateView(@NonNull LayoutInflater inflater, ViewGroup container, Bundle savedInstanceState) {
         View root = inflater.inflate(R.layout.fragment_home, container, false);
+
+        if (getActivity() != null) {
+            navController = Navigation.findNavController(getActivity(), R.id.nav_host_fragment);
+            navView = getActivity().findViewById(R.id.nav_view);
+            badge = navView.getBadge(R.id.navigation_carrinho);
+        }
+
         productsViewModel = new ViewModelProvider(requireParentFragment()).get(ProductsViewModel.class);
         carrinhoViewModel = new ViewModelProvider(requireParentFragment()).get(CarrinhoViewModel.class);
+        pesquisarViewModel = new ViewModelProvider(requireParentFragment()).get(PesquisarViewModel.class);
         carrinhoViewModel.getBadgeDisplayLiveData().observe(getViewLifecycleOwner(), badgeNumber -> {
             if (navView != null) {
                 if (badge != null) {
@@ -326,6 +367,20 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
         Intent intent = new Intent(getContext(), ProductDetail.class);
         intent.putExtra("selectedProduct", produto);
         startActivityForResult(intent, 1);
+    }
+
+    @Override
+    public void onActivityResult(int requestCode, int resultCode, Intent data) {
+        if (resultCode == Activity.RESULT_OK && requestCode == 1) {
+            Produto produto = data.getParcelableExtra("selectedProduct");
+            if (produto != null) {
+                int qntdAddCart = data.getIntExtra("qntdAddCart", 0);
+                produto.setQtdNoCarrinho(qntdAddCart);
+                carrinhoViewModel.addProductToCart(produto);
+            }
+        }
+        Log.d(MY_LOG_TAG, "on Activity Result");
+        super.onActivityResult(requestCode, resultCode, data);
     }
 }
 

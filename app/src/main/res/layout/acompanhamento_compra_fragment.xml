@@ -63,10 +63,11 @@
                 app:layout_constraintTop_toBottomOf="@+id/textView2">
 
                 <ProgressBar
-                    android:id="@+id/progressBarPedido"
+                    android:id="@+id/progressBarPedidoAceito"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:max="100"
                     app:layout_constraintBottom_toBottomOf="@+id/iconeEmTransporte"
                     app:layout_constraintEnd_toStartOf="@+id/iconeEmTransporte"
                     app:layout_constraintStart_toEndOf="@+id/iconeAceito"
@@ -79,10 +80,10 @@
                     android:layout_marginStart="64dp"
                     android:elevation="2dp"
                     android:src="@drawable/ic_thumb_up_black_24dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/progressBarPedido"
-                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedido"
+                    app:layout_constraintBottom_toBottomOf="@+id/progressBarPedidoAceito"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedidoAceito"
                     app:layout_constraintStart_toStartOf="parent"
-                    app:layout_constraintTop_toTopOf="@+id/progressBarPedido" />
+                    app:layout_constraintTop_toTopOf="@+id/progressBarPedidoAceito" />
 
                 <androidx.appcompat.widget.AppCompatImageView
                     android:id="@+id/iconeEmTransporte"
@@ -91,15 +92,16 @@
                     android:layout_marginTop="2dp"
                     android:elevation="2dp"
                     android:src="@drawable/ic_motorcycle_grey_24dp"
-                    app:layout_constraintEnd_toStartOf="@+id/progressBar3"
-                    app:layout_constraintStart_toEndOf="@+id/progressBarPedido"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedidoTransporte"
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedidoAceito"
                     app:layout_constraintTop_toBottomOf="@+id/textViewEmTransporte" />
 
                 <ProgressBar
-                    android:id="@+id/progressBar3"
+                    android:id="@+id/progressBarPedidoTransporte"
                     style="?android:attr/progressBarStyleHorizontal"
                     android:layout_width="0dp"
                     android:layout_height="wrap_content"
+                    android:max="100"
                     app:layout_constraintBottom_toBottomOf="@+id/iconeEmTransporte"
                     app:layout_constraintEnd_toStartOf="@+id/iconeFinalizado"
                     app:layout_constraintStart_toEndOf="@+id/iconeEmTransporte"
@@ -112,10 +114,10 @@
                     android:layout_marginEnd="64dp"
                     android:elevation="2dp"
                     android:src="@drawable/ic_check_circle_grey_24dp"
-                    app:layout_constraintBottom_toBottomOf="@+id/progressBar3"
+                    app:layout_constraintBottom_toBottomOf="@+id/progressBarPedidoTransporte"
                     app:layout_constraintEnd_toEndOf="parent"
-                    app:layout_constraintStart_toEndOf="@+id/progressBar3"
-                    app:layout_constraintTop_toTopOf="@+id/progressBar3" />
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedidoTransporte"
+                    app:layout_constraintTop_toTopOf="@+id/progressBarPedidoTransporte" />
 
                 <androidx.appcompat.widget.AppCompatTextView
                     android:id="@+id/textViewEmTransporte"
@@ -123,17 +125,17 @@
                     android:layout_height="wrap_content"
                     android:text="@string/em_transporte"
                     app:layout_constraintEnd_toEndOf="@+id/iconeEmTransporte"
-                    app:layout_constraintStart_toEndOf="@+id/progressBarPedido"
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedidoAceito"
                     app:layout_constraintTop_toTopOf="parent" />
 
                 <androidx.appcompat.widget.AppCompatTextView
-                    android:id="@+id/textViewRealizado"
+                    android:id="@+id/textViewFinalizado"
                     android:layout_width="wrap_content"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="2dp"
                     android:text="@string/finalizado"
                     app:layout_constraintEnd_toEndOf="@+id/iconeFinalizado"
-                    app:layout_constraintStart_toEndOf="@+id/progressBar3"
+                    app:layout_constraintStart_toEndOf="@+id/progressBarPedidoTransporte"
                     app:layout_constraintTop_toBottomOf="@+id/iconeFinalizado" />
 
                 <androidx.appcompat.widget.AppCompatTextView
@@ -144,7 +146,7 @@
                     android:layout_marginBottom="1dp"
                     android:text="@string/aceito"
                     app:layout_constraintBottom_toBottomOf="parent"
-                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedido"
+                    app:layout_constraintEnd_toStartOf="@+id/progressBarPedidoAceito"
                     app:layout_constraintStart_toStartOf="@+id/iconeAceito"
                     app:layout_constraintTop_toBottomOf="@+id/iconeAceito" />
             </androidx.constraintlayout.widget.ConstraintLayout>
@@ -392,6 +394,31 @@
                     app:layout_constraintTop_toTopOf="@+id/cidadeValue" />
 
             </androidx.constraintlayout.widget.ConstraintLayout>
+
+            <TextView
+                android:id="@+id/numPedidoValue"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="16dp"
+                android:fontFamily="@font/roboto"
+                android:text="1234"
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/textView"
+                app:layout_constraintEnd_toEndOf="parent"
+                app:layout_constraintTop_toTopOf="@+id/textView" />
+
+            <TextView
+                android:id="@+id/textView10"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:layout_marginEnd="5dp"
+                android:text="Nº "
+                android:textColor="@color/colorAccent"
+                android:textSize="20sp"
+                app:layout_constraintBottom_toBottomOf="@+id/numPedidoValue"
+                app:layout_constraintEnd_toStartOf="@+id/numPedidoValue"
+                app:layout_constraintTop_toTopOf="@+id/numPedidoValue" />
 
         </androidx.constraintlayout.widget.ConstraintLayout>
     </ScrollView>

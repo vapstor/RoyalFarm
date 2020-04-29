@@ -339,16 +339,6 @@ public class ProdutosHomeAdapter extends RecyclerView.Adapter {
 
     private void openDetailProductActivity(Produto produto) {
         iDetailViewClick.onDetailViewClick(produto);
-//
-//        Bundle bundle = makeSceneTransitionAnimation(Objects.requireNonNull((AppCompatActivity) context)).toBundle();
-//        if (bundle != null) {
-//            bundle.putParcelable("selectedProduct", produto);
-//
-//            context.startActivity(intent, bundle);
-//        } else {
-//            Toast.makeText(context, "Erro ao empacotar produto!", Toast.LENGTH_SHORT).show();
-//        }
-//        //TODO navigation
     }
 
     @Override

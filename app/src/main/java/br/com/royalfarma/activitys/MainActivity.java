@@ -19,6 +19,7 @@ import androidx.navigation.ui.AppBarConfiguration;
 import androidx.navigation.ui.NavigationUI;
 
 import com.google.android.material.bottomnavigation.BottomNavigationView;
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.database.DataBaseConnection;
@@ -82,6 +83,7 @@ public class MainActivity extends AppCompatActivity {
                         navView.setVisibility(View.VISIBLE);
                     }
                     if (getSupportActionBar() != null) {
+                        getSupportActionBar().setCustomView(null);
                         displayOption = getSupportActionBar().getDisplayOptions();
                         AppCompatTextView mTitleTextView = new AppCompatTextView(getApplicationContext());
                         mTitleTextView.setSingleLine();
@@ -184,12 +186,17 @@ public class MainActivity extends AppCompatActivity {
             }
         } else {
             if (navController.getCurrentDestination().getId() == R.id.navigation_acompanhamento) {
-
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
+                builder.setTitle("Atenção")
+                        .setMessage("Se você sair desta tela não poderá acompanhar seu pedido.")
+                        .setPositiveButton("Sair", (dialog, which) -> super.onBackPressed())
+                        .setNegativeButton("Cancelar", (dialog, which) -> {})
+                        .setCancelable(false)
+                        .create()
+                        .show();
             } else {
-
+                super.onBackPressed();
             }
-
-            super.onBackPressed();
         }
     }
 }

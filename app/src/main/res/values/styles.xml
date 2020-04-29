@@ -78,6 +78,11 @@
         <item name="windowNoTitle">true</item>
     </style>
 
+    <style name="AppTheme.NoActionBar.Bridge" parent="Theme.AppCompat.DayNight.NoActionBar">
+        <item name="windowActionBar">false</item>
+        <item name="windowNoTitle">true</item>
+    </style>
+
 
     <style name="MaterialAnimations" parent="@style/Theme.AppCompat.Light.DarkActionBar">
         <item name="android:windowContentTransitions">true</item>
@@ -99,11 +104,19 @@
         <item name="shapeAppearanceOverlay">
             @style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded
         </item>
+        <item name="buttonStyle">@style/TextAppearance.AppCompat.Widget.Button.Borderless.Colored</item>
+    </style>
+
+    <style name="MaterialAlertDialog.Rounded.NoActionBar" parent="AppTheme.NoActionBar.Bridge">
+        <item name="shapeAppearanceOverlay">
+            @style/ShapeAppearanceOverlay.MaterialAlertDialog.Rounded
+        </item>
     </style>
 
     <style name="ShapeAppearanceOverlay.MaterialAlertDialog.Rounded" parent="">
         <item name="android:textAppearanceButton">@color/colorAccent</item>
     </style>
+
 
     <style name="AppTheme.Picker" parent="Theme.AppCompat.Light.NoActionBar">
         <item name="android:colorPrimary">@color/colorAccent</item>

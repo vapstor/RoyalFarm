@@ -1,6 +1,7 @@
 package br.com.royalfarma.activitys;
 
 import android.content.Intent;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.text.SpannableStringBuilder;
 import android.text.Spanned;
@@ -19,6 +20,7 @@ import androidx.appcompat.widget.AppCompatTextView;
 import androidx.appcompat.widget.Toolbar;
 import androidx.lifecycle.ViewModelProvider;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.squareup.picasso.Picasso;
 
@@ -83,10 +85,16 @@ public class ProductDetail extends AppCompatActivity {
 
             fabCart = findViewById(R.id.fab);
             fabCart.setOnClickListener(view -> {
-                final AlertDialog.Builder d = new AlertDialog.Builder(this, R.style.MaterialAlertDialog_Rounded);
+                AppCompatTextView textView = new AppCompatTextView(this);
+                textView.setText("Selecione uma quantidade");
+                textView.setPadding(20, 30, 20, 30);
+                textView.setTextSize(18F);
+                textView.setBackgroundColor(getResources().getColor(R.color.colorAccent));
+                textView.setTextColor(Color.WHITE);
+                final MaterialAlertDialogBuilder d = new MaterialAlertDialogBuilder(this, R.style.MaterialAlertDialog_Rounded);
+                d.setCustomTitle(textView);
                 LayoutInflater inflater = this.getLayoutInflater();
                 View dialogView = inflater.inflate(R.layout.layout_dialog_item_quantity, null);
-                d.setTitle("Selecione uma quantidade");
                 d.setView(dialogView);
                 final NumberPicker numberPicker = dialogView.findViewById(R.id.itemQtdNumberPicker);
                 numberPicker.setMaxValue(produto.getEstoqueAtual());

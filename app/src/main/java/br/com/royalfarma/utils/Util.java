@@ -29,7 +29,8 @@ public abstract class Util {
     }
 
     public static double fromRStoDouble(String RSFormat) {
-        BigDecimal bigDecimal = new BigDecimal(Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)))).divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
+        double myDouble = Double.parseDouble(cutEspaceAndChangeComma4Dot(unmask(RSFormat)));
+        BigDecimal bigDecimal = new BigDecimal(myDouble).divide(new BigDecimal(100)).setScale(2, BigDecimal.ROUND_HALF_UP);
         return Double.parseDouble(bigDecimal.toString());
     }
 

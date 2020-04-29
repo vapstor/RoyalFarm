@@ -57,7 +57,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
     private TextInputLayout layoutEndereco, layoutNumero, layoutCEP, layoutBairro, layoutCidade, layoutEstado, layoutTroco, layoutInputSpinnerEndereco, layoutInputNomeEndereco;
     private RadioGroup formaPagamentoRadioGroup, freteRadioGroup;
     private SwitchCompat switchTroco;
-    private AppCompatButton btnAvancar;
+    private AppCompatButton btnAvancar, btnFinalizarCompra;
     private Endereco endereco;
     private String nomeEndereco, rua, numero, cep, bairro, cidade, estado, dinheiroDoCliente, labelFormaPagamento, complemento;
     private int radioButtonCartaoID, radioButtonDinheiroID;
@@ -70,11 +70,12 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
     private Usuario usuario;
     private ImageButton btnSaveInfos, btnEditInfos, btnClearAddEndereco, btnAddEndereco;
     private Handler handler;
-    private ProgressBar progressBarSaveAddr, progressBarFinaliza;
+    private ProgressBar progressBarSaveAddr, progressBarFinaliza, progressBarAvancarFinalizacaoCompra;
     private CepTextWatcher cepTextWatcher;
     private boolean erro;
     private boolean finalizado;
-    private AlertDialog formaPagamentoEFrereDialog;
+    private AlertDialog formaPagamentoEFreteDialog;
+    private String idPedido;
 
     @Override
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
@@ -188,65 +189,88 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
             }
         } else if (msg.what == 1) {
             String obj = (String) msg.obj;
-            int key = 0;
-            if (obj.contains("inserido")) {
-                if (obj.contains("_")) {
-                    key = Integer.parseInt(obj.replace("inserido_", ""));
-                    obj = "inserido";
-                }
-            }
-            switch (obj) {
-                case "onPreExecute":
-                    erro = false;
-                    toggleButtonEditVisibility(false, true);
-                    break;
-                case "onPreExecuteInsereOrdem":
-                    toggleBtnAvancarVisibility(false);
-                    break;
-                case "pedidoInserido":
-                    finalizado = true;
-                    toggleBtnAvancarVisibility(true);
-                    Toast.makeText(getContext(), R.string.pedido_efetuado_com_sucesso, Toast.LENGTH_LONG).show();
-                    navigateToAcompanhamento();
-                    break;
-                case "inserido":
-                    erro = false;
-                    endereco.setAddrID(key);
-                    usuario.getEnderecos().add(endereco);
-                    Toast.makeText(getContext(), R.string.endereco_inserido_com_sucesso, Toast.LENGTH_LONG).show();
-                    break;
-                case "atualizado":
-                    erro = false;
-                    Toast.makeText(getContext(), R.string.endereco_atualizado_com_sucesso, Toast.LENGTH_LONG).show();
-                    break;
-                case "falhou_inserir":
-                    erro = true;
-                    Toast.makeText(getContext(), R.string.falhou_ao_inserir_endereco, Toast.LENGTH_SHORT).show();
-                    break;
-                case "falhouInserirPedido":
-                    erro = true;
-                    Toast.makeText(getContext(), R.string.falhou_ao_processar_o_pedido, Toast.LENGTH_LONG).show();
-                    break;
-                case "erro_sql":
-                    erro = true;
-                    Toast.makeText(getContext(), "Erro de SQL", Toast.LENGTH_SHORT).show();
-                    break;
-                case "onPostExecute":
-                    if (!erro) {
-                        if (!finalizado) {
-                            toggleButtonEditVisibility(true, false);
-                            setInputsEnabled(false);
-                            setInfosUserOnViews(endereco);
-                            loginViewModel.getUsuarioMutableLiveData().setValue(usuario);
-                        }
-                    } else {
-                        toggleButtonEditVisibility(false, false);
-                        setInputsEnabled(true);
+            if (obj.contains("orderIdValue")) {
+                idPedido = ((String) msg.obj).replace("orderIdValue", "");
+            } else {
+
+                int key = 0;
+                if (obj.contains("inserido")) {
+                    if (obj.contains("_")) {
+                        key = Integer.parseInt(obj.replace("inserido_", ""));
+                        obj = "inserido";
                     }
-                    break;
+                }
+                switch (obj) {
+                    case "onPreExecute":
+                        erro = false;
+                        toggleButtonEditVisibility(false, true);
+                        break;
+                    case "onPreExecuteInsereOrdem":
+//                        toggleBtnFinalizarVisibility(false);
+                        break;
+                    case "pedidoInserido":
+                        finalizado = true;
+                        toggleBtnFinalizarVisibility(true);
+                        if (formaPagamentoEFreteDialog != null && formaPagamentoEFreteDialog.isShowing()) {
+                            formaPagamentoEFreteDialog.dismiss();
+                        }
+                        Toast.makeText(getContext(), R.string.pedido_efetuado_com_sucesso, Toast.LENGTH_LONG).show();
+                        navigateToAcompanhamento();
+                        break;
+                    case "inserido":
+                        erro = false;
+                        endereco.setAddrID(key);
+                        usuario.getEnderecos().add(endereco);
+                        Toast.makeText(getContext(), R.string.endereco_inserido_com_sucesso, Toast.LENGTH_LONG).show();
+                        break;
+                    case "atualizado":
+                        erro = false;
+                        Toast.makeText(getContext(), R.string.endereco_atualizado_com_sucesso, Toast.LENGTH_LONG).show();
+                        break;
+                    case "falhou_inserir":
+                        erro = true;
+                        Toast.makeText(getContext(), R.string.falhou_ao_inserir_endereco, Toast.LENGTH_SHORT).show();
+                        break;
+                    case "falhouInserirPedido":
+                        erro = true;
+                        toggleBtnFinalizarVisibility(true);
+                        Toast.makeText(getContext(), R.string.falhou_ao_processar_o_pedido, Toast.LENGTH_LONG).show();
+                        break;
+                    case "erro_sql":
+                        erro = true;
+                        Toast.makeText(getContext(), "Erro de SQL", Toast.LENGTH_SHORT).show();
+                        break;
+                    case "onPostExecute":
+                        if (!erro) {
+                            if (!finalizado) {
+                                toggleButtonEditVisibility(true, false);
+                                setInputsEnabled(false);
+                                setInfosUserOnViews(endereco);
+                                loginViewModel.getUsuarioMutableLiveData().setValue(usuario);
+                            }
+                        } else {
+                            toggleButtonEditVisibility(false, false);
+                            setInputsEnabled(true);
+                        }
+                        break;
+                }
             }
         } else {
             Toast.makeText(getContext(), "Ocorreu um erro!", Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    private void toggleBtnFinalizarVisibility(boolean visibility) {
+        final ViewGroup root = formaPagamentoEFreteDialog.findViewById(R.id.layout_dialog_pagamento_frete_root);
+        if (root != null) {
+            TransitionManager.beginDelayedTransition(root, new Fade());
+            if (visibility) {
+                btnFinalizarCompra.setVisibility(View.VISIBLE);
+                progressBarFinaliza.setVisibility(View.INVISIBLE);
+            } else {
+                progressBarFinaliza.setVisibility(View.VISIBLE);
+                btnFinalizarCompra.setVisibility(View.INVISIBLE);
+            }
         }
     }
 
@@ -256,11 +280,11 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         if (visibility) {
             if (btnAvancar.getVisibility() != View.VISIBLE)
                 btnAvancar.setVisibility(View.VISIBLE);
-            if (progressBarFinaliza.getVisibility() != View.INVISIBLE)
-                progressBarFinaliza.setVisibility(View.INVISIBLE);
+            if (progressBarAvancarFinalizacaoCompra.getVisibility() != View.INVISIBLE)
+                progressBarAvancarFinalizacaoCompra.setVisibility(View.INVISIBLE);
         } else {
-            if (progressBarFinaliza.getVisibility() != View.VISIBLE)
-                progressBarFinaliza.setVisibility(View.VISIBLE);
+            if (progressBarAvancarFinalizacaoCompra.getVisibility() != View.VISIBLE)
+                progressBarAvancarFinalizacaoCompra.setVisibility(View.VISIBLE);
             if (btnAvancar.getVisibility() != View.INVISIBLE)
                 btnAvancar.setVisibility(View.INVISIBLE);
         }
@@ -367,31 +391,32 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
     private void toggleButtonEditVisibility(boolean isEditVisible, boolean isLoading) {
         if (getActivity() != null) {
             final ViewGroup root = getActivity().findViewById(R.id.container_info_entrega);
-            TransitionManager.beginDelayedTransition(root, new Fade());
-            if (isLoading) {
-                btnEditInfos.setVisibility(View.INVISIBLE);
-                btnSaveInfos.setVisibility(View.INVISIBLE);
-                layoutInputNomeEndereco.setVisibility(View.INVISIBLE);
-                progressBarSaveAddr.setVisibility(View.VISIBLE);
-                layoutInputSpinnerEndereco.setVisibility(View.VISIBLE);
-            } else {
-                progressBarSaveAddr.setVisibility(View.INVISIBLE);
-                if (isEditVisible) {
+            if (root != null) {
+                TransitionManager.beginDelayedTransition(root, new Fade());
+                if (isLoading) {
+                    btnEditInfos.setVisibility(View.INVISIBLE);
                     btnSaveInfos.setVisibility(View.INVISIBLE);
                     layoutInputNomeEndereco.setVisibility(View.INVISIBLE);
-                    btnEditInfos.setVisibility(View.VISIBLE);
+                    progressBarSaveAddr.setVisibility(View.VISIBLE);
                     layoutInputSpinnerEndereco.setVisibility(View.VISIBLE);
                 } else {
-                    btnEditInfos.setVisibility(View.INVISIBLE);
-                    layoutInputSpinnerEndereco.setVisibility(View.INVISIBLE);
-                    btnSaveInfos.setVisibility(View.VISIBLE);
-                    layoutInputNomeEndereco.setVisibility(View.VISIBLE);
+                    progressBarSaveAddr.setVisibility(View.INVISIBLE);
+                    if (isEditVisible) {
+                        btnSaveInfos.setVisibility(View.INVISIBLE);
+                        layoutInputNomeEndereco.setVisibility(View.INVISIBLE);
+                        btnEditInfos.setVisibility(View.VISIBLE);
+                        layoutInputSpinnerEndereco.setVisibility(View.VISIBLE);
+                    } else {
+                        btnEditInfos.setVisibility(View.INVISIBLE);
+                        layoutInputSpinnerEndereco.setVisibility(View.INVISIBLE);
+                        btnSaveInfos.setVisibility(View.VISIBLE);
+                        layoutInputNomeEndereco.setVisibility(View.VISIBLE);
 
+                    }
                 }
             }
         }
     }
-
 
     private void toggleBtnAddEnderecoVisibility(boolean isVisible) {
         if (isVisible) {
@@ -587,6 +612,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
 
     public void userChoose(ViewGroup root, boolean quantiaExata) {
         if (quantiaExata) {
+            toggleBtnFinalizarVisibility(false);
             insereCompraNoBanco();
         } else {
             switchTroco.setChecked(true);
@@ -643,7 +669,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         btnSaveInfos = view.findViewById(R.id.button_save_infos);
         btnEditInfos = view.findViewById(R.id.button_edit_infos);
         progressBarSaveAddr = view.findViewById(R.id.progressBarSaveAddress);
-        progressBarFinaliza = view.findViewById(R.id.progressBarAvancarFinalizacaoCompra);
+        progressBarAvancarFinalizacaoCompra = view.findViewById(R.id.progressBarAvancarFinalizacaoCompra);
 
         btnAvancar = view.findViewById(R.id.btnAvancarFinalizacaoCompra);
         btnAvancar.setOnClickListener(v -> {
@@ -727,9 +753,16 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         ArrayList<Produto> produtos = carrinhoViewModel.getCartProductsLiveData().getValue();
         infosCompra.add(String.valueOf(usuario.getId())); //userid
         infosCompra.add(String.valueOf(orderPayment));//formapagamento
-        infosCompra.add(subtotal.replace("R$ ", ""));//valorcompra
-//        String valorPago = getValorPago();
-//        infosCompra.add(valorPago);//valorpago
+        String valorCompra = subtotal.replace("R$ ", "").replace(",", ".");
+        infosCompra.add(valorCompra);//valorcompra
+        infosCompra.add(valorCompra); //instalment [valor da parcela - 1 parcela]
+        //dinheiro
+//        if(orderPayment == 103) {
+        infosCompra.add("1");
+//        } else {
+//            infosCompra.add("1");
+//        } //cartao
+
         infosCompra.add(String.valueOf(endereco.getAddrID()));//idendereco
         infosCompra.add(String.valueOf(formaFrete));
         if (switchTroco.isChecked()) {
@@ -738,6 +771,13 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         } else {
             infosCompra.add("0,00"); //troco
         }
+
+        /**seguinte a coluna order_installments se for dinheiro ela recebe 1 e
+         se for cartao ela recebe o numero de paracelas que foi
+         divido a compra ou 1 pra parcela unica. e o order_instalment
+         recebe o valor de cada prestação ou o valor total se for pagamento unico!
+         **/
+
         DataBaseConnection.InsertPurchase insertPurchase = new DataBaseConnection.InsertPurchase(handler, infosCompra, produtos);
         insertPurchase.execute();
     }
@@ -749,6 +789,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         bundle.putString("enderecoJson", enderecoJSON);
         bundle.putString("formaPagamentoValue", labelFormaPagamento);
         bundle.putString("subtotalValue", subtotal);
+        bundle.putString("idPedido", idPedido);
         if (switchTroco.isChecked()) {
             bundle.putString("trocoParaQuantoValue", dinheiroDoCliente);
             String valorDoTroco = String.valueOf(fromRStoDouble(dinheiroDoCliente) - fromRStoDouble(subtotal)).replace("R$ ", "").replace(".", ",");
@@ -760,26 +801,16 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         navController.navigate(R.id.action_finalizarCompraFragment_to_acompanhamentoCompraFragment, bundle);
     }
 
-    private String getValorPago() {
-        int checkedId = formaPagamentoRadioGroup.getCheckedRadioButtonId();
-        if (checkedId == radioButtonCartaoID) {
-            return subtotal.replace("R$ ", "");
-        } else {
-            if (dinheiroDoCliente == null || dinheiroDoCliente.equals("")) {
-                return subtotal.replace("R$ ", "");
-            } else {
-                return dinheiroDoCliente;
-            }
-        }
-    }
-
-
     public void openDialogPagamentoFrete() {
         // create an alert builder
         MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
         // set the custom layout
         final View customLayout = getLayoutInflater().inflate(R.layout.layout_dialog_pagamento_frete, null);
         final ViewGroup root = customLayout.findViewById(R.id.scrollViewCntrFinalizar);
+
+        btnFinalizarCompra = customLayout.findViewById(R.id.btnFinalizarCompra);
+        progressBarFinaliza = customLayout.findViewById(R.id.progressBarFinaliza);
+
         formaPagamentoRadioGroup = customLayout.findViewById(R.id.formaDePagamentoRadioGroup);
         freteRadioGroup = customLayout.findViewById(R.id.freteRadioGroup);
         AppCompatButton btnFinalizarCompra = customLayout.findViewById(R.id.btnFinalizarCompra);
@@ -814,15 +845,14 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
 
         switchTroco.setOnClickListener(v -> toggleVisibilityInputLayoutTroco(root));
         btnFinalizarCompra.setOnClickListener(v -> {
-            if (!validateFormaDePagamento(root) && !validateFrete()) {
-            } else {
+            if (validateFormaDePagamento(root) && validateFrete()) {
+                toggleBtnFinalizarVisibility(false);
                 insereCompraNoBanco();
-                formaPagamentoEFrereDialog.dismiss();
             }
         });
         builder.setView(customLayout);
-        formaPagamentoEFrereDialog = builder.create();
-        formaPagamentoEFrereDialog.show();
+        formaPagamentoEFreteDialog = builder.create();
+        formaPagamentoEFreteDialog.show();
     }
 
     @Override

@@ -3,12 +3,16 @@ package br.com.royalfarma.ui.acompanhamento;
 import android.content.Context;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
+import android.os.CountDownTimer;
+import android.os.Handler;
 import android.util.Log;
 import android.view.Gravity;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
 import android.view.inputmethod.InputMethodManager;
+import android.widget.ProgressBar;
+import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
@@ -25,19 +29,22 @@ import androidx.transition.Slide;
 import androidx.transition.Transition;
 import androidx.transition.TransitionManager;
 
+import com.google.android.material.dialog.MaterialAlertDialogBuilder;
 import com.google.gson.Gson;
 
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
+import br.com.royalfarma.database.DataBaseConnection;
+import br.com.royalfarma.interfaces.iOrderStatus;
 import br.com.royalfarma.model.Endereco;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 
 import static br.com.royalfarma.utils.Util.MY_LOG_TAG;
 
-public class AcompanhamentoCompraFragment extends Fragment {
+public class AcompanhamentoCompraFragment extends Fragment implements iOrderStatus {
 
     private AcompanhamentoCompraViewModel mViewModel;
     private NavController navController;
@@ -50,6 +57,19 @@ public class AcompanhamentoCompraFragment extends Fragment {
     private AnimationDrawable arrowAnimation;
     private boolean showContact = true;
     private AppCompatImageView arrowImage;
+    private Handler handler;
+    private AppCompatTextView numPedidoValue;
+    private String idPedido;
+    private CountDownTimer countdown;
+    private AppCompatImageView iconeAceito;
+    private AppCompatTextView textViewAceito;
+    private ProgressBar progressBarAceito;
+    private AppCompatImageView iconeEmTransporte;
+    private AppCompatTextView textViewEmTransporte;
+    private ProgressBar progressBarPedidoTransporte;
+    private AppCompatImageView iconeFinalizado;
+    private AppCompatTextView textViewFinalizado;
+    private int orderStatus;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -58,6 +78,32 @@ public class AcompanhamentoCompraFragment extends Fragment {
         if (infosEntrega == null) {
             Log.e(MY_LOG_TAG, "Informações de Entrega Vazia!");
         }
+        setHasOptionsMenu(false);
+    }
+
+    private void createCountDown() {
+        getOrderStatusDB();
+        //Countdown de 1/2 Hora
+        countdown = new CountDownTimer(120000, 60000) {
+            @Override
+            public void onTick(long millisUntilFinished) {
+                Log.d(MY_LOG_TAG, "milis: " + millisUntilFinished);
+            }
+
+            @Override
+            public void onFinish() {
+                if (orderStatus == 1) {
+                    //finalizou
+                } else {
+                    this.cancel();
+                    createCountDown();
+                }
+            }
+        }.start();
+    }
+
+    private void navigateToHome() {
+        navController.navigate(R.id.action_acompanhamentoCompraFragment_to_navigation_home);
     }
 
     @Override
@@ -80,7 +126,6 @@ public class AcompanhamentoCompraFragment extends Fragment {
             InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
         }
-
         arrowImage = view.findViewById(R.id.iconArrow);
         arrowImage.setOnClickListener(v -> {
             if (showContact) {
@@ -105,11 +150,13 @@ public class AcompanhamentoCompraFragment extends Fragment {
             TransitionManager.beginDelayedTransition(parent, transition);
             cardLayout.setVisibility(showContact ? View.VISIBLE : View.GONE);
         });
+        createCountDown();
     }
 
 
     private void initViews(View view) {
         AppCompatTextView ruaValue = view.findViewById(R.id.ruaValue);
+        AppCompatTextView numPedidoValue = view.findViewById(R.id.numPedidoValue);
         AppCompatTextView numeroValue = view.findViewById(R.id.numeroValue);
         AppCompatTextView cepValue = view.findViewById(R.id.cepValue);
         AppCompatTextView cidadeValue = view.findViewById(R.id.cidadeValue);
@@ -121,6 +168,17 @@ public class AcompanhamentoCompraFragment extends Fragment {
         AppCompatTextView bairroValue = view.findViewById(R.id.bairroValue);
         AppCompatTextView paisValue = view.findViewById(R.id.paisValue);
         recycler = view.findViewById(R.id.recyclerViewItensCompra);
+
+        iconeAceito = view.findViewById(R.id.iconeAceito);
+        textViewAceito = view.findViewById(R.id.textViewAceito);
+        progressBarAceito = view.findViewById(R.id.progressBarPedidoAceito);
+
+        iconeEmTransporte = view.findViewById(R.id.iconeEmTransporte);
+        textViewEmTransporte = view.findViewById(R.id.textViewEmTransporte);
+        progressBarPedidoTransporte = view.findViewById(R.id.progressBarPedidoTransporte);
+
+        iconeFinalizado = view.findViewById(R.id.iconeFinalizado);
+        textViewFinalizado = view.findViewById(R.id.textViewFinalizado);
 
         if (infosEntrega != null) {
             Gson g = new Gson();
@@ -135,6 +193,7 @@ public class AcompanhamentoCompraFragment extends Fragment {
             String formaDePagamento = infosEntrega.getString("formaPagamentoValue");
             String subtotal = infosEntrega.getString("subtotalValue");
             String trocoParaQuanto = infosEntrega.getString("trocoParaQuantoValue");
+            idPedido = infosEntrega.getString("idPedido");
             if (trocoParaQuanto == null) {
                 trocoParaQntValue.setVisibility(View.GONE);
             } else {
@@ -150,6 +209,7 @@ public class AcompanhamentoCompraFragment extends Fragment {
             subtotalValue.setText("Subtotal: " + subtotal);
             bairroValue.setText(bairro);
             paisValue.setText("Brasil");
+            numPedidoValue.setText(String.valueOf(idPedido));
             complementValue.setText(complement);
         }
 
@@ -163,5 +223,55 @@ public class AcompanhamentoCompraFragment extends Fragment {
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(getParentFragment()).get(AcompanhamentoCompraViewModel.class);
+    }
+
+
+    private void getOrderStatusDB() {
+        DataBaseConnection.GetOrderStatus orderStatus = new DataBaseConnection.GetOrderStatus(this);
+        orderStatus.execute(idPedido);
+    }
+
+    @Override
+    public void orderStatus(int status) {
+        //Order_status 1- concluido 2 - cancelado 3 - novo pedido 4 - aguardando pagamento 6 - processando
+        orderStatus = status;
+        Log.d(MY_LOG_TAG, "Order Status: " + orderStatus);
+        switch (orderStatus) {
+            case 3:
+                iconeAceito.setImageDrawable(getResources().getDrawable(R.drawable.ic_thumb_up_accent_24dp));
+                textViewAceito.setTextColor(getResources().getColor(R.color.colorAccent));
+                progressBarAceito.setProgress(100);
+                break;
+            case 6:
+                iconeEmTransporte.setImageDrawable(getResources().getDrawable(R.drawable.ic_motorcycle_accent_24dp));
+                textViewEmTransporte.setTextColor(getResources().getColor(R.color.colorAccent));
+                progressBarPedidoTransporte.setProgress(100);
+                break;
+            case 1:
+                //finalizou
+                iconeFinalizado.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_accent_24dp));
+                textViewFinalizado.setTextColor(getResources().getColor(R.color.colorAccent));
+
+                //zera carrinho
+                carrinhoViewModel.updateProductsList(new ArrayList<>());
+                carrinhoViewModel.updateBadgeDisplay();
+
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
+                builder.setTitle("Pedido Finalizado")
+                        .setMessage("Seu pedido (nº " + idPedido + ") encontra-se com o status finalizado.\nAgradecemos pela preferência!")
+                        .setPositiveButton("Ok", (dialog, which) -> navigateToHome())
+                        .setCancelable(false)
+                        .create()
+                        .show();
+                break;
+            case -1:
+                Log.e(MY_LOG_TAG, "Erro de SQL");
+                Toast.makeText(getContext(), "Erro de SQL", Toast.LENGTH_SHORT).show();
+                break;
+            default:
+                Log.d(MY_LOG_TAG, "Switch não capturado: " + orderStatus);
+                break;
+        }
+
     }
 }

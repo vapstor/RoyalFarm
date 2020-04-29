@@ -154,14 +154,16 @@ public class LoginFragment extends Fragment implements ILoginInfos {
 
     private void toggleCircularBarBtn(boolean circularBarVisibility) {
         final ViewGroup root = getActivity().findViewById(R.id.login_root_layout);
-        Button btn = getActivity().findViewById(R.id.buttonLogin);
-        TransitionManager.beginDelayedTransition(root, new Fade());
-        if (circularBarVisibility) {
-            circularBar.setVisibility(View.VISIBLE);
-            btn.setVisibility(View.INVISIBLE);
-        } else {
-            btn.setVisibility(View.VISIBLE);
-            circularBar.setVisibility(View.INVISIBLE);
+        if(root != null) {
+            Button btn = getActivity().findViewById(R.id.buttonLogin);
+            TransitionManager.beginDelayedTransition(root, new Fade());
+            if (circularBarVisibility) {
+                circularBar.setVisibility(View.VISIBLE);
+                btn.setVisibility(View.INVISIBLE);
+            } else {
+                btn.setVisibility(View.VISIBLE);
+                circularBar.setVisibility(View.INVISIBLE);
+            }
         }
     }
 

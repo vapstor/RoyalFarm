@@ -19,6 +19,7 @@ import java.util.ArrayList;
 import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.interfaces.ILoginInfos;
 import br.com.royalfarma.interfaces.iCEPHelper;
+import br.com.royalfarma.interfaces.iOrderStatus;
 import br.com.royalfarma.model.Endereco;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.model.Usuario;
@@ -49,7 +50,7 @@ public class DataBaseConnection {
     public static void createConnection() {
         synchronized (lock) {
             try {
-                if (connection == null || connection.isClosed()) {
+                if (connection == null || connection.isClosed() || !connection.isValid(500)) {
                     try {
                         Message message = new Message();
                         message.what = 0;
@@ -282,7 +283,7 @@ public class DataBaseConnection {
                     ArrayList<Produto> todosOsProdutos = new ArrayList<>();
                     Produto produto;
 
-                    this.message.obj = "size: " + resultSet.getFetchSize();
+                    this.message.obj = "size: " + resultSet.getFetchSize() + 1;
                     Log.d(MY_LOG_TAG, "Size: " + this.message.obj);
                     this.handler.sendMessage(message);
                     int progress = 0;
@@ -626,6 +627,7 @@ public class DataBaseConnection {
         private final ArrayList<String> infosCompra;
         private final ArrayList<Produto> produtos;
         private Message message;
+        private int orderID;
 
         public InsertPurchase(Handler handler, ArrayList<String> infosCompra, ArrayList<Produto> produtos) {
             this.infosCompra = infosCompra;
@@ -653,113 +655,118 @@ public class DataBaseConnection {
                     Log.v(MY_LOG_TAG, "onPreExecuteInsereOrdem");
                     this.message = new Message();
                     this.message.what = 1;
+                    this.message.obj = "onPreExecuteInsereOrdem";
+                    handler.sendMessage(message);
                     if (infosCompra == null) {
                         Log.e(MY_LOG_TAG, "Erro ao resgatar Infos De Compra");
                         message.obj = "infos_compra_null";
                         handler.sendMessage(message);
                         return null;
                     } else {
-                        try {
-                            String insertOrder = "INSERT INTO ws_orders VALUES (" +
-                                    "?, " + //userid
-                                    "?, " + //order id
-                                    "?, " + //order status
-                                    "?, " + //order payment
-                                    "?, " + //valorcompra order price
-                                    "?, " + //order installments
-                                    "?, " + //instalmment
-                                    "?, " + //coupon
-                                    "?, " + //free
-                                    "?, " + //billet
-                                    "?, " + //code
-                                    "?, " + //addrId
-                                    "?, " + //shipcode
-                                    "?, " + //shiprice (frete)
-                                    "CURRENT_DATE(), " + //data envio
-                                    "?, " + //order tracking
-                                    "?, " + //nfepdf
-                                    "?, " + //nfexml
-                                    "CURRENT_TIMESTAMP(), " + //order date
-                                    "CURRENT_TIMESTAMP(), " + //order update
-                                    "?, " + //mail processing
-                                    "?, " + //completed
-                                    "?)"; //troco
-                            PreparedStatement pstmt;
+                        String insertOrder = "INSERT INTO ws_orders VALUES (" +
+                                "?, " + //userid
+                                "?, " + //order id
+                                "?, " + //order status
+                                "?, " + //order payment
+                                "?, " + //valorcompra order price
+                                "?, " + //order installments
+                                "?, " + //instalmment
+                                "?, " + //coupon
+                                "?, " + //free
+                                "?, " + //billet
+                                "?, " + //code
+                                "?, " + //addrId
+                                "?, " + //shipcode
+                                "?, " + //shiprice (frete)
+                                "CURRENT_DATE(), " + //data envio
+                                "?, " + //order tracking
+                                "?, " + //nfepdf
+                                "?, " + //nfexml
+                                "CURRENT_TIMESTAMP(), " + //order date
+                                "CURRENT_TIMESTAMP(), " + //order update
+                                "?, " + //mail processing
+                                "?, " + //completed
+                                "?)"; //troco
+                        PreparedStatement pstmt;
 //                            pstmt = connection.prepareStatement(insertOrder);
-                            pstmt = connection.prepareStatement(insertOrder, PreparedStatement.RETURN_GENERATED_KEYS);
-                            pstmt.setInt(1, Integer.parseInt(infosCompra.get(0))); //id
-                            pstmt.setInt(2, NULL); //order id
-                            pstmt.setInt(3, 3); //status 3 = novo pedido
-                            pstmt.setString(4, infosCompra.get(1)); //payment
-                            pstmt.setBigDecimal(5, new BigDecimal(infosCompra.get(2).replace(",", "."))); //price
-                            pstmt.setInt(6, NULL); //installment
-                            pstmt.setInt(7, NULL); //installments
-                            pstmt.setInt(8, NULL); //coupon
-                            pstmt.setInt(9, NULL); //free
-                            pstmt.setInt(10, NULL); //billet
-                            pstmt.setInt(11, NULL); //code
-                            pstmt.setInt(12, Integer.parseInt(infosCompra.get(3))); //addrid
-                            pstmt.setInt(13, Integer.parseInt(infosCompra.get(4))); //shipcode
-                            pstmt.setBigDecimal(14, new BigDecimal("0.00")); //shipprice
-                            pstmt.setInt(15, NULL); //ordertackin
-                            pstmt.setInt(16, NULL); //nfe
-                            pstmt.setInt(17, NULL); //nfe
-                            pstmt.setInt(18, NULL); //mail processing
-                            pstmt.setInt(19, NULL); //completed
-                            pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(5).replace(",", "."))); //troco
+                        pstmt = connection.prepareStatement(insertOrder, PreparedStatement.RETURN_GENERATED_KEYS);
+                        pstmt.setInt(1, Integer.parseInt(infosCompra.get(0))); //id
+                        pstmt.setInt(2, NULL); //order id
+                        pstmt.setInt(3, 3); //status 3 = novo pedido
+                        pstmt.setString(4, infosCompra.get(1)); //payment
+                        pstmt.setBigDecimal(5, new BigDecimal(infosCompra.get(2))); //price
+                        pstmt.setBigDecimal(6, new BigDecimal(infosCompra.get(3))); //installment
+                        pstmt.setBigDecimal(7, new BigDecimal(infosCompra.get(4))); //installments
+                        pstmt.setInt(8, NULL); //coupon
+                        pstmt.setInt(9, NULL); //free
+                        pstmt.setInt(10, NULL); //billet
+                        pstmt.setInt(11, NULL); //code
+                        pstmt.setInt(12, Integer.parseInt(infosCompra.get(5))); //addrid
+                        pstmt.setInt(13, Integer.parseInt(infosCompra.get(6))); //shipcode
+                        pstmt.setBigDecimal(14, new BigDecimal("0.00")); //shipprice
+                        pstmt.setInt(15, NULL); //ordertackin
+                        pstmt.setInt(16, NULL); //nfe
+                        pstmt.setInt(17, NULL); //nfe
+                        pstmt.setInt(18, NULL); //mail processing
+                        pstmt.setInt(19, NULL); //completed
+                        pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(7).replace(",", "."))); //troco
 
-                            int affectedLines = pstmt.executeUpdate();
-                            if (affectedLines == 1) {
-                                ResultSet rs = pstmt.getGeneratedKeys();
-                                int key = rs.next() ? rs.getInt(1) : 0;
-                                Produto p;
-                                for (int i = 0; i < produtos.size(); i++) {
-                                    String sqlItensPedido = "INSERT INTO ws_orders_items VALUES (?,?,?,?,?,?,?)";
-                                    p = produtos.get(i);
-                                    pstmt = connection.prepareStatement(sqlItensPedido);
-                                    pstmt.setInt(1, key); //order_id
-                                    pstmt.setInt(2, p.getId()); //pdt_id
-                                    pstmt.setInt(3, NULL);//stock_id
-                                    pstmt.setInt(4, NULL);//item_id
-                                    pstmt.setString(5, p.getNome());//item_name
-                                    if (p.isDesconto()) {
-                                        pstmt.setBigDecimal(6, new BigDecimal(p.getPrecoOferta())); //item_price
-                                    } else {
-                                        pstmt.setBigDecimal(6, new BigDecimal(p.getPreco())); //item_price
-                                    }
-                                    pstmt.setBigDecimal(7, new BigDecimal(p.getQtdNoCarrinho()));//item_amount
-
-                                    if (!pstmt.execute()) {
-                                        Message message = new Message();
-                                        message.what = 1;
-                                        message.obj = "pedidoInserido";
-                                        handler.sendMessage(message);
-                                    } else {
-                                        Message message = new Message();
-                                        message.what = 1;
-                                        message.obj = "falhouInserirPedido";
-                                        handler.sendMessage(message);
-                                        Log.e(MY_LOG_TAG, "Erro ao Inserir Compra");
-                                    }
+                        int affectedLines = pstmt.executeUpdate();
+                        if (affectedLines == 1) {
+                            ResultSet rs = pstmt.getGeneratedKeys();
+                            orderID = rs.next() ? rs.getInt(1) : 0;
+                            Produto p;
+                            for (int i = 0; i < produtos.size(); i++) {
+                                String sqlItensPedido = "INSERT INTO ws_orders_items VALUES (?,?,?,?,?,?,?)";
+                                p = produtos.get(i);
+                                pstmt = connection.prepareStatement(sqlItensPedido);
+                                pstmt.setInt(1, orderID); //order_id
+                                pstmt.setInt(2, p.getId()); //pdt_id
+                                pstmt.setInt(3, NULL);//stock_id
+                                pstmt.setInt(4, NULL);//item_id
+                                pstmt.setString(5, p.getNome());//item_name
+                                if (p.isDesconto()) {
+                                    pstmt.setBigDecimal(6, new BigDecimal(p.getPrecoOferta())); //item_price
+                                } else {
+                                    pstmt.setBigDecimal(6, new BigDecimal(p.getPreco())); //item_price
                                 }
-                            } else {
-                                Message message = new Message();
-                                message.what = 1;
-                                message.obj = "falhouInserirPedido";
-                                handler.sendMessage(message);
-                                Log.e(MY_LOG_TAG, "Erro ao Inserir Compra");
+                                pstmt.setBigDecimal(7, new BigDecimal(p.getQtdNoCarrinho()));//item_amount
+
+                                if (!pstmt.execute()) {
+                                    Message message = new Message();
+                                    message.what = 1;
+                                    Log.v(MY_LOG_TAG, "ORDER_ID" + orderID);
+                                    message.obj = "orderIdValue" + orderID;
+                                    handler.sendMessage(message);
+
+                                    Message message2 = new Message();
+                                    message2.what = 1;
+                                    message2.obj = "pedidoInserido";
+                                    handler.sendMessage(message2);
+                                } else {
+                                    Message message = new Message();
+                                    message.what = 1;
+                                    message.obj = "falhouInserirPedido";
+                                    handler.sendMessage(message);
+                                    Log.e(MY_LOG_TAG, "Erro ao Inserir Compra");
+                                }
                             }
-                        } catch (SQLException e) {
+                        } else {
                             Message message = new Message();
                             message.what = 1;
-                            message.obj = "erro_sql";
+                            message.obj = "falhouInserirPedido";
                             handler.sendMessage(message);
-                            e.printStackTrace();
-                            Log.e(MY_LOG_TAG, "Erro de SQL");
+                            Log.e(MY_LOG_TAG, "Erro ao Inserir Compra");
                         }
                     }
                 }
-            } catch (InterruptedException e) {
+            } catch (SQLException | InterruptedException e) {
+                Message message = new Message();
+                message.what = 1;
+                message.obj = "erro_sql";
+                handler.sendMessage(message);
+                e.printStackTrace();
+                Log.e(MY_LOG_TAG, "Erro de SQL");
                 e.printStackTrace();
             }
             return null;
@@ -776,24 +783,41 @@ public class DataBaseConnection {
         }
     }
 
-    public static class GetOrderStatus extends AsyncTask<Void, Void, Void> {
+    public static class GetOrderStatus extends AsyncTask<String, Void, Integer> {
+        private final iOrderStatus iOrderStatus;
+
+        public GetOrderStatus(iOrderStatus iOrderStatus) {
+            this.iOrderStatus = iOrderStatus;
+        }
 
         @Override
-        protected Void doInBackground(Void... voids) {
+        protected Integer doInBackground(String... strings) {
             try {
                 synchronized (lock) {
                     new Thread(DataBaseConnection::createConnection).start();
                     lock.wait();
 
-                    String sqlGet = "";
-                    PreparedStatement pstm = connection.prepareStatement(sqlGet, PreparedStatement.RETURN_GENERATED_KEYS);
-                    pstm.setString(1, "");
-                    pstm.executeQuery();
+                    String sqlGetStatus = "SELECT order_status FROM ws_orders WHERE order_id = ?";
+                    PreparedStatement pstm = connection.prepareStatement(sqlGetStatus);
+                    pstm.setInt(1, Integer.parseInt(strings[0]));
+                    ResultSet rs = pstm.executeQuery();
+                    if (rs.next()) {
+                        return rs.getInt("order_status");
+                    }
                 }
             } catch (SQLException | InterruptedException e) {
-
+                return null;
             }
             return null;
+        }
+
+        @Override
+        protected void onPostExecute(Integer integer) {
+            if (integer == null) {
+                integer = -1;
+            }
+            iOrderStatus.orderStatus(integer);
+            super.onPostExecute(integer);
         }
     }
 
