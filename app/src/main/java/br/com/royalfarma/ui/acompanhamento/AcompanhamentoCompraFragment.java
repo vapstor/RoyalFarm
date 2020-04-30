@@ -1,7 +1,6 @@
 package br.com.royalfarma.ui.acompanhamento;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -36,7 +35,6 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
-import br.com.royalfarma.activitys.MainActivity;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.iOrderStatus;
@@ -94,8 +92,8 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
 
             @Override
             public void onFinish() {
-                if (orderStatus == 1) {
-                    //finalizou
+                if (orderStatus == 1 || orderStatus == 2) {
+                    //finalizou ou cancelou
                 } else {
                     this.cancel();
                     createCountDown();
@@ -105,10 +103,9 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
     }
 
     private void navigateToHome() {
-        if (getActivity() != null) {
-            getActivity().finish();
-            startActivity(new Intent(getContext(), MainActivity.class));
-        }
+        Bundle extras = new Bundle();
+        extras.putBoolean("jaLogado", true);
+        navController.navigate(R.id.action_acompanhamentoCompraFragment_to_navigation_home, extras);
     }
 
     @Override
@@ -252,6 +249,14 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
                 textViewEmTransporte.setTextColor(getResources().getColor(R.color.colorAccent));
                 progressBarPedidoTransporte.setProgress(100);
                 break;
+            case 2:
+                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
+                builder.setTitle("Pedido Cancelado")
+                        .setMessage("Seu pedido (nº " + idPedido + ") encontra-se com o status cancelado.\nEntre em contato para obter mais detalhes.")
+                        .setPositiveButton("Ok", (dialog, which) -> navigateToHome())
+                        .setCancelable(false)
+                        .create()
+                        .show();
             case 1:
                 //finalizou
                 iconeFinalizado.setImageDrawable(getResources().getDrawable(R.drawable.ic_check_circle_accent_24dp));
@@ -261,8 +266,8 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
                 carrinhoViewModel.updateProductsList(new ArrayList<>());
                 carrinhoViewModel.updateBadgeDisplay();
 
-                MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
-                builder.setTitle("Pedido Finalizado")
+                MaterialAlertDialogBuilder builder2 = new MaterialAlertDialogBuilder(getContext(), R.style.MaterialAlertDialog_Rounded);
+                builder2.setTitle("Pedido Finalizado")
                         .setMessage("Seu pedido (nº " + idPedido + ") encontra-se com o status finalizado.\nAgradecemos pela preferência!")
                         .setPositiveButton("Ok", (dialog, which) -> navigateToHome())
                         .setCancelable(false)

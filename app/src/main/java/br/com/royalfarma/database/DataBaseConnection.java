@@ -709,7 +709,7 @@ public class DataBaseConnection {
                         pstmt.setInt(17, NULL); //nfe
                         pstmt.setInt(18, NULL); //mail processing
                         pstmt.setInt(19, NULL); //completed
-                        pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(7).replace(",", "."))); //troco
+                        pstmt.setBigDecimal(20, new BigDecimal(infosCompra.get(7))); //troco
 
                         int affectedLines = pstmt.executeUpdate();
                         if (affectedLines == 1) {

@@ -755,10 +755,10 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         infosCompra.add(String.valueOf(orderPayment));//formapagamento
         String valorCompra = subtotal.replace("R$ ", "").replace(",", ".");
         infosCompra.add(valorCompra);//valorcompra
-        infosCompra.add(valorCompra); //instalment [valor da parcela - 1 parcela]
         //dinheiro
 //        if(orderPayment == 103) {
         infosCompra.add("1");
+        infosCompra.add(valorCompra); //instalment [valor da parcela - 1 parcela]
 //        } else {
 //            infosCompra.add("1");
 //        } //cartao
@@ -766,10 +766,10 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         infosCompra.add(String.valueOf(endereco.getAddrID()));//idendereco
         infosCompra.add(String.valueOf(formaFrete));
         if (switchTroco.isChecked()) {
-            String valorDoTroco = String.valueOf(fromRStoDouble(dinheiroDoCliente) - fromRStoDouble(subtotal)).replace("R$", "").trim().replace(".", ",");
+            String valorDoTroco = dinheiroDoCliente.replace("R$ ", "").replace(",", ".");
             infosCompra.add(valorDoTroco); //troco
         } else {
-            infosCompra.add("0,00"); //troco
+            infosCompra.add("0.00"); //troco
         }
 
         /**seguinte a coluna order_installments se for dinheiro ela recebe 1 e

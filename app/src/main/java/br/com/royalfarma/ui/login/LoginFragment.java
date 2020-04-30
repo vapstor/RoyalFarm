@@ -74,7 +74,15 @@ public class LoginFragment extends Fragment implements ILoginInfos {
     @Override
     public View onCreateView(@NonNull LayoutInflater inflater, @Nullable ViewGroup container, @Nullable Bundle savedInstanceState) {
         loginViewModel = new ViewModelProvider(requireParentFragment()).get(LoginViewModel.class);
+        Usuario usuario = loginViewModel.getUsuarioMutableLiveData().getValue();
+        if (usuario != null) {
+            navigateToFinalizar();
+        }
         return inflater.inflate(R.layout.fragment_login, container, false);
+    }
+
+    private void navigateToFinalizar() {
+        navController.navigate(R.id.action_navigation_login_to_finalizarCompraFragment);
     }
 
     @Override
@@ -154,7 +162,7 @@ public class LoginFragment extends Fragment implements ILoginInfos {
 
     private void toggleCircularBarBtn(boolean circularBarVisibility) {
         final ViewGroup root = getActivity().findViewById(R.id.login_root_layout);
-        if(root != null) {
+        if (root != null) {
             Button btn = getActivity().findViewById(R.id.buttonLogin);
             TransitionManager.beginDelayedTransition(root, new Fade());
             if (circularBarVisibility) {
@@ -318,15 +326,10 @@ public class LoginFragment extends Fragment implements ILoginInfos {
         }
     }
 
-    private void debugApp() {
-        navController.navigate(R.id.action_navigation_login_to_finalizarCompraFragment);
-    }
-
-
     @Override
     public void onInfosLoginResult(Usuario cliente) {
         //Atualiza modelo com infos do usuario
-        loginViewModel.getUsuarioMutableLiveData().setValue(cliente);
+        loginViewModel.updateUsuarioInfo(cliente);
         resultLogin(resultLogin);
     }
 }

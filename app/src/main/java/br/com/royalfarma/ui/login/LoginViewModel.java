@@ -16,9 +16,6 @@ public class LoginViewModel extends ViewModel {
         if (user.equals("") || password.equals("")) {
             usuarioMutableLiveData = new MutableLiveData<>();
             usuarioMutableLiveData.setValue(null);
-        } else {
-            usuarioMutableLiveData = new MutableLiveData<>();
-            usuarioMutableLiveData.setValue(new Usuario(user, password));
         }
     }
 

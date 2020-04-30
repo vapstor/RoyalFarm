@@ -170,7 +170,11 @@ public class CarrinhoFragment extends Fragment implements RecyclerItemTouchHelpe
             if (getActivity() != null) {
                 ArrayList<Produto> produtosCarrinho = carrinhoViewModel.getCartProductsLiveData().getValue();
                 if (produtosCarrinho != null && produtosCarrinho.size() > 0) {
-                    navController.navigate(R.id.action_navigation_carrinho_to_loginFragment);
+                    if(this.usuario == null) {
+                        navController.navigate(R.id.action_navigation_carrinho_to_loginFragment);
+                    } else {
+                        navController.navigate(R.id.action_navigation_carrinho_to_navigation_finalizar);
+                    }
                 } else {
                     Toast.makeText(getContext(), "Adicione itens ao carrinho para prosseguir!", Toast.LENGTH_SHORT).show();
                 }

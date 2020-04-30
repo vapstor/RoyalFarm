@@ -61,6 +61,7 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
     private BottomNavigationView navView;
     private BadgeDrawable badge;
     private PesquisarViewModel pesquisarViewModel;
+    private boolean jaLogado;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -71,6 +72,10 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
                 updateUI(msg);
             }
         };
+
+        Bundle extras = getArguments();
+        if (extras != null)
+            jaLogado = extras.getBoolean("jaLogado");
 
         countdown = new CountDownTimer(5000, 500) {
             @Override
@@ -285,6 +290,7 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
                 }
             }
         });
+
         return root;
     }
 
@@ -308,14 +314,12 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
                 extras.putParcelableArrayList("initialProducts", produtosNovidades);
                 navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
-
             view.findViewById(R.id.btnVerMaisPopulares).setOnClickListener(v -> {
                 Bundle extras = new Bundle();
                 extras.putString("title", "Populares");
 
                 navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
-
             view.findViewById(R.id.btnVerMaisMaisVendidos).setOnClickListener(v -> {
                 Bundle extras = new Bundle();
                 extras.putString("title", "Mais Vendidos");
@@ -323,7 +327,12 @@ public class HomeFragment extends Fragment implements IFetchProducts, IDetailVie
                 extras.putParcelableArrayList("initialProducts", produtosMaisVendidos);
                 navController.navigate(R.id.action_navigation_home_to_navigation_lista_produtos, extras);
             });
+
+            if (jaLogado) {
+                fetchProducts();
+            }
         }
+
 
         //Click nas views não utilizado, apenas nos botoes e imagem
 //        ItemClickSupport.addTo(recyclerNovidades).setOnItemClickListener((recyclerView, position, v) -> {
