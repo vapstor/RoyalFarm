@@ -753,7 +753,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         ArrayList<Produto> produtos = carrinhoViewModel.getCartProductsLiveData().getValue();
         infosCompra.add(String.valueOf(usuario.getId())); //userid
         infosCompra.add(String.valueOf(orderPayment));//formapagamento
-        String valorCompra = subtotal.replace("R$ ", "").replace(",", ".");
+        String valorCompra = subtotal.replace("R$ ", "").replace("R$", "").replace(",", ".");
         infosCompra.add(valorCompra);//valorcompra
         //dinheiro
 //        if(orderPayment == 103) {
@@ -766,7 +766,7 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         infosCompra.add(String.valueOf(endereco.getAddrID()));//idendereco
         infosCompra.add(String.valueOf(formaFrete));
         if (switchTroco.isChecked()) {
-            String valorDoTroco = dinheiroDoCliente.replace("R$ ", "").replace(",", ".");
+            String valorDoTroco = dinheiroDoCliente.replace("R$ ", "").replace("R$", "").replace(",", ".");
             infosCompra.add(valorDoTroco); //troco
         } else {
             infosCompra.add("0.00"); //troco
@@ -852,7 +852,9 @@ public class FinalizarCompraFragment extends Fragment implements iCEPHelper {
         });
         builder.setView(customLayout);
         formaPagamentoEFreteDialog = builder.create();
-        formaPagamentoEFreteDialog.show();
+        if (!formaPagamentoEFreteDialog.isShowing()) {
+            formaPagamentoEFreteDialog.show();
+        }
     }
 
     @Override

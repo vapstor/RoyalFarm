@@ -189,7 +189,7 @@ public class MainActivity extends AppCompatActivity {
                 MaterialAlertDialogBuilder builder = new MaterialAlertDialogBuilder(this);
                 builder.setTitle("Atenção")
                         .setMessage("Se você sair desta tela não poderá acompanhar seu pedido.")
-                        .setPositiveButton("Sair", (dialog, which) -> super.onBackPressed())
+                        .setPositiveButton("Sair", (dialog, which) -> navController.navigate(R.id.action_acompanhamentoCompraFragment_to_navigation_home))
                         .setNegativeButton("Cancelar", (dialog, which) -> {})
                         .setCancelable(false)
                         .create()

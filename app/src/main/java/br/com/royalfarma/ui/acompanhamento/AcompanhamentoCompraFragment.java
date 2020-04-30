@@ -16,6 +16,8 @@ import android.widget.Toast;
 
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
+import androidx.appcompat.app.ActionBar;
+import androidx.appcompat.app.AppCompatActivity;
 import androidx.appcompat.widget.AppCompatImageView;
 import androidx.appcompat.widget.AppCompatTextView;
 import androidx.fragment.app.Fragment;
@@ -127,6 +129,10 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
         if (getActivity() != null) {
             InputMethodManager imm = (InputMethodManager) getContext().getSystemService(Context.INPUT_METHOD_SERVICE);
             imm.hideSoftInputFromWindow(view.getWindowToken(), 0);
+            ActionBar actionBar = ((AppCompatActivity) getActivity()).getSupportActionBar();
+            if (actionBar != null) {
+                actionBar.setDisplayHomeAsUpEnabled(false);
+            }
         }
         arrowImage = view.findViewById(R.id.iconArrow);
         arrowImage.setOnClickListener(v -> {
@@ -225,6 +231,7 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
     public void onActivityCreated(@Nullable Bundle savedInstanceState) {
         super.onActivityCreated(savedInstanceState);
         mViewModel = new ViewModelProvider(getParentFragment()).get(AcompanhamentoCompraViewModel.class);
+
     }
 
 
