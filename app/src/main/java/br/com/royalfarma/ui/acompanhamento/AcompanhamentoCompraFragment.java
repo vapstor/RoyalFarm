@@ -1,6 +1,7 @@
 package br.com.royalfarma.ui.acompanhamento;
 
 import android.content.Context;
+import android.content.Intent;
 import android.graphics.drawable.AnimationDrawable;
 import android.os.Bundle;
 import android.os.CountDownTimer;
@@ -35,6 +36,7 @@ import com.google.gson.Gson;
 import java.util.ArrayList;
 
 import br.com.royalfarma.R;
+import br.com.royalfarma.activitys.MainActivity;
 import br.com.royalfarma.adapter.ProdutosPesquisaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
 import br.com.royalfarma.interfaces.iOrderStatus;
@@ -103,7 +105,10 @@ public class AcompanhamentoCompraFragment extends Fragment implements iOrderStat
     }
 
     private void navigateToHome() {
-        navController.navigate(R.id.action_acompanhamentoCompraFragment_to_navigation_home);
+        if (getActivity() != null) {
+            getActivity().finish();
+            startActivity(new Intent(getContext(), MainActivity.class));
+        }
     }
 
     @Override
