@@ -48,7 +48,7 @@
   <img src="app/screenshots/screen2.png?raw=true" width="250"/>
   <img src="app/screenshots/screen3.png?raw=true" width="250"/> 
   <img src="app/screenshots/screen6.png?raw=true" width="250"/> 
-  <img src="app/screenshots/screen7.png?raw=true" width="250"/>
+  <img src="app/screenshots/screen_last.png?raw=true" width="250"/>
 </div>
 
 ## 👏 Todo (Desenvolvimento)
@@ -85,7 +85,7 @@
       
 * Desenvolver Pesquisar
   - [x] Implementar tela com VerticalScrollView de produtos com Nome/Cod Barra 
-  - [ ] ~Implementar botão para limpar seção de pesquisa~
+  - [x] Implementar botão para limpar seção de pesquisa
 
 * Desenvolver CarrinhoPage
   - [x] Implementar Badge no menu de carrinho com quantidade de itens selecionados 
@@ -105,7 +105,8 @@
   - [ ] ~Implementar Diálogo de confirmação da compra~
   - [x] Configurar INSERT via JDBC
   - [x] Implementar View "Sucesso de Compra"
-  - [ ] Implementar SELECT para status da Venda
+  - [x] Implementar SELECT para status da Venda
+  - [x] Implementar Icones para acompanhamento
   
 ## How to version
 
