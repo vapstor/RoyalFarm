@@ -7,7 +7,7 @@
   <p align="center">
     <img src="https://ci.appveyor.com/api/projects/status/g8d58ipi3auqdtrk/branch/master?svg=true" alt="Config. Device Activity Passing." />
 <!--      <img src="https://ci.appveyor.com/api/projects/status/216h1g17b8ir009t?svg=true" alt="Config. Device Activity Crashing." /> -->
-    <img src="https://img.shields.io/badge/version-17.9.1-blue.svg" alt="Current APP version." />  
+    <img src="https://img.shields.io/badge/version-17.9.4-blue.svg" alt="Current APP version." />  
   </p>
 </p>
 
