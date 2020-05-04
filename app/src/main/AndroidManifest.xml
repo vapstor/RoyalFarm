@@ -1,8 +1,7 @@
 <?xml version="1.0" encoding="utf-8"?>
 <manifest xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
-    package="br.com.royalfarma"
-    >
+    package="br.com.royalfarma">
 
     <uses-permission android:name="android.permission.INTERNET" />
 
@@ -20,8 +19,7 @@
             android:name=".activitys.ProductDetail"
             android:label="@string/title_activity_product_detail"
             android:launchMode="singleTop"
-            android:theme="@style/AppTheme.NoActionBar"
-            />
+            android:theme="@style/AppTheme.NoActionBar" />
         <activity
             android:name=".activitys.ProductDetailImageActivity"
             android:theme="@style/Theme.MaterialComponents.DayNight.NoActionBar" />

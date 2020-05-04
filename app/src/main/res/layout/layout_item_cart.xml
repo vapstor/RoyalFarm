@@ -140,7 +140,7 @@
                 app:srcCompat="@drawable/ic_remove_circle_outline_accent_24dp" />
 
             <ProgressBar
-                android:id="@+id/progressBar"
+                android:id="@+id/progressBarItensLista"
                 style="?android:attr/progressBarStyle"
                 android:layout_width="24dp"
                 android:layout_height="24dp"

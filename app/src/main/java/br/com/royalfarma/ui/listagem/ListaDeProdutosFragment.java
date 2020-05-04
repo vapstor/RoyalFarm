@@ -4,7 +4,6 @@ import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
-import android.os.CountDownTimer;
 import android.os.Handler;
 import android.os.Message;
 import android.transition.Fade;
@@ -14,7 +13,7 @@ import android.view.LayoutInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.FrameLayout;
+import android.widget.ProgressBar;
 import android.widget.Toast;
 
 import androidx.activity.OnBackPressedCallback;
@@ -38,8 +37,8 @@ import br.com.royalfarma.R;
 import br.com.royalfarma.activitys.ProductDetail;
 import br.com.royalfarma.adapter.ProdutosListaAdapter;
 import br.com.royalfarma.database.DataBaseConnection;
-import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.interfaces.IDetailViewClick;
+import br.com.royalfarma.interfaces.IFetchProducts;
 import br.com.royalfarma.model.Produto;
 import br.com.royalfarma.ui.carrinho.CarrinhoViewModel;
 import br.com.royalfarma.ui.home.ProductsViewModel;
@@ -57,13 +56,13 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
     // Store a member variable for the listener
     private EndlessRecyclerViewScrollListener scrollListener;
     private Handler handler;
-    private CountDownTimer countdown;
     private int myPage;
     private ArrayList<Produto> initialProducts;
     private ListaDeProdutosViewModel pagedProductsViewModel;
     private CarrinhoViewModel carrinhoVieModel;
     private BottomNavigationView navView;
     private BadgeDrawable badge;
+    private GridLayoutManager gridLayoutManager;
 
     @Override
     public void onCreate(@Nullable Bundle savedInstanceState) {
@@ -96,17 +95,6 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
             }
         };
 
-        countdown = new CountDownTimer(5000, 500) {
-            @Override
-            public void onTick(long millisUntilFinished) {
-            }
-
-            @Override
-            public void onFinish() {
-                Toast.makeText(getContext(), "Por favor, aguarde...", Toast.LENGTH_SHORT).show();
-            }
-        };
-
         setHasOptionsMenu(true);
     }
 
@@ -116,32 +104,25 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
         return super.onOptionsItemSelected(item);
     }
 
-    @Override
-    public void onDestroy() {
-        if (countdown != null) {
-            countdown.cancel();
-        }
-        super.onDestroy();
-    }
 
     private void updateUI(Message msg) {
         if (msg.what == 0) {
             if ("tentando_conectar".equals(msg.obj)) {
-                toggleFrameLoadingVisibility(true);
+                toggleProgressBarVisibility(true);
             }
         } else if (msg.what == 1) {
             switch ((String) msg.obj) {
                 case "onPreExecute":
-                    toggleFrameLoadingVisibility(true);
+                    toggleProgressBarVisibility(true);
                     break;
                 case "erro_sql":
                     Toast.makeText(getContext(), "Erro de SQL", Toast.LENGTH_SHORT).show();
-                    toggleFrameLoadingVisibility(false);
+                    toggleProgressBarVisibility(false);
                     if (getActivity() != null) {
                         getActivity().finish();
                     }
                 case "onPostExecute":
-                    toggleFrameLoadingVisibility(false);
+                    toggleProgressBarVisibility(false);
 //                    Toast.makeText(getActivity(), "Produtos recuperados com sucesso!", Toast.LENGTH_SHORT).show();
                     break;
             }
@@ -150,18 +131,18 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
         }
     }
 
-    private void toggleFrameLoadingVisibility(boolean frameVisibility) {
+    private void toggleProgressBarVisibility(boolean progressBarVisibility) {
         if (getActivity() != null) {
-            final ViewGroup root = getActivity().findViewById(R.id.scrollViewListaProdutosContainer);
+            final ViewGroup root = getActivity().findViewById(R.id.fragment_lista_de_produtos);
             if (root != null) {
-                FrameLayout frameLayout = root.findViewById(R.id.frameLoadingLayout);
+                ProgressBar progressBar = root.findViewById(R.id.progressBarItensLista);
                 TransitionManager.beginDelayedTransition(root, new androidx.transition.Fade().setDuration(750));
-                if (frameVisibility) {
-                    frameLayout.setVisibility(View.VISIBLE);
-                    frameLayout.setClickable(true);
-                    frameLayout.setOnClickListener(v -> Toast.makeText(getContext(), "Aguarde", Toast.LENGTH_SHORT).show());
+                if (progressBarVisibility) {
+                    if (progressBar.getVisibility() != View.VISIBLE)
+                        progressBar.setVisibility(View.VISIBLE);
                 } else {
-                    frameLayout.setVisibility(View.INVISIBLE);
+                    if (progressBar.getVisibility() != View.GONE)
+                        progressBar.setVisibility(View.GONE);
                 }
             }
         }
@@ -213,7 +194,6 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
             }
         });
 
-
         ArrayList<Produto> homeProductsBackup = productsViewModel.getTodosOsProdutosLiveData().getValue();
         if (pageTitle.equals("Novidades")) {
             initialProducts = new ArrayList<>(homeProductsBackup.subList(0, 5));
@@ -227,23 +207,36 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
         }
 
         pagedProductsViewModel.getListaDeProdutos().observe(getViewLifecycleOwner(), produtos -> {
-            ArrayList<Produto> teste = new ArrayList<>(produtos);
-            if (teste.size() > 5) {
-                adapter.clear();
-                adapter.addAll(teste);
-                adapter.notifyItemRangeInserted(adapter.getItemCount() - 10, 10);
-            }
+            recycler.post(() -> {
+                ArrayList<Produto> myProducts = new ArrayList<>(produtos);
+                if (produtos.size() == 5) {
+                    adapter.notifyDataSetChanged();
+                } else {
+                    adapter.clear();
+                    adapter.addAll(myProducts);
+                    adapter.notifyItemRangeInserted(adapter.getItemCount() - 10, 10);
+                }
+            });
         });
-        View view = inflater.inflate(R.layout.fragment_lista_de_produtos, container, false);
-        return view;
+
+        gridLayoutManager = new GridLayoutManager(getContext(), 2);
+        gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
+//        fetchProducts(0);
+
+        // Retain an instance so that you can call `resetState()` for fresh searches
+        scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
+            @Override
+            public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
+                fetchProducts(page);
+            }
+        };
+        return inflater.inflate(R.layout.fragment_lista_de_produtos, container, false);
     }
 
     private void fetchProducts(int page) {
         //resgata produtos assíncronamente
         DataBaseConnection.FetchProducts fetchProducts = new DataBaseConnection.FetchProducts(handler, true, "10 OFFSET " + page * 10, this);
         fetchProducts.execute();
-        //Inicia counter para avisar sobre carregamento lento
-        countdown.start();
     }
 
     @Override
@@ -251,30 +244,21 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
         super.onViewCreated(view, savedInstanceState);
         Context context = getContext();
         if (context != null) {
-            toggleFrameLoadingVisibility(false);
+            toggleProgressBarVisibility(false);
 
             recycler = view.findViewById(R.id.recyclerListaDeProdutos);
-            GridLayoutManager gridLayoutManager = new GridLayoutManager(getContext(), 2);
-            gridLayoutManager.setOrientation(LinearLayoutManager.VERTICAL);
             adapter = new ProdutosListaAdapter(initialProducts, getContext(), this);
             adapter.setHasStableIds(true);
             recycler.setLayoutManager(gridLayoutManager);
             recycler.setAdapter(adapter);
 
-            // Retain an instance so that you can call `resetState()` for fresh searches
-            scrollListener = new EndlessRecyclerViewScrollListener(gridLayoutManager) {
-                @Override
-                public void onLoadMore(int page, int totalItemsCount, RecyclerView view) {
-                    recycler.post(() -> fetchProducts(page));
-                }
-            };
             recycler.addOnScrollListener(scrollListener);
         }
     }
 
     @Override
     public void onDestroyView() {
-        toggleFrameLoadingVisibility(false);
+        toggleProgressBarVisibility(false);
         pagedProductsViewModel.setListaDeProdutos(new ArrayList<>());
         super.onDestroyView();
     }
@@ -300,17 +284,7 @@ public class ListaDeProdutosFragment extends Fragment implements IFetchProducts,
     @Override
     public void onGetDataDone(ArrayList<Produto> listaDeProdutos) {
         ArrayList<Produto> productsInPersistence = pagedProductsViewModel.getListaDeProdutos().getValue();
-//        ArrayList<Produto> listaDeProdutosClean = new ArrayList<>();
         if (productsInPersistence != null) {
-//            for (Produto p : listaDeProdutos) {
-//                for (Produto produtoPersistent : productsInPersistence) {
-//                    if (p.getId() != produtoPersistent.getId()) {
-//                        Log.d(MY_LOG_TAG, p.getNome());
-//                        listaDeProdutosClean.add(p);
-//                    }
-//                }
-//            }
-//            if (listaDeProdutos.size() > 0) {
             boolean success = productsInPersistence.addAll(listaDeProdutos);
             if (success) {
                 pagedProductsViewModel.setListaDeProdutos(productsInPersistence);

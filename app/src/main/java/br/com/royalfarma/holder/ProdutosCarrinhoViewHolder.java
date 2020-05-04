@@ -25,7 +25,7 @@ public class ProdutosCarrinhoViewHolder extends RecyclerView.ViewHolder {
         precoItemProduto = itemView.findViewById(R.id.preco_item_produto);
         qntdItem = itemView.findViewById(R.id.qntd_item_produto);
         imgProduto = itemView.findViewById(R.id.image_item_produto);
-        progressBar = itemView.findViewById(R.id.progressBar);
+        progressBar = itemView.findViewById(R.id.progressBarItensLista);
         viewBackground = itemView.findViewById(R.id.viewBackground);
         viewForeground = itemView.findViewById(R.id.viewForeground);
     }
